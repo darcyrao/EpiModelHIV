@@ -5,7 +5,7 @@
 #'              deaths, as well as aging out of the network, among population 
 #'              members for the WHAMP model.
 #'
-#' @inheritParams aging_msm_whamp
+#' @inheritParams aging_msm
 #'
 #' @details
 #' Deaths are divided into two categories: general deaths, for which demographic
