@@ -305,29 +305,51 @@ init_status_msm_whamp <- function(dat) {
   race..wa <- dat$attr$race..wa
   region <- dat$attr$region
 
-  # Infection Status
-  nInfB <- round(dat$init$prev.B * num.B)
-  nInfW <- round(dat$init$prev.W * num.W)
+  # Number initially infected by race/ethnicity
+    nInfB <- round(dat$init$prev.B * num.B) #-- Delete this old code when finish debugging
+    nInfW <- round(dat$init$prev.W * num.W) #-- Delete this old code when finish debugging
+  
+  nInfH..wa <- round(dat$init$prev.H..wa * num.H..wa)
+  nInfB..wa <- round(dat$init$prev.B..wa * num.B..wa)
+  nInfO..wa <- round(dat$init$prev.O..wa * num.O..wa)
 
   # Age-based infection probability
-  probInfCrB <- age[ids.B] * dat$init$init.prev.age.slope.B
-  probInfB <- probInfCrB + (nInfB - sum(probInfCrB)) / num.B
+    probInfCrB <- age[ids.B] * dat$init$init.prev.age.slope.B #-- Delete this old code when finish debugging
+    probInfB <- probInfCrB + (nInfB - sum(probInfCrB)) / num.B #-- Delete this old code when finish debugging
 
-  probInfCrW <- age[ids.W] * dat$init$init.prev.age.slope.W
-  probInfW <- probInfCrW + (nInfW - sum(probInfCrW)) / num.W
+    probInfCrW <- age[ids.W] * dat$init$init.prev.age.slope.W #-- Delete this old code when finish debugging
+    probInfW <- probInfCrW + (nInfW - sum(probInfCrW)) / num.W #-- Delete this old code when finish debugging
 
-  if (any(probInfB <= 0) | any(probInfW <= 0)) {
+    if (any(probInfB <= 0) | any(probInfW <= 0)) {  #-- Delete this old code when finish debugging
+      stop("Slope of initial prevalence by age must be sufficiently low to ",
+           "avoid non-positive probabilities.", call. = FALSE)
+    }
+
+  probInfCrH..wa <- age[ids.H..wa] * dat$init$init.prev.age.slope.H..wa 
+  probInfH..wa <- probInfCrH..wa + (nInfH..wa - sum(probInfCrH..wa)) / num.H..wa
+  
+  probInfCrB..wa <- age[ids.B..wa] * dat$init$init.prev.age.slope.B..wa 
+  probInfB..wa <- probInfCrB..wa + (nInfB..wa - sum(probInfCrB..wa)) / num.B..wa
+
+  probInfCrO..wa <- age[ids.O..wa] * dat$init$init.prev.age.slope.O..wa 
+  probInfO..wa <- probInfCrO..wa + (nInfO..wa - sum(probInfCrO..wa)) / num.O..wa
+  
+  if (any(probInfH..wa <= 0) | any(probInfB..wa <= 0) | any(probInfO..wa <= 0)) { 
     stop("Slope of initial prevalence by age must be sufficiently low to ",
          "avoid non-positive probabilities.", call. = FALSE)
   }
-
-  # Infection status
+    
+    
+  # Assign infection status
   status <- rep(0, num)
-  while (sum(status[ids.B]) != nInfB) {
-    status[ids.B] <- rbinom(num.B, 1, probInfB)
+  while (sum(status[ids.H..wa]) != nInfH..wa) {
+    status[ids.H..wa] <- rbinom(num.H..wa, 1, probInfH..wa)
   }
-  while (sum(status[ids.W]) != nInfW) {
-    status[ids.W] <- rbinom(num.W, 1, probInfW)
+  while (sum(status[ids.B..wa]) != nInfB..wa) {
+    status[ids.B..wa] <- rbinom(num.B..wa, 1, probInfB..wa)
+  }
+  while (sum(status[ids.O..wa]) != nInfO..wa) {
+    status[ids.O..wa] <- rbinom(num.O..wa, 1, probInfO..wa)
   }
   dat$attr$status <- status
 
