@@ -2,7 +2,8 @@
 #' @title Death Module
 #'
 #' @description Module function for simulting both general and disease-related
-#'              deaths among population members for the WHAMP model.
+#'              deaths, as well as aging out of the network, among population 
+#'              members for the WHAMP model.
 #'
 #' @inheritParams aging_msm_whamp
 #'
@@ -13,7 +14,7 @@
 #' Which nodes have died is determined stochastically for general deaths using
 #' draws from a binomial distribution, and deterministically for disease-related
 #' deaths after nodes have reach a maximum viral load value set in the
-#' \code{vl.fatal} parameter.
+#' \code{vl.fatal} parameter. This module also tracks nodes that age out of the network.
 #'
 #' @return
 #' This function returns the updated \code{dat} object accounting for deaths.
@@ -27,7 +28,7 @@
 #'
 deaths_msm_whamp <- function(dat, at) {
 
-  ## General deaths
+  ## General deaths (includes deaths from aging out of the population b/c asmr = 1 at age 60)
   age <- floor(dat$attr$age)
   race <- dat$attr$race   #-- Delete this old code eventually
   race..wa <- dat$attr$race..wa
@@ -81,10 +82,13 @@ deaths_msm_whamp <- function(dat, at) {
     }
   }
 
-
+  ## Aging out of the network
+  dth.age<-which(age >= dat$param$exit.age)
+  
   ## Summary Output
-  dat$epi$dth.gen..wa[at] <- length(dth.gen..wa)
-  dat$epi$dth.dis[at] <- length(dth.dis)
+  dat$epi$dth.gen..wa[at] <- max(0, length(dth.gen..wa)-length(dth.age)) #subtract age deaths to track them separately, b/c dth.gen includes # aging out
+  dat$epi$dth.dis[at] <- max(0, length(dth.dis))
+  dat$epi$dth.age[at] <- max(0, length(dth.age))
 
   return(dat)
 }
