@@ -8,7 +8,7 @@
 #'
 #' @param nwstats Target statistics for the network model. An object of class
 #'        \code{nwstats} output from \code{\link{calc_nwstats_msm}}.
-#' @param race.method Number of races in the model, with options of 1 or 2. If
+#' @param race.method Number of races in the model, with options of 1 or 2. If    #-- Delete this when finish debugging
 #'        1, then race-specific parameters will be averaged.
 #' @param last.neg.test.B.int Time range in days for last negative test for
 #'        black men.
@@ -71,9 +71,8 @@
 #'        re-initiation until the level in \code{vl.part.supp}.
 #' @param part.supp.up.slope For partial suppressors, number of log10 units that
 #'        viral load rises per time step from treatment halting until expected value.
-#' @param b.B.rate Rate at which black MSM enter the population.
-#' @param b.W.rate Rate at which white MSM enter the population.
 #' @param birth.age Age (in years) of new arrivals.
+#' @param exit.age Age (in years) at which individuals age out of the network
 #' @param b.method Method for calculating the number of expected births at each
 #'        time step, with \code{"fixed"} based on the number of persons at the
 #'        initial time step and \code{"varying"} based on the current time step.
@@ -296,7 +295,7 @@
 #' @export
 #'
 param_msm_whamp <- function(nwstats,
-                      race.method = 1,
+                      race.method = 1, #-- Delete this when finish debugging
                       last.neg.test.B.int = 301,
                       last.neg.test.W.int = 315,
                       mean.test.B.int = 301,
@@ -331,9 +330,8 @@ param_msm_whamp <- function(nwstats,
                       part.supp.down.slope = 0.25,
                       part.supp.up.slope = 0.25,
 
-                      b.B.rate = 1e-3 / 7,
-                      b.W.rate = 1e-3 / 7,
                       birth.age = 18,
+                      exit.age = 60,
                       b.method = "fixed",
 
                       URAI.prob = 0.0082 * 1.09,
@@ -579,7 +577,7 @@ param_msm_whamp <- function(nwstats,
 init_msm_whamp <- function(nwstats,
                      prev.B = 0.253,
                      prev.W = 0.253,
-                     prev.H..wa = 0.08, # Use data on PLWHA and estimated MSM pop size to construct. Note PLWHA is only diagnosed, so will underestimate, but want to start a bit below true prevalence to reach equilibrium faster
+                     prev.H..wa = 0.08, #-- Use data on PLWHA and estimated MSM pop size to construct. Note PLWHA is only diagnosed, so will underestimate, but want to start a bit below true prevalence to reach equilibrium faster
                      prev.B..wa = 0.08,
                      prev.O..wa = 0.08,
                      prev.ugc = 0.005,
