@@ -14,7 +14,7 @@ control_msm_whamp(simno = 1, nsims = 1, ncores = 1, nsteps = 100,
   condoms.FUN = condoms_msm, riskhist.FUN = riskhist_msm,
   position.FUN = position_msm, trans.FUN = trans_msm,
   stitrans.FUN = sti_trans, stirecov.FUN = sti_recov, stitx.FUN = sti_tx,
-  prev.FUN = prevalence_msm, verbose.FUN = verbose_msm,
+  prev.FUN = prevalence_msm_whamp, verbose.FUN = verbose_msm,
   save.nwstats = FALSE, verbose = TRUE, verbose.int = 1, ...)
 }
 \arguments{
