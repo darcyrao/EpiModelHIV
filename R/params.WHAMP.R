@@ -537,9 +537,9 @@ param_msm_whamp <- function(nwstats,
   p$asmr.B <- nwstats$asmr.B #-- Delete this old code when finish debugging
   p$asmr.W <- nwstats$asmr.W #-- Delete this old code when finish debugging
 
-  p$asmr.H <- nwstats$asmr.H..wa
-  p$asmr.B <- nwstats$asmr.B..wa
-  p$asmr.O <- nwstats$asmr.O..wa
+  p$asmr.H..wa <- nwstats$asmr.H..wa
+  p$asmr.B..wa <- nwstats$asmr.B..wa
+  p$asmr.O..wa <- nwstats$asmr.O..wa
   
   
   p$nwstats <- NULL
@@ -601,13 +601,12 @@ init_msm_whamp <- function(nwstats,
   
   p$ages <- nwstats$ages
 
-  #-- Delete this old code eventually
-  p$init.prev.age.slope.B <- prev.B / 12
-  p$init.prev.age.slope.W <- prev.W / 12
+  p$init.prev.age.slope.B <- prev.B / ((max(p$ages) - min(p$ages) + 1)/2) #-- Delete this old code eventually
+  p$init.prev.age.slope.W <- prev.W / ((max(p$ages) - min(p$ages) + 1)/2) #-- Delete this old code eventually
 
-  p$init.prev.age.slope.H..wa <- prev.H..wa / 12
-  p$init.prev.age.slope.B..wa <- prev.B..wa / 12
-  p$init.prev.age.slope.O..wa <- prev.O..wa / 12
+  p$init.prev.age.slope.H..wa <- prev.H..wa / ((max(p$ages) - min(p$ages) + 1)/2) # Divide by half the age range to set the slope for prevalence by age
+  p$init.prev.age.slope.B..wa <- prev.B..wa / ((max(p$ages) - min(p$ages) + 1)/2)
+  p$init.prev.age.slope.O..wa <- prev.O..wa / ((max(p$ages) - min(p$ages) + 1)/2)
   
   p$nwstats <- NULL
 
