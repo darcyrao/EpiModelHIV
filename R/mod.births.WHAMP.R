@@ -32,7 +32,7 @@ births_msm_whamp <- function(dat, at){
   ## Update Attr
   
   if (nBirths > 0) {
-    dat <- setBirthAttr_msm(dat, at, nBirths)
+    dat <- setBirthAttr_msm_whamp(dat, at, nBirths)
   }
 
 
@@ -68,24 +68,20 @@ setBirthAttr_msm_whamp <- function(dat, at, nBirths) {
   dat$attr$arrival.time[newIds] <- rep(at, nBirths)
   
   # Distribute new births by race/ethnicity and region according to proportion of the population in each group
-  prop.H.KC <- 0.0549
-  prop.B.KC <- 0.0421
-  prop.O.KC <- 0.4739
-  prop.H.OW <- 0.0309
-  prop.B.OW <- 0.0166
-  prop.O.OW <- 0.2807
-  prop.H.EW <- 0.0222
-  prop.B.EW <- 0.0021
-  prop.O.EW <- 1 - sum(prop.H.KC, prop.B.KC, prop.O.KC, prop.H.OW, prop.B.OW, prop.O.OW, prop.H.EW, prop.B.EW) #set value for last group to remainder to avoid rounding error
+    
+    #-- Delete when finish debugging
+    race <- sample(apportion_lr(nBirths, c("B", "W"), c(0.5, 0.5))) #-- Assign old race attribute until finish revising code
+    newB <- which(race == "B") #-- Delete when finish de-bugging
+    newW <- which(race == "W") #-- Delete when finish de-bugging
+    nBirths.B <- length(newB) #-- Delete when finish de-bugging
+    nBirths.W <- length(newW) #-- Delete when finish de-bugging
+    dat$attr$race[newIds] <- race #-- Delete when finish de-bugging
   
-  race <- sample(rep(c("B", "W"), c(0.5*nBirths, 0.5*nBirths))) #-- Assign old race attribute until finish revising code
-  new.B <- which(race == "B") #-- Delete when finish de-bugging
-  new.W <- which(race == "W") #-- Delete when finish de-bugging
-  dat$attr$race[newIds] <- race #-- Delete when finish de-bugging
-  race.region <- sample(rep(c("H.KC", "B.KC", "O.KC", "H.OW", "B.OW", "O.OW", "H.EW", "B.EW", "O.EW"), 
-                            c(prop.H.KC*nBirths, prop.B.KC*nBirths, prop.O.KC*nBirths, 
-                              prop.H.OW*nBirths, prop.B.OW*nBirths, prop.O.OW*nBirths, 
-                              prop.H.EW*nBirths, prop.B.EW*nBirths, prop.O.EW*nBirths)))
+  ## Vector with the proportion of Hispanic, black, and other race/ethnicity men in King County, other western WA, and eastern WA
+  prop.race.region <- c(0.0549, 0.0421, 0.4739, 0.0309, 0.0166, 0.2807, 0.0222, 0.0021)
+  prop.race.region[9] <- 1 - sum(prop.race.region[1:8]) # Set last proportion to avoid rounding errors
+  
+  race.region <- sample(c("H.KC", "B.KC", "O.KC", "H.OW", "B.OW", "O.OW", "H.EW", "B.EW", "O.EW"), nBirths, replace=TRUE, prop.race.region)
   race..wa <- ifelse(race.region %in% c("H.KC", "H.OW", "H.EW"), "H",
                      ifelse(race.region %in% c("B.KC", "B.OW", "B.EW"), "B",
                             ifelse(race.region %in% c("O.KC", "O.OW", "O.EW"), "O", NA))) 
@@ -96,9 +92,9 @@ setBirthAttr_msm_whamp <- function(dat, at, nBirths) {
   newH..wa <- which(race..wa == "H")
   newB..wa <- which(race..wa == "B")
   newO..wa <- which(race..wa == "O")
-  new.KC <- which(region == "KC")
-  new.OW <- which(region == "OW")
-  new.EW <- which(region == "EW")
+  newKC <- which(region == "KC")
+  newOW <- which(region == "OW")
+  newEW <- which(region == "EW")
   
   dat$attr$race..wa[newIds] <- race..wa
   dat$attr$region[newIds] <- region
