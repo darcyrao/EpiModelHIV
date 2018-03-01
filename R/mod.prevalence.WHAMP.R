@@ -30,7 +30,7 @@ prevalence_msm_whamp <- function(dat, at) {
 
   active <- dat$attr$active
   race <- dat$attr$race #-- delete this when finish de-bugging
-  race <- dat$attr$race..wa
+  race..wa <- dat$attr$race..wa
   region <- dat$attr$region
   status <- dat$attr$status
   prepStat <- dat$attr$prepStat
