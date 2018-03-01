@@ -213,12 +213,27 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   # }
 
   # Dissolution model
-  exp.mort <- (mean(asmr.H..wa[ages]) + mean(asmr.B..wa[ages]) + mean(asmr.O..wa[ages])) / 2
+   ## Expected mortality is a weighted avg of the racial/ethnic- and age-specific mortality ratios
+   exp.mort.H <- mean(asmr.H..wa[18:24])*agestr[1] + mean(asmr.H..wa[25:29])*agestr[2] + 
+     mean(asmr.H..wa[30:34])*agestr[3] + mean(asmr.H..wa[35:39])*agestr[4] + 
+     mean(asmr.H..wa[40:44])*agestr[5] + mean(asmr.H..wa[45:49])*agestr[6] +
+     mean(asmr.H..wa[50:54])*agestr[7] + mean(asmr.H..wa[55:59])*agestr[8]
+   
+   exp.mort.B <- mean(asmr.B..wa[18:24])*agestr[1] + mean(asmr.B..wa[25:29])*agestr[2] + 
+     mean(asmr.B..wa[30:34])*agestr[3] + mean(asmr.B..wa[35:39])*agestr[4] + 
+     mean(asmr.B..wa[40:44])*agestr[5] + mean(asmr.B..wa[45:49])*agestr[6] +
+     mean(asmr.B..wa[50:54])*agestr[7] + mean(asmr.B..wa[55:59])*agestr[8]
+   
+   exp.mort.O <- mean(asmr.O..wa[18:24])*agestr[1] + mean(asmr.O..wa[25:29])*agestr[2] + 
+     mean(asmr.O..wa[30:34])*agestr[3] + mean(asmr.O..wa[35:39])*agestr[4] + 
+     mean(asmr.O..wa[40:44])*agestr[5] + mean(asmr.O..wa[45:49])*agestr[6] +
+     mean(asmr.O..wa[50:54])*agestr[7] + mean(asmr.O..wa[55:59])*agestr[8]
+      
+   exp.mort <- exp.mort.H*(num.H..wa / num) + exp.mort.B*(num.B..wa / num) + exp.mort.O*(num.O..wa / num)
 
   coef.diss.m <- dissolution_coefs(dissolution = diss.main,
                                    duration = durs.main / time.unit,
                                    d.rate = exp.mort)
-
 
 
   # Casual partnerships -----------------------------------------------------
@@ -447,8 +462,8 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
 #'
 base_nw_msm_whamp <- function(nwstats) {
 
-  num.B <- nwstats$num.B
-  num.W <- nwstats$num.W
+  num.B <- nwstats$num.B #-- delete when finish debugging
+  num.W <- nwstats$num.W #-- delete when finish debugging
   num.H..wa <- nwstats$num.H..wa
   num.B..wa <- nwstats$num.B..wa
   num.O..wa <- nwstats$num.O..wa
@@ -462,27 +477,29 @@ base_nw_msm_whamp <- function(nwstats) {
   nw <- network::network.initialize(n, directed = FALSE)
 
   # Calculate attributes
-  race <- c(rep("B", num.B), rep("W", num.W))
-  race <- sample(race)
+  race <- c(rep("B", num.B), rep("W", num.W)) #-- delete when finish debugging
+  race <- sample(race) #-- delete when finish debugging
   
   race..wa <- c(rep("H", num.H..wa), rep("B", num.B..wa), rep("O", num.O..wa))
   race..wa <- sample(race..wa)
   
   region <- c(rep("KC", num.KC), rep("OW", num.OW), rep("EW", num.EW))
   
-  age <- c(sample(seq(18, 24, 1 / (365 / nwstats$time.unit)), n*agestr[1], TRUE),
-           sample(seq(25, 29, 1 / (365 / nwstats$time.unit)), n*agestr[2], TRUE),
-           sample(seq(30, 34, 1 / (365 / nwstats$time.unit)), n*agestr[3], TRUE),
-           sample(seq(35, 39, 1 / (365 / nwstats$time.unit)), n*agestr[4], TRUE),
-           sample(seq(40, 44, 1 / (365 / nwstats$time.unit)), n*agestr[5], TRUE),
-           sample(seq(45, 49, 1 / (365 / nwstats$time.unit)), n*agestr[6], TRUE),
-           sample(seq(50, 54, 1 / (365 / nwstats$time.unit)), n*agestr[7], TRUE),
-           sample(seq(55, 60, 1 / (365 / nwstats$time.unit)), n*agestr[8], TRUE))
+  n.by.age <- table(apportion_lr(n, c("18-24", "25-29", "30-34", "35-39", "40-44", "45-49", "50-54", "55-59"), agestr))
+  age <- c(sample(seq(18, 24, 1 / (365 / nwstats$time.unit)), n.by.age[[1]], TRUE),
+           sample(seq(25, 29, 1 / (365 / nwstats$time.unit)), n.by.age[[2]], TRUE),
+           sample(seq(30, 34, 1 / (365 / nwstats$time.unit)), n.by.age[[3]], TRUE),
+           sample(seq(35, 39, 1 / (365 / nwstats$time.unit)), n.by.age[[4]], TRUE),
+           sample(seq(40, 44, 1 / (365 / nwstats$time.unit)), n.by.age[[5]], TRUE),
+           sample(seq(45, 49, 1 / (365 / nwstats$time.unit)), n.by.age[[6]], TRUE),
+           sample(seq(50, 54, 1 / (365 / nwstats$time.unit)), n.by.age[[7]], TRUE),
+           sample(seq(55, 60, 1 / (365 / nwstats$time.unit)), n.by.age[[8]], TRUE))
+  
   sqrt.age <- sqrt(age)
 
-  role.B <- sample(apportion_lr(num.B, c("I", "R", "V"), nwstats$role.B.prob))
-  role.W <- sample(apportion_lr(num.W, c("I", "R", "V"), nwstats$role.W.prob))
-  role <- rep(NA, n)
+  role.B <- sample(apportion_lr(num.B, c("I", "R", "V"), nwstats$role.B.prob)) 
+  role.W <- sample(apportion_lr(num.W, c("I", "R", "V"), nwstats$role.W.prob)) 
+  role <- rep(NA, n) 
   role[race == "B"] <- role.B
   role[race == "W"] <- role.W
 
