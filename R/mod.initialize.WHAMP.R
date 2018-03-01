@@ -155,7 +155,7 @@ initialize_msm_whamp <- function(x, param, init, control, s) {
   dat$attr$ins.quot <- ins.quot
 
   # HIV-related attributes
-  dat <- init_status_msm(dat)
+  dat <- init_status_msm_whamp(dat)
 
   ## GC/CT status
   idsUreth <- which(role.class %in% c("I", "V"))
@@ -290,7 +290,7 @@ init_status_msm_whamp <- function(dat) {
   num.B <- dat$init$num.B
   num.W <- dat$init$num.W
   num.H..wa <- dat$init$num.H..wa
-  num.B..wa <- dat$init$num.H..wa
+  num.B..wa <- dat$init$num.B..wa
   num.O..wa <- dat$init$num.O..wa
   num <- num.H..wa + num.B..wa + num.O..wa
   
