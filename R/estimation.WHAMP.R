@@ -5,7 +5,11 @@
 #' @title Calculate Target Statistics for Network Model Estimation for the WHAMP model
 #'
 #' @description Calculates the target statistics for the formation and dissolution
-#'              components of the network model to be estimated with \code{netest}.
+#'              components of the network model to be estimated with \code{netest}. 
+#'              For the WHAMP model, the base EpiModelHIV code was modified to define 
+#'              three racial/ethnic groups (Hispanic, black, and other), age structure,
+#'              add region as an attribute, and change the way risk group quantiles are 
+#'              defined.
 #'
 #' @param time.unit Time unit relative to 1 for daily.
 #' @param method Method for calculating target statistics by race, with options of
@@ -129,7 +133,9 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   if (sum(deg.mp.W) != 1) {
     stop("deg.mp.W must sum to 1.")
   }
-  if (!(method %in% 1:2)) {
+  
+  #--delete this eventually
+  if (!(method %in% 1:2)) {     
     stop("method must either be 1 for one-race models or 2 for two-race models", call. = FALSE)
   }
   if (sum(agestr) !=1) {
@@ -449,7 +455,7 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
 #'
 #' @details
 #' This function takes the output of \code{\link{calc_nwstats_msm}} and constructs
-#' an empty network with the necessary attributes for race, square root of age,
+#' an empty network with the necessary attributes for race, region, square root of age,
 #' and sexual role class. This base network is used for all three network
 #' estimations.
 #'
@@ -486,14 +492,14 @@ base_nw_msm_whamp <- function(nwstats) {
   region <- c(rep("KC", num.KC), rep("OW", num.OW), rep("EW", num.EW))
   
   n.by.age <- table(apportion_lr(n, c("18-24", "25-29", "30-34", "35-39", "40-44", "45-49", "50-54", "55-59"), agestr))
-  age <- c(sample(seq(18, 24, 1 / (365 / nwstats$time.unit)), n.by.age[[1]], TRUE),
-           sample(seq(25, 29, 1 / (365 / nwstats$time.unit)), n.by.age[[2]], TRUE),
-           sample(seq(30, 34, 1 / (365 / nwstats$time.unit)), n.by.age[[3]], TRUE),
-           sample(seq(35, 39, 1 / (365 / nwstats$time.unit)), n.by.age[[4]], TRUE),
-           sample(seq(40, 44, 1 / (365 / nwstats$time.unit)), n.by.age[[5]], TRUE),
-           sample(seq(45, 49, 1 / (365 / nwstats$time.unit)), n.by.age[[6]], TRUE),
-           sample(seq(50, 54, 1 / (365 / nwstats$time.unit)), n.by.age[[7]], TRUE),
-           sample(seq(55, 60, 1 / (365 / nwstats$time.unit)), n.by.age[[8]], TRUE))
+  age <- c(sample(seq(18, 24.999, 1 / (365 / nwstats$time.unit)), n.by.age[[1]], TRUE),
+           sample(seq(25, 29.999, 1 / (365 / nwstats$time.unit)), n.by.age[[2]], TRUE),
+           sample(seq(30, 34.999, 1 / (365 / nwstats$time.unit)), n.by.age[[3]], TRUE),
+           sample(seq(35, 39.999, 1 / (365 / nwstats$time.unit)), n.by.age[[4]], TRUE),
+           sample(seq(40, 44.999, 1 / (365 / nwstats$time.unit)), n.by.age[[5]], TRUE),
+           sample(seq(45, 49.000, 1 / (365 / nwstats$time.unit)), n.by.age[[6]], TRUE),
+           sample(seq(50, 54.999, 1 / (365 / nwstats$time.unit)), n.by.age[[7]], TRUE),
+           sample(seq(55, 59.999, 1 / (365 / nwstats$time.unit)), n.by.age[[8]], TRUE))
   
   sqrt.age <- sqrt(age)
 
