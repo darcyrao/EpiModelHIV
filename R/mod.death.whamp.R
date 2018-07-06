@@ -67,8 +67,9 @@ deaths_msm_whamp <- function(dat, at) {
   dth.dis <- which(dat$attr$stage == 4 &
                    dat$attr$vl >= dat$param$vl.fatal)
 
-  dth.all <- NULL
+  dth.all <- NULL  #-- Delete this when finish debugging
   dth.all <- unique(c(dth.gen, dth.dis)) #-- Delete this when finish debugging
+  dth.all..wa <- NULL
   dth.all..wa <- unique(c(dth.gen..wa, dth.dis))
 
   if (length(dth.all..wa) > 0) {
