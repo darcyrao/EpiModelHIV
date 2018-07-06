@@ -113,7 +113,11 @@ insertive, receptive, and versatile, for white MSM.}
 }
 \description{
 Calculates the target statistics for the formation and dissolution
-             components of the network model to be estimated with \code{netest}.
+             components of the network model to be estimated with \code{netest}. 
+             For the WHAMP model, the base EpiModelHIV code was modified to define 
+             three racial/ethnic groups (Hispanic, black, and other), age structure,
+             add region as an attribute, and change the way risk group quantiles are 
+             defined.
 }
 \details{
 This function performs basic calculations to determine the components of the
