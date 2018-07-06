@@ -16,7 +16,7 @@ Initializes the base network for model estimation within
 }
 \details{
 This function takes the output of \code{\link{calc_nwstats_msm}} and constructs
-an empty network with the necessary attributes for race, square root of age,
+an empty network with the necessary attributes for race, region, square root of age,
 and sexual role class. This base network is used for all three network
 estimations.
 }
