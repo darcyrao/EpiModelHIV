@@ -220,7 +220,7 @@ initialize_msm_whamp <- function(x, param, init, control, s) {
 
 
   # CCR5
-  dat <- init_ccr5_msm(dat)
+  dat <- init_ccr5_msm_whamp(dat)
 
 
   # Network statistics
@@ -232,7 +232,7 @@ initialize_msm_whamp <- function(x, param, init, control, s) {
   dat$temp$discl.list <- matrix(NA, nrow = 0, ncol = 3)
   colnames(dat$temp$discl.list) <- c("pos", "neg", "discl.time")
 
-  dat <- prevalence_msm(dat, at = 1)
+  dat <- prevalence_msm_whamp(dat, at = 1)
 
   class(dat) <- "dat"
   return(dat)
@@ -750,7 +750,7 @@ init_ccr5_msm_whamp <- function(dat) {
   num.B <- dat$init$num.B
   num.W <- dat$init$num.W
   num.H..wa <- dat$init$num.H..wa
-  num.B..wa <- dat$init$num.H..wa
+  num.B..wa <- dat$init$num.B..wa
   num.O..wa <- dat$init$num.O..wa
   num <- num.H..wa + num.B..wa + num.O..wa
   
@@ -760,7 +760,7 @@ init_ccr5_msm_whamp <- function(dat) {
   ids.B..wa <- which(dat$attr$race..wa == "B")
   ids.O..wa <- which(dat$attr$race..wa == "O")
   
-  race <- dat$attr$race
+  race <- dat$attr$race #-- Delete this code eventually
   race..wa <- dat$attr$race..wa
   region <- dat$attr$region
   status <- dat$attr$status
