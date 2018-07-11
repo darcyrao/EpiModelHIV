@@ -78,7 +78,7 @@
 #'
 #' @details
 #' This function performs basic calculations to determine the components of the
-#' formationa and dissolution models for the network model estimation to be
+#' formation and dissolution models for the network model estimation to be
 #' conducted with \code{\link{netest}}. The inputs inputs for this function are
 #' calculated externally to the package in a setup scenario file.
 #'
@@ -95,12 +95,15 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
                              method = 2,
                              num.B,
                              num.W,
-                             num.H..wa,
-                             num.B..wa,
-                             num.O..wa,
-                             num.KC,
-                             num.OW,
-                             num.EW,
+                             num.H.KC,
+                             num.B.KC,
+                             num.O.KC,
+                             num.H.OW,
+                             num.B.OW,
+                             num.O.OW,
+                             num.H.EW,
+                             num.B.EW,
+                             num.O.EW,
                              agestr,
                              deg.mp.B,
                              deg.mp.W,
@@ -142,7 +145,11 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
     stop("agestr must sum to 1")
   }
 
-  num <- num.H..wa + num.B..wa + num.O..wa
+  # total number and numbers by race (aggregated across regions)
+  num <- num.H.KC + num.B.KC + num.O.KC + num.H.OW + num.B.OW + num.O.OW + num.H.EW + num.B.EW + num.O.EW
+  num.H..wa <- sum(num.H.KC, num.H.OW, num.H.EW)
+  num.B..wa <- sum(num.B.KC, num.B.OW, num.B.EW)
+  num.O..wa <- sum(num.O.KC, num.O.OW, num.O.EW)
 
   # deg.pers nodal attribute
   if (method == 2) {
@@ -427,12 +434,15 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   
   out$num.B <- num.B
   out$num.W <- num.W
-  out$num.H..wa <- num.H..wa
-  out$num.B..wa <- num.B..wa
-  out$num.O..wa <- num.O..wa
-  out$num.KC <- num.KC
-  out$num.OW <- num.OW
-  out$num.EW <- num.EW
+  out$num.H.KC <- num.H.KC
+  out$num.B.KC <- num.B.KC
+  out$num.O.KC <- num.O.KC
+  out$num.H.OW <- num.H.OW
+  out$num.B.OW <- num.B.OW
+  out$num.O.OW <- num.O.OW
+  out$num.H.EW <- num.H.EW
+  out$num.B.EW <- num.B.EW
+  out$num.O.EW <- num.O.EW
   
   out$deg.mp.B <- deg.mp.B
   out$deg.mp.W <- deg.mp.W
@@ -470,26 +480,39 @@ base_nw_msm_whamp <- function(nwstats) {
 
   num.B <- nwstats$num.B #-- delete when finish debugging
   num.W <- nwstats$num.W #-- delete when finish debugging
-  num.H..wa <- nwstats$num.H..wa
-  num.B..wa <- nwstats$num.B..wa
-  num.O..wa <- nwstats$num.O..wa
-  num.KC <- nwstats$num.KC
-  num.OW <- nwstats$num.OW
-  num.EW <- nwstats$num.EW
+  num.H.KC <- nwstats$num.H.KC
+  num.B.KC <- nwstats$num.B.KC
+  num.O.KC <- nwstats$num.O.KC
+  num.H.OW <- nwstats$num.H.OW
+  num.B.OW <- nwstats$num.B.OW
+  num.O.OW <- nwstats$num.O.OW
+  num.H.EW <- nwstats$num.H.EW
+  num.B.EW <- nwstats$num.B.EW
+  num.O.EW <- nwstats$num.O.EW
   agestr <- nwstats$agestr
 
   # Initialize network
-  n <- num.H..wa + num.B..wa + num.O..wa
+  n <- num.H.KC + num.B.KC + num.O.KC + num.H.OW + num.B.OW + num.O.OW + num.H.EW + num.B.EW + num.O.EW
   nw <- network::network.initialize(n, directed = FALSE)
 
   # Calculate attributes
   race <- c(rep("B", num.B), rep("W", num.W)) #-- delete when finish debugging
   race <- sample(race) #-- delete when finish debugging
   
-  race..wa <- c(rep("H", num.H..wa), rep("B", num.B..wa), rep("O", num.O..wa))
-  race..wa <- sample(race..wa)
+  race.region <- c(rep("H.KC", num.H.KC), rep("B.KC", num.B.KC), rep("O.KC", num.O.KC),  
+                   rep("H.OW", num.H.OW), rep("B.OW", num.B.OW), rep("O.OW", num.O.OW), 
+                   rep("H.EW", num.H.EW), rep("B.EW", num.B.EW), rep("O.EW", num.O.EW))
+  race.region <- sample(race.region)
   
-  region <- c(rep("KC", num.KC), rep("OW", num.OW), rep("EW", num.EW))
+  race..wa <- rep(NA, n)
+  race..wa[race.region %in% c("H.KC", "H.OW", "H.EW")] <- "H"
+  race..wa[race.region %in% c("B.KC", "B.OW", "B.EW")] <- "B"
+  race..wa[race.region %in% c("O.KC", "O.OW", "O.EW")] <- "O"
+  
+  region <- rep(NA, n)
+  region[race.region %in% c("H.KC", "B.KC", "O.KC")] <- "KC"
+  region[race.region %in% c("H.OW", "B.OW", "O.OW")] <- "OW"
+  region[race.region %in% c("H.EW", "B.EW", "O.EW")] <- "EW"
   
   n.by.age <- table(apportion_lr(n, c("18-24", "25-29", "30-34", "35-39", "40-44", "45-49", "50-54", "55-59"), agestr))
   age <- c(sample(seq(18, 24.999, 1 / (365 / nwstats$time.unit)), n.by.age[[1]], TRUE),
@@ -568,7 +591,7 @@ assign_degree_whamp <- function(nw, deg.type, nwstats) {
     stop("W degree distributions do not sum to 1")
   }
 
-  race <- get.vertex.attribute(nw, "race")
+  race <- get.vertex.attribute(nw, "race") #-- Delete when finish debugging
   vB <- which(race == "B")
   vW <- which(race == "W")
   nB <- length(vB)
