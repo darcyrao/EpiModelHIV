@@ -81,24 +81,36 @@ setBirthAttr_msm_whamp <- function(dat, at, nBirths) {
   prop.race.region <- c(0.0549, 0.0421, 0.4739, 0.0309, 0.0166, 0.2807, 0.0222, 0.0021)
   prop.race.region[9] <- 1 - sum(prop.race.region[1:8]) # Set last proportion to avoid rounding errors
   
-  race.region <- sample(c("H.KC", "B.KC", "O.KC", "H.OW", "B.OW", "O.OW", "H.EW", "B.EW", "O.EW"), nBirths, replace=TRUE, prop.race.region)
-  race..wa <- ifelse(race.region %in% c("H.KC", "H.OW", "H.EW"), "H",
-                     ifelse(race.region %in% c("B.KC", "B.OW", "B.EW"), "B",
-                            ifelse(race.region %in% c("O.KC", "O.OW", "O.EW"), "O", NA))) 
-  region <- ifelse(race.region %in% c("H.KC", "B.KC", "O.KC"), "KC",
-                   ifelse(race.region %in% c("H.OW", "B.OW", "O.OW"), "OW",
-                          ifelse(race.region %in% c("H.EW", "B.EW", "O.EW"), "EW", NA)))
+  race.region <- sample(apportion_lr(nBirths, c("H.KC", "B.KC", "O.KC", "H.OW", "B.OW", "O.OW", "H.EW", "B.EW", "O.EW"), 
+                                    prop.race.region))
   
+  race..wa <- rep(NA, nBirths)
+  race..wa[race.region %in% c("H.KC", "H.OW", "H.EW")] <- "H"
+  race..wa[race.region %in% c("B.KC", "B.OW", "B.EW")] <- "B"
+  race..wa[race.region %in% c("O.KC", "O.OW", "O.EW")] <- "O"
   newH..wa <- which(race..wa == "H")
   newB..wa <- which(race..wa == "B")
   newO..wa <- which(race..wa == "O")
-  newKC <- which(region == "KC")
+  nBirths.H..wa <- length(newH..wa)
+  nBirths.B..wa <- length(newB..wa)
+  nBirths.O..wa <- length(newO..wa)
+  
+  region <- rep(NA, nBirths)
+  region[race.region %in% c("H.KC", "B.KC", "O.KC")] <- "KC"
+  region[race.region %in% c("H.OW", "B.OW", "O.OW")] <- "OW"
+  region[race.region %in% c("H.EW", "B.EW", "O.EW")] <- "EW"
+  
+  newKC <- which(region == "KC") #-- May not need this section of code. if don't use it in other parts of this file, delete
   newOW <- which(region == "OW")
   newEW <- which(region == "EW")
+  nBirths.KC <- length(newKC)
+  nBirths.OW <- length(newOW)
+  nBirths.EW <- length(newEW)
   
   dat$attr$race..wa[newIds] <- race..wa
   dat$attr$region[newIds] <- region
   
+
   # New entries will enter at age 18
   dat$attr$age[newIds] <- rep(dat$param$birth.age, nBirths)
   dat$attr$sqrt.age[newIds] <- sqrt(dat$attr$age[newIds])
