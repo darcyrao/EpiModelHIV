@@ -520,7 +520,7 @@ base_nw_msm_whamp <- function(nwstats) {
            sample(seq(30, 34.999, 1 / (365 / nwstats$time.unit)), n.by.age[[3]], TRUE),
            sample(seq(35, 39.999, 1 / (365 / nwstats$time.unit)), n.by.age[[4]], TRUE),
            sample(seq(40, 44.999, 1 / (365 / nwstats$time.unit)), n.by.age[[5]], TRUE),
-           sample(seq(45, 49.000, 1 / (365 / nwstats$time.unit)), n.by.age[[6]], TRUE),
+           sample(seq(45, 49.999, 1 / (365 / nwstats$time.unit)), n.by.age[[6]], TRUE),
            sample(seq(50, 54.999, 1 / (365 / nwstats$time.unit)), n.by.age[[7]], TRUE),
            sample(seq(55, 59.999, 1 / (365 / nwstats$time.unit)), n.by.age[[8]], TRUE))
   
