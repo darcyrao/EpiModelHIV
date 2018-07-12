@@ -591,13 +591,13 @@ init_msm_whamp <- function(nwstats,
 
   p$num.B <- nwstats$num.B   #-- Delete this old code eventually
   p$num.W <- nwstats$num.W   #-- Delete this old code eventually
-  p$num.H..wa <- nwstats$num.H..wa
-  p$num.B..wa <- nwstats$num.B..wa
-  p$num.O..wa <- nwstats$num.O..wa
+  p$num.H..wa <- nwstats$num.H.KC + nwstats$num.H.OW + nwstats$num.H.EW
+  p$num.B..wa <- nwstats$num.B.KC + nwstats$num.B.OW + nwstats$num.B.EW
+  p$num.O..wa <- nwstats$num.O.KC + nwstats$num.O.OW + nwstats$num.O.EW
   
-  p$num.KC <- nwstats$num.KC
-  p$num.OW <- nwstats$num.OW
-  p$num.EW <- nwstats$num.EW
+  p$num.KC <- nwstats$num.H.KC + nwstats$num.B.KC + nwstats$num.O.KC
+  p$num.OW <- nwstats$num.H.OW + nwstats$num.B.OW + nwstats$num.O.OW
+  p$num.EW <- nwstats$num.H.EW + nwstats$num.B.EW + nwstats$num.O.EW
   
   p$ages <- nwstats$ages
 
