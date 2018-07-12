@@ -135,12 +135,12 @@ prevalence_msm_whamp <- function(dat, at) {
   dat$epi$num[at] <- sum(active == 1, na.rm = TRUE)
   dat$epi$num.B[at] <- sum(race == "B", na.rm = TRUE) #-- delete this when finish de-bugging
   dat$epi$num.W[at] <- sum(race == "W", na.rm = TRUE) #-- delete this when finish de-bugging
-  dat$epi$num.H..wa[at] <- sum(race..wa =="H", na.rm = TRUE)
-  dat$epi$num.B..wa[at] <- sum(race..wa =="B", na.rm = TRUE)
-  dat$epi$num.O..wa[at] <- sum(race..wa =="O", na.rm = TRUE)
-  dat$epi$num.KC[at] <- sum(region =="KC", na.rm = TRUE)
-  dat$epi$num.OW[at] <- sum(region =="OW", na.rm = TRUE)
-  dat$epi$num.EW[at] <- sum(region =="EW", na.rm = TRUE)
+  dat$epi$num.H..wa[at] <- sum(race..wa == "H", na.rm = TRUE)
+  dat$epi$num.B..wa[at] <- sum(race..wa == "B", na.rm = TRUE)
+  dat$epi$num.O..wa[at] <- sum(race..wa == "O", na.rm = TRUE)
+  dat$epi$num.KC[at] <- sum(region == "KC", na.rm = TRUE)
+  dat$epi$num.OW[at] <- sum(region == "OW", na.rm = TRUE)
+  dat$epi$num.EW[at] <- sum(region == "EW", na.rm = TRUE)
   dat$epi$s.num[at] <- sum(status == 0, na.rm = TRUE)
   dat$epi$i.num[at] <- sum(status == 1, na.rm = TRUE)
   dat$epi$i.num.B[at] <- sum(status == 1 & race == "B", na.rm = TRUE) #-- delete this when finish de-bugging
