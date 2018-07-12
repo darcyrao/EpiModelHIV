@@ -32,7 +32,7 @@ deaths_msm_whamp <- function(dat, at) {
   age <- floor(dat$attr$age)
   race <- dat$attr$race   #-- Delete this old code eventually
   race..wa <- dat$attr$race..wa
-
+  
   #-- Delete this old code eventually
     alive.B <- which(race == "B")
     age.B <- age[alive.B]
@@ -54,7 +54,7 @@ deaths_msm_whamp <- function(dat, at) {
   death.B.prob..wa <-  dat$param$asmr.B..wa[age.B..wa]
   deaths.B..wa <- alive.B..wa[rbinom(length(death.B.prob..wa), 1, death.B.prob..wa) == 1]
   
-  alive.O..wa <- which(race..wa == "O")
+  alive.O..wa <- which(race..wa =="O")
   age.O..wa <- age[alive.O..wa]
   death.O.prob..wa <-  dat$param$asmr.O..wa[age.O..wa]
   deaths.O..wa <- alive.O..wa[rbinom(length(death.O.prob..wa), 1, death.O.prob..wa) == 1]
