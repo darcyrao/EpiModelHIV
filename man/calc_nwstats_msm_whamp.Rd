@@ -4,12 +4,13 @@
 \alias{calc_nwstats_msm_whamp}
 \title{Calculate Target Statistics for Network Model Estimation for the WHAMP model}
 \usage{
-calc_nwstats_msm_whamp(time.unit = 7, method = 2, num.B, num.W, num.H..wa,
-  num.B..wa, num.O..wa, num.KC, num.OW, num.EW, agestr, deg.mp.B, deg.mp.W,
-  mdeg.inst.B, mdeg.inst.W, qnts.B, qnts.W, prop.hom.mpi.B, prop.hom.mpi.W,
-  balance = "mean", sqrt.adiff.BB, sqrt.adiff.WW, sqrt.adiff.BW, diss.main,
-  diss.pers, durs.main, durs.pers, ages, asmr.B, asmr.W, asmr.H..wa, asmr.B..wa,
-  asmr.O..wa, role.B.prob, role.W.prob)
+calc_nwstats_msm_whamp(time.unit = 7, method = 2, num.B, num.W, num.H.KC,
+  num.B.KC, num.O.KC, num.H.OW, num.B.OW, num.O.OW, num.H.EW, num.B.EW,
+  num.O.EW, agestr, deg.mp.B, deg.mp.W, mdeg.inst.B, mdeg.inst.W, qnts.B,
+  qnts.W, prop.hom.mpi.B, prop.hom.mpi.W, balance = "mean", sqrt.adiff.BB,
+  sqrt.adiff.WW, sqrt.adiff.BW, diss.main, diss.pers, durs.main, durs.pers,
+  ages, asmr.B, asmr.W, asmr.H..wa, asmr.B..wa, asmr.O..wa, role.B.prob,
+  role.W.prob)
 }
 \arguments{
 \item{time.unit}{Time unit relative to 1 for daily.}
@@ -21,18 +22,6 @@ averaging over the statistics and dropping the race-specific terms.}
 \item{num.B}{Population size of black MSM.}
 
 \item{num.W}{Population size of white MSM.}
-
-\item{num.H..wa}{Population size of Hispanic MSM.}
-
-\item{num.B..wa}{Population size of non-Hispanic black MSM.}
-
-\item{num.O..wa}{Population size of non-Hispanic other MSM.}
-
-\item{num.KC}{Population size of MSM in other counties in western Washington.}
-
-\item{num.OW}{Population size of MSM in other counties in western Washington.}
-
-\item{num.EW}{Population size of MSM in other counties in western Washington.}
 
 \item{agestr}{Vector with the proportion of MSM in each age group 18-24, 25-29...50-59}
 
@@ -110,6 +99,18 @@ insertive, receptive, and versatile, for black MSM.}
 
 \item{role.W.prob}{Vector of length 3 for the probability of sexual role as
 insertive, receptive, and versatile, for white MSM.}
+
+\item{num.H..wa}{Population size of Hispanic MSM.}
+
+\item{num.B..wa}{Population size of non-Hispanic black MSM.}
+
+\item{num.O..wa}{Population size of non-Hispanic other MSM.}
+
+\item{num.KC}{Population size of MSM in other counties in western Washington.}
+
+\item{num.OW}{Population size of MSM in other counties in western Washington.}
+
+\item{num.EW}{Population size of MSM in other counties in western Washington.}
 }
 \description{
 Calculates the target statistics for the formation and dissolution
@@ -121,7 +122,7 @@ Calculates the target statistics for the formation and dissolution
 }
 \details{
 This function performs basic calculations to determine the components of the
-formationa and dissolution models for the network model estimation to be
+formation and dissolution models for the network model estimation to be
 conducted with \code{\link{netest}}. The inputs inputs for this function are
 calculated externally to the package in a setup scenario file.
 }
