@@ -24,17 +24,24 @@
 #' @param num.OW Population size of MSM in other counties in western Washington.
 #' @param num.EW Population size of MSM in other counties in western Washington.
 #' @param agestr Vector with the proportion of MSM in each age group 18-24, 25-29...50-59
-#' @param deg.mp.B Degree distribution matrix for main and casual partners for
-#'        black MSM, as a 2 by 3 matrix.
-#' @param deg.mp.W Degree distribution matrix for main and causal partners for
-#'        white MSM, as a 2 by 3 matrix.
-#' @param mdeg.inst.B Mean degree, or rate, of one-off partnerships per day
-#'        for black MSM.
-#' @param mdeg.inst.W Mean degree, or rate, of one-off partnerships per day
-#'        for white MSM.
-#' @param qnts.B Means of one-off rates split into quintiles for white MSM. Use
+#' @param deg.mp Degree distribution matrix for main and casual partners overall,
+#'        as a 2 by 3 matrix.
+#' @param deg.mp.H Degree distribution matrix for main and causal partners for
+#'        Hispanic MSM, as a 2 by 3 matrix.
+#' @param deg.mp.B Degree distribution matrix for main and causal partners for
+#'        Black MSM, as a 2 by 3 matrix. 
+#' @param deg.mp.O Degree distribution matrix for main and causal partners for
+#'        Other race/ethnicity MSM, as a 2 by 3 matrix.     
+#' @param deg.mp.KC Degree distribution matrix for main and causal partners for
+#'        King County MSM, as a 2 by 3 matrix. 
+#' @param deg.mp.OW Degree distribution matrix for main and causal partners for
+#'        other western WA MSM, as a 2 by 3 matrix.  
+#' @param deg.mp.EW Degree distribution matrix for main and causal partners for
+#'        eastern WA MSM, as a 2 by 3 matrix.                  
+#' @param mdeg.inst Mean degree, or rate, of one-off partnerships per day.
+#' @param qnts.18to49 Means of one-off rates split into quantiles for MSM ages 18-49. Use
 #'        \code{NA} to ignore these quantiles in the target statistics.
-#' @param qnts.W Means of one-off rates split into quintiles for black MSM. Use
+#' @param qnts.50to59 Means of one-off rates split into quantiles for MSM ages 50-59. Use
 #'        \code{NA} to ignore these quantiles in the target statistics.
 #' @param prop.hom.mpi.B A vector of length 3 for the proportion of main, casual,
 #'        and one-off partnerships in same race for black MSM.
@@ -55,10 +62,8 @@
 #'        partnerships.
 #' @param diss.main Dissolution model formula for main partnerships.
 #' @param diss.pers Dissolution model formula for casual partnerships.
-#' @param durs.main Vector of length 3 with the duration of BB, BW, and WW main
-#'        partnerships in days.
-#' @param durs.pers Vector of length 3 with the duration of BB, BW, and WW
-#'        casual partnerships in days.
+#' @param durs.main Duration of main partnerships in days.
+#' @param durs.pers Duration of persistent partnerships in days. 
 #' @param ages Integer vector of ages in years that defines range of possible
 #'        initial ages in the population.
 #' @param asmr.B Vector of length 40 defining the age-specific
@@ -71,10 +76,8 @@
 #'        mortality rates for for black MSM.
 #' @param asmr.O..wa Vector of length 60 defining the age-specific
 #'        mortality rates for for other race/ethnicity MSM.
-#' @param role.B.prob Vector of length 3 for the probability of sexual role as
-#'        insertive, receptive, and versatile, for black MSM.
-#' @param role.W.prob Vector of length 3 for the probability of sexual role as
-#'        insertive, receptive, and versatile, for white MSM.
+#' @param role.prob Vector of length 3 for the probability of sexual role as
+#'        insertive, receptive, and versatile.
 #'
 #' @details
 #' This function performs basic calculations to determine the components of the
@@ -105,12 +108,16 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
                              num.B.EW,
                              num.O.EW,
                              agestr,
+                             deg.mp,
+                             deg.mp.H,
                              deg.mp.B,
-                             deg.mp.W,
-                             mdeg.inst.B,
-                             mdeg.inst.W,
-                             qnts.B,
-                             qnts.W,
+                             deg.mp.O,
+                             deg.mp.KC,
+                             deg.mp.OW,
+                             deg.mp.EW,
+                             mdeg.inst,
+                             qnts.18to49,
+                             qnts.50to59,
                              prop.hom.mpi.B,
                              prop.hom.mpi.W,
                              balance = "mean",
@@ -127,103 +134,101 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
                              asmr.H..wa,
                              asmr.B..wa,
                              asmr.O..wa,
-                             role.B.prob,
-                             role.W.prob) {
+                             role.prob) {
 
-  if (sum(deg.mp.B) != 1) {
-    stop("deg.mp.B must sum to 1.")
+  if (sum(deg.mp) != 1) {
+    stop("deg.mp must sum to 1.")
   }
-  if (sum(deg.mp.W) != 1) {
-    stop("deg.mp.W must sum to 1.")
+  if (sum(deg.mp.H) != 1 | sum(deg.mp.B) !=1 | sum(deg.mp.O) !=1) {
+    stop("deg.mp terms must sum to 1.")
+  }
+  if (sum(deg.mp.KC) != 1 | sum(deg.mp.OW) !=1 | sum(deg.mp.EW) !=1) {
+    stop("deg.mp terms must sum to 1.")
   }
   
-  #--delete this eventually
-  if (!(method %in% 1:2)) {     
+  if (!(method %in% 1:2)) {      #--delete this eventually
     stop("method must either be 1 for one-race models or 2 for two-race models", call. = FALSE)
   }
+  
   if (sum(agestr) !=1) {
     stop("agestr must sum to 1")
   }
 
-  # total number and numbers by race (aggregated across regions)
+  # total number and numbers by race/ethnicity, region, and age
   num <- num.H.KC + num.B.KC + num.O.KC + num.H.OW + num.B.OW + num.O.OW + num.H.EW + num.B.EW + num.O.EW
   num.H..wa <- sum(num.H.KC, num.H.OW, num.H.EW)
   num.B..wa <- sum(num.B.KC, num.B.OW, num.B.EW)
   num.O..wa <- sum(num.O.KC, num.O.OW, num.O.EW)
 
+  num.KC <- sum(num.H.KC, num.B.KC, num.O.KC)
+  num.OW <- sum(num.H.OW, num.B.OW, num.O.OW)
+  num.EW <- sum(num.H.EW, num.B.EW, num.O.EW)
+  
   # deg.pers nodal attribute
-  if (method == 2) {
-    deg.pers.B <- apportion_lr(num.B, c("B0", "B1", "B2"), colSums(deg.mp.B))
-    deg.pers.W <- apportion_lr(num.W, c("W0", "W1", "W2"), colSums(deg.mp.W))
-  }
-  if (method == 1) {
-    deg.pers <- apportion_lr(num, 0:2, colSums(deg.mp.W))
-  }
+    deg.pers <- apportion_lr(num, 0:2, colSums(deg.mp))
 
   # deg main nodal attribute
-  if (method == 2) {
-    deg.main.B <- apportion_lr(num.B, c("B0", "B1"), rowSums(deg.mp.B))
-    deg.main.W <- apportion_lr(num.W, c("W0", "W1"), rowSums(deg.mp.W))
-  }
-  if (method == 1) {
-    deg.main <- apportion_lr(num, 0:1, rowSums(deg.mp.W))
-  }
+    deg.main.H <- apportion_lr(num.H..wa, c("H0", "H1"), rowSums(deg.mp.H))
+    deg.main.B <- apportion_lr(num.B..wa, c("B0", "B1"), rowSums(deg.mp.B))
+    deg.main.O <- apportion_lr(num.O..wa, c("O0", "O1"), rowSums(deg.mp.O))
+    
+    deg.main.KC <- apportion_lr(num.KC, c("KC0", "KC1"), rowSums(deg.mp.KC))
+    deg.main.OW <- apportion_lr(num.OW, c("OW0", "OW1"), rowSums(deg.mp.OW))
+    deg.main.EW <- apportion_lr(num.EW, c("EW0", "EW1"), rowSums(deg.mp.EW))
 
 
   # Main partnerships -------------------------------------------------------
 
   # Persons in partnerships by casual degree
-  if (method == 2) {
-    totdeg.m.by.dp <- c(num.B * deg.mp.B[2, ], num.W * deg.mp.W[2, ])
-  }
-  if (method == 1) {
-    totdeg.m.by.dp <- c(num * deg.mp.B[2, ])
-  }
+    totdeg.m.by.dp <- c(num * deg.mp[2, ])
 
-  # Persons in partnerships by race
-  if (method == 2) {
-    totdeg.m.by.race <- c(sum(totdeg.m.by.dp[1:3]), sum(totdeg.m.by.dp[4:6]))
-  }
+  # Persons in partnerships by race/ethnicity (H, B, O)
+    totdeg.m.by.race <- c(sum(num.H..wa * deg.mp.H[2,]), 
+                          sum(num.B..wa * deg.mp.B[2,]),
+                          sum(num.O..wa * deg.mp.O[2,]))
+  
+  # Persons in partnerships by region (KC, OW, EW)
+    totdeg.m.by.region <- c(sum(num.KC * deg.mp.KC[2,]),
+                            sum(num.OW * deg.mp.OW[2,]),
+                            sum(num.EW * deg.mp.EW[2,]))
+    
 
   # Number of partnerships
   edges.m <- (sum(totdeg.m.by.dp)) / 2
 
   # Mixing
-  if (method == 2) {
-    # Number of mixed-race partnerships, with balancing to decide
-    edges.m.B2W <- totdeg.m.by.race[1] * (1 - prop.hom.mpi.B[1])
-    edges.m.W2B <- totdeg.m.by.race[2] * (1 - prop.hom.mpi.W[1])
-    edges.het.m <- switch(balance,
-                          black = edges.m.B2W,
-                          white = edges.m.W2B,
-                          mean = (edges.m.B2W + edges.m.W2B) / 2)
+  # if (method == 2) {
+  #   # Number of mixed-race partnerships, with balancing to decide
+  #   edges.m.B2W <- totdeg.m.by.race[1] * (1 - prop.hom.mpi.B[1])
+  #   edges.m.W2B <- totdeg.m.by.race[2] * (1 - prop.hom.mpi.W[1])
+  #   edges.het.m <- switch(balance,
+  #                         black = edges.m.B2W,
+  #                         white = edges.m.W2B,
+  #                         mean = (edges.m.B2W + edges.m.W2B) / 2)
+  # 
+  #   # Number of same-race partnerships
+  #   edges.hom.m <- (totdeg.m.by.race - edges.het.m) / 2
+  # 
+  #   # Nodemix target stat: numer of BB, BW, WW partnerships
+  #   edges.nodemix.m <- c(edges.hom.m[1], edges.het.m, edges.hom.m[2])
+  # }
 
-    # Number of same-race partnerships
-    edges.hom.m <- (totdeg.m.by.race - edges.het.m) / 2
-
-    # Nodemix target stat: numer of BB, BW, WW partnerships
-    edges.nodemix.m <- c(edges.hom.m[1], edges.het.m, edges.hom.m[2])
-  }
-
-  # Sqrt absdiff term for age
-  if (method == 2) {
-    sqrt.adiff.m <- edges.nodemix.m * c(sqrt.adiff.BB[1], sqrt.adiff.BW[1], sqrt.adiff.WW[1])
-  }
-  if (method == 1) {
-    sqrt.adiff.m <- edges.m * mean(c(sqrt.adiff.BB[1], sqrt.adiff.BW[1], sqrt.adiff.WW[1]))
-  }
+  # # Sqrt absdiff term for age
+  # if (method == 2) {
+  #   sqrt.adiff.m <- edges.nodemix.m * c(sqrt.adiff.BB[1], sqrt.adiff.BW[1], sqrt.adiff.WW[1])
+  # }
+  # if (method == 1) {
+  #   sqrt.adiff.m <- edges.m * mean(c(sqrt.adiff.BB[1], sqrt.adiff.BW[1], sqrt.adiff.WW[1]))
+  # }
 
   # Compile target stats
   
     ##--FOR NOW, FIT AS EDGES-ONLY MODEL
       stats.m <- c(edges.m)
     
-  # if (method == 2) {
-  #   stats.m <- c(edges.m, edges.nodemix.m[2:3], totdeg.m.by.dp[c(2:3, 5:6)], sqrt.adiff.m)
-  # }
-  # if (method == 1) {
-  #   stats.m <- c(edges.m, totdeg.m.by.dp[2:3], sqrt.adiff.m)
-  # }
+    ##-- Desired target stats when all code is updated: edges, nodefactor("deg.pers"), nodefactor("race"), nodefactor("region"), nodematch("race"), absdiff("sqrt.age")
+          ##-- confirm which level to omit for nodefactor terms, confirm how specify target stats for offset terms
+  #   stats.m <- c(edges.m, totdeg.m.by.dp[2:3], totdeg.m.by.race[1:2], totdeg.m.by.region[2:3], nodematch.m.race, sqrt.adiff.m)
 
   # Dissolution model
    ## Expected mortality is a weighted avg of the racial/ethnic- and age-specific mortality ratios
@@ -252,66 +257,49 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   # Casual partnerships -----------------------------------------------------
 
   # Persons in partnerships by main degree
-  if (method == 2) {
-    totdeg.p.by.dm <- c(num.B * deg.mp.B[, 2] + num.B * deg.mp.B[, 3] * 2,
-                        num.W * deg.mp.W[, 2] + num.W * deg.mp.W[, 3] * 2)
-  }
-  if (method == 1) {
-    totdeg.p.by.dm <- c(num * deg.mp.B[, 2] + num * deg.mp.B[, 3] * 2)
-  }
+  totdeg.p.by.dm <- c(num * deg.mp[, 2] + num * deg.mp[, 3] * 2)
 
-  # Persons in partnerships by race
-  if (method == 2) {
-    totdeg.p.by.race <- c(sum(totdeg.p.by.dm[1:2]), sum(totdeg.p.by.dm[3:4]))
-  }
 
   # Persons concurrent
-  if (method == 2) {
-    conc.p.by.race <- c(sum(deg.mp.B[, 3]) * num.B, sum(deg.mp.W[, 3]) * num.W)
-  }
-  if (method == 1) {
-    conc.p <- sum(deg.mp.B[, 3] * num)
-  }
-
+  conc.p <- c(sum(deg.mp[, 3]) * num)
+  
   # Number of partnerships
   edges.p <- sum(totdeg.p.by.dm) / 2
 
-  # Mixing
-  if (method == 2) {
-    # Number of mixed-race partnerships, with balancing to decide
-    edges.p.B2W <- totdeg.p.by.race[1] * (1 - prop.hom.mpi.B[2])
-    edges.p.W2B <- totdeg.p.by.race[2] * (1 - prop.hom.mpi.W[2])
-    edges.het.p <- switch(balance,
-                          black = edges.p.B2W, white = edges.p.W2B,
-                          mean = (edges.p.B2W + edges.p.W2B) / 2)
-
-    # Number of same-race partnerships
-    edges.hom.p <- (totdeg.p.by.race - edges.het.p) / 2
-
-    # Nodemix target stat: number of BB, BW, WW partnerships
-    edges.nodemix.p <- c(edges.hom.p[1], edges.het.p, edges.hom.p[2])
-  }
-
-  # Sqrt absdiff term for age
-  if (method == 2) {
-    sqrt.adiff.p <- edges.nodemix.p * c(sqrt.adiff.BB[2], sqrt.adiff.BW[2], sqrt.adiff.WW[2])
-  }
-  if (method == 1) {
-    sqrt.adiff.p <- edges.p * mean(c(sqrt.adiff.BB[2], sqrt.adiff.BW[2], sqrt.adiff.WW[2]))
-  }
+  # # Mixing
+  # if (method == 2) {
+  #   # Number of mixed-race partnerships, with balancing to decide
+  #   edges.p.B2W <- totdeg.p.by.race[1] * (1 - prop.hom.mpi.B[2])
+  #   edges.p.W2B <- totdeg.p.by.race[2] * (1 - prop.hom.mpi.W[2])
+  #   edges.het.p <- switch(balance,
+  #                         black = edges.p.B2W, white = edges.p.W2B,
+  #                         mean = (edges.p.B2W + edges.p.W2B) / 2)
+  # 
+  #   # Number of same-race partnerships
+  #   edges.hom.p <- (totdeg.p.by.race - edges.het.p) / 2
+  # 
+  #   # Nodemix target stat: number of BB, BW, WW partnerships
+  #   edges.nodemix.p <- c(edges.hom.p[1], edges.het.p, edges.hom.p[2])
+  # }
+  # 
+  # # Sqrt absdiff term for age
+  # if (method == 2) {
+  #   sqrt.adiff.p <- edges.nodemix.p * c(sqrt.adiff.BB[2], sqrt.adiff.BW[2], sqrt.adiff.WW[2])
+  # }
+  # if (method == 1) {
+  #   sqrt.adiff.p <- edges.p * mean(c(sqrt.adiff.BB[2], sqrt.adiff.BW[2], sqrt.adiff.WW[2]))
+  # }
 
   # Compile target statistics
   
     ##--FOR NOW, FIT AS EDGES-ONLY MODEL
     stats.p <- c(edges.p)
     
-  # if (method == 2) {
-  #   stats.p <- c(edges.p, edges.nodemix.p[2:3], totdeg.p.by.dm[c(2, 4)],
-  #                conc.p.by.race, sqrt.adiff.p)
-  # }
-  # if (method == 1) {
-  #   stats.p <- c(edges.p, totdeg.p.by.dm[2], conc.p, sqrt.adiff.p)
-  # }
+    ##-- Desired target stats when all code is updated: edges, nodefactor("deg.main"), concurrent, nodematch("race"), nodemix("region"), absdiff(sqrt.age)
+    ##-- confirm which level to omit for nodefactor terms, confirm how specify target stats for offset terms
+    # 
+    #   stats.p <- c(edges.p, totdeg.p.by.dm[2], conc.p, nodematch.p.race, nodemix.p.region, sqrt.adiff.p)
+    
 
   # Dissolution model
   coef.diss.p <- dissolution_coefs(dissolution = diss.pers,
@@ -323,98 +311,72 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   # Instant partnerships ----------------------------------------------------
 
   # Number of instant partnerships per time step, by main and casl degree
-  if (method == 2) {
-    num.inst.B <- num.B * deg.mp.B * mdeg.inst.B * time.unit
-    num.inst.W <- num.W * deg.mp.W * mdeg.inst.W * time.unit
-  }
-  if (method == 1) {
-    num.inst <- num * deg.mp.W * mdeg.inst.W * time.unit
-  }
-
+  num.inst <- num * deg.mp * mdeg.inst * time.unit
+  
   # Risk quantiles
-  if (!is.na(qnts.B[1]) & !is.na(qnts.W[1])) {
-    if (method == 2) {
-      num.riskg.B <- (0.2*num.B) * qnts.B * time.unit
-      num.riskg.W <- (0.2*num.W) * qnts.W * time.unit
+  num.50to59 <- num*sum(agestr[7:8])
+  num.18to49 <- num*sum(agestr[1:6])
+  
+  if (!is.na(qnts.18to49[1]) & !is.na(qnts.50to59[1])) {
+      num.riskg.50to59 <- (0.25*num.50to59) * qnts.50to59 * time.unit
+      num.riskg.18to49 <- (0.25*num.18to49) * qnts.18to49 * time.unit
+      num.riskg <- c(num.riskg.50to59, num.riskg.18to49)
     }
-    if (method == 1) {
-      num.riskg <- 0.2 * num * qnts.B * time.unit
-    }
-  }
 
-  # Number of instant partnerships per time step, by race
-  if (method == 2) {
-    totdeg.i <- c(sum(num.inst.B), sum(num.inst.W))
-  }
-  if (method == 1) {
-    totdeg.i <- sum(num.inst)
-  }
+  # Number of instant partnerships per time step
+  totdeg.i <- sum(num.inst)
 
   # Number of partnerships
   edges.i <- sum(totdeg.i) / 2
 
-  # Mixing
-  if (method == 2) {
-    # Number of mixed-race partnerships, with balancing to decide
-    edges.i.B2W <- totdeg.i[1] * (1 - prop.hom.mpi.B[3])
-    edges.i.W2B <- totdeg.i[2] * (1 - prop.hom.mpi.W[3])
-    edges.het.i <- switch(balance,
-                          black = edges.i.B2W, white = edges.i.W2B,
-                          mean = (edges.i.B2W + edges.i.W2B) / 2)
-
-    # Number of same-race partnerships
-    edges.hom.i <- edges.i - edges.het.i
-
-    # Nodemix target stat: number of BB, BW, WW partnerships
-    edges.nodemix.i <- c((totdeg.i[1] - edges.het.i) / 2,
-                         edges.het.i,
-                         (totdeg.i[1] - edges.het.i) / 2)
-  }
-  
-    # Sqrt absdiff term for age
-    if (method == 2) {
-      sqrt.adiff.i <- edges.nodemix.i * c(sqrt.adiff.BB[3], sqrt.adiff.BW[3], sqrt.adiff.WW[3])
-    }
-    if (method == 1) {
-      sqrt.adiff.i <- edges.i * mean(c(sqrt.adiff.BB[3], sqrt.adiff.BW[3], sqrt.adiff.WW[3]))
-    }
+  # # Mixing
+  # if (method == 2) {
+  #   # Number of mixed-race partnerships, with balancing to decide
+  #   edges.i.B2W <- totdeg.i[1] * (1 - prop.hom.mpi.B[3])
+  #   edges.i.W2B <- totdeg.i[2] * (1 - prop.hom.mpi.W[3])
+  #   edges.het.i <- switch(balance,
+  #                         black = edges.i.B2W, white = edges.i.W2B,
+  #                         mean = (edges.i.B2W + edges.i.W2B) / 2)
+  # 
+  #   # Number of same-race partnerships
+  #   edges.hom.i <- edges.i - edges.het.i
+  # 
+  #   # Nodemix target stat: number of BB, BW, WW partnerships
+  #   edges.nodemix.i <- c((totdeg.i[1] - edges.het.i) / 2,
+  #                        edges.het.i,
+  #                        (totdeg.i[1] - edges.het.i) / 2)
+  # }
+  # 
+  #   # Sqrt absdiff term for age
+  #   if (method == 2) {
+  #     sqrt.adiff.i <- edges.nodemix.i * c(sqrt.adiff.BB[3], sqrt.adiff.BW[3], sqrt.adiff.WW[3])
+  #   }
+  #   if (method == 1) {
+  #     sqrt.adiff.i <- edges.i * mean(c(sqrt.adiff.BB[3], sqrt.adiff.BW[3], sqrt.adiff.WW[3]))
+  #   }
 
     # Compile target stats
       ##--FOR NOW, FIT AS EDGES-ONLY MODEL
       stats.i <- c(edges.i)
       
-    # if (!is.na(qnts.B[1]) & !is.na(qnts.W[1])) {
-    #   if (method == 2) {
-    #     stats.i <- c(edges.i, num.inst.B[-1], num.inst.W,
-    #                  num.riskg.B[-3], num.riskg.W[-3],
-    #                  edges.hom.i, sqrt.adiff.i)
-    #   }
-    #   if (method == 1) {
-    #     stats.i <- c(edges.i, num.inst[-1], num.riskg[-3], sqrt.adiff.i)
-    #   }
-    # 
-    # } else {
-    #   if (method == 2) {
-    #     stats.i <- c(edges.i, num.inst.B[-1], num.inst.W, edges.hom.i, sqrt.adiff.i)
-    #   }
-    #   if (method == 1) {
-    #     stats.i <- c(edges.i, num.inst[-1], sqrt.adiff.i)
-    #   }
-    # }
+      ##-- Desired target stats when all code is updated: edges, nodefactor(c("deg.main", "deg.pers")), nodefactor("riskg") nodematch("race"), nodemix("region"), absdiff(sqrt.age)
+      ##-- confirm which level to omit for nodefactor terms, confirm how specify target stats for offset terms
+      # if (!is.na(qnts.18to49[1]) & !is.na(qnts.50to59[1])) {
+      #   stats.i <- c(edges.i, num.inst[-1], numriskg[-1], nodematch.i.race, nodemix.i.region, sqrt.adiff.i)
+      # } else {
+      #   stats.i <- c(edges.i, num.inst[-1], nodematch.i.race, nodemix.i.region, sqrt.adiff.i)
+      # }
+      # 
+
 
 
   # Compile results ---------------------------------------------------------
   out <- list()
   out$method <- method
-  if (method == 2) {
-    out$deg.pers <- c(deg.pers.B, deg.pers.W)
-    out$deg.main <- c(deg.main.B, deg.main.W)
-  }
-  if (method == 1) {
-    out$deg.pers <- deg.pers
-    out$deg.main <- deg.main
-  }
-
+  out$deg.pers <- deg.pers
+  out$deg.main.race <- c(deg.main.H, deg.main.B, deg.main.O)
+  out$deg.main.region <- c(deg.main.KC, deg.main.OW, deg.main.EW)
+  
   out$stats.m <- stats.m
   out$stats.p <- stats.p
   out$stats.i <- stats.i
@@ -444,14 +406,19 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   out$num.B.EW <- num.B.EW
   out$num.O.EW <- num.O.EW
   
+  out$deg.mp <- deg.mp
+  out$deg.mp.H <- deg.mp.H
   out$deg.mp.B <- deg.mp.B
-  out$deg.mp.W <- deg.mp.W
-
-  out$role.B.prob <- role.B.prob
-  out$role.W.prob <- role.W.prob
+  out$deg.mp.O <- deg.mp.O
+  out$deg.mp.KC <- deg.mp.KC
+  out$deg.mp.OW <- deg.mp.OW
+  out$deg.mp.EW <- deg.mp.EW
+ 
+  out$role.prob <- role.prob
 
   class(out) <- "nwstats"
   return(out)
+  
 }
 
 
@@ -526,17 +493,13 @@ base_nw_msm_whamp <- function(nwstats) {
   
   sqrt.age <- sqrt(age)
 
-  role.B <- sample(apportion_lr(num.B, c("I", "R", "V"), nwstats$role.B.prob)) 
-  role.W <- sample(apportion_lr(num.W, c("I", "R", "V"), nwstats$role.W.prob)) 
-  role <- rep(NA, n) 
-  role[race == "B"] <- role.B
-  role[race == "W"] <- role.W
+  role <- sample(apportion_lr(n, c("I", "R", "V"), nwstats$role.prob)) 
 
-  riskg.B <- sample(apportion_lr(num.B, 1:5, rep(0.2, 5)))
-  riskg.W <- sample(apportion_lr(num.W, 1:5, rep(0.2, 5)))
+  riskg.50to59 <- sample(apportion_lr(num*sum(agestr[7:8]), c("O1", "O2", "O3", "O4"), rep(0.25, 4)))
+  riskg.18to49 <- sample(apportion_lr(num*sum(agestr[1:6]), c("Y1", "Y2", "Y3", "Y4"), rep(0.25, 4)))
   riskg <- rep(NA, n)
-  riskg[race == "B"] <- riskg.B
-  riskg[race == "W"] <- riskg.W
+  riskg[age>=18 & age<50] <- riskg.18to49
+  riskg[age>=50] <- riskg.50to59
 
   attr.names <- c("race", "race..wa", "region", "riskg", "sqrt.age", "role.class")
   attr.values <- list(race, race..wa, region, riskg, sqrt.age, role)
@@ -571,61 +534,113 @@ assign_degree_whamp <- function(nw, deg.type, nwstats) {
   if (!("network" %in% class(nw))) {
     stop("nw must be of class network")
   }
-
-  if (deg.type == "main") {
-    attr.name <- "deg.main"
-    dist.B <- rowSums(nwstats$deg.mp.B)
-    dist.W <- rowSums(nwstats$deg.mp.W)
+  if (!isTRUE(all.equal(sum(colSums(nwstats$deg.mp.H)), 1, tolerance = 5e-6))) {
+    stop("H degree distributions do not sum to 1")
   }
-  if (deg.type == "pers") {
-    attr.name <- "deg.pers"
-    dist.B <- colSums(nwstats$deg.mp.B)
-    dist.W <- colSums(nwstats$deg.mp.W)
-  }
-
   if (!isTRUE(all.equal(sum(colSums(nwstats$deg.mp.B)), 1, tolerance = 5e-6))) {
     stop("B degree distributions do not sum to 1")
   }
+  if (!isTRUE(all.equal(sum(colSums(nwstats$deg.mp.O)), 1, tolerance = 5e-6))) {
+    stop("O degree distributions do not sum to 1")
+  }
+  if (!isTRUE(all.equal(sum(colSums(nwstats$deg.mp.KC)), 1, tolerance = 5e-6))) {
+    stop("KC degree distributions do not sum to 1")
+  }
+  if (!isTRUE(all.equal(sum(colSums(nwstats$deg.mp.OW)), 1, tolerance = 5e-6))) {
+    stop("OW degree distributions do not sum to 1")
+  }
+  if (!isTRUE(all.equal(sum(colSums(nwstats$deg.mp.EW)), 1, tolerance = 5e-6))) {
+    stop("EW degree distributions do not sum to 1")
+  }
+  if (!isTRUE(all.equal(sum(colSums(nwstats$deg.mp)), 1, tolerance = 5e-6))) {
+    stop("Degree distributions do not sum to 1")
+  }
+  
 
-  if (!isTRUE(all.equal(sum(colSums(nwstats$deg.mp.W)), 1, tolerance = 5e-6))) {
-    stop("W degree distributions do not sum to 1")
+  if (deg.type == "main") {
+    
+    attr.name <- "deg.main"
+    
+    #Calculate expected mean main degree for each race by region combination assuming independence
+    mdeg.main.H.KC <- sum(nwstats$deg.mp.H[2,])*sum(nwstats$deg.mp.KC[2,])/sum(nwstats$deg.mp[2,])
+    mdeg.main.B.KC <- sum(nwstats$deg.mp.B[2,])*sum(nwstats$deg.mp.KC[2,])/sum(nwstats$deg.mp[2,])
+    mdeg.main.O.KC <- sum(nwstats$deg.mp.O[2,])*sum(nwstats$deg.mp.KC[2,])/sum(nwstats$deg.mp[2,])
+    mdeg.main.H.OW <- sum(nwstats$deg.mp.H[2,])*sum(nwstats$deg.mp.OW[2,])/sum(nwstats$deg.mp[2,])
+    mdeg.main.B.OW <- sum(nwstats$deg.mp.B[2,])*sum(nwstats$deg.mp.OW[2,])/sum(nwstats$deg.mp[2,])
+    mdeg.main.O.OW <- sum(nwstats$deg.mp.O[2,])*sum(nwstats$deg.mp.OW[2,])/sum(nwstats$deg.mp[2,])
+    mdeg.main.H.EW <- sum(nwstats$deg.mp.H[2,])*sum(nwstats$deg.mp.EW[2,])/sum(nwstats$deg.mp[2,])
+    mdeg.main.B.EW <- sum(nwstats$deg.mp.B[2,])*sum(nwstats$deg.mp.EW[2,])/sum(nwstats$deg.mp[2,])
+    mdeg.main.O.EW <- sum(nwstats$deg.mp.O[2,])*sum(nwstats$deg.mp.EW[2,])/sum(nwstats$deg.mp[2,])
+    
+    dist.H.KC <- c(1 - mdeg.main.H.KC, mdeg.main.H.KC)
+    dist.B.KC <- c(1 - mdeg.main.B.KC, mdeg.main.B.KC)
+    dist.O.KC <- c(1 - mdeg.main.O.KC, mdeg.main.O.KC)
+    dist.H.OW <- c(1 - mdeg.main.H.OW, mdeg.main.H.OW)
+    dist.B.OW <- c(1 - mdeg.main.B.OW, mdeg.main.B.OW)
+    dist.O.OW <- c(1 - mdeg.main.O.OW, mdeg.main.O.OW)
+    dist.H.EW <- c(1 - mdeg.main.H.EW, mdeg.main.H.EW)
+    dist.B.EW <- c(1 - mdeg.main.B.EW, mdeg.main.B.EW)
+    dist.O.EW <- c(1 - mdeg.main.O.EW, mdeg.main.O.EW)
+    
+    race..wa <- get.vertex.attribute(nw, "race..wa")
+    region <- get.vertex.attribute(nw, "region")
+    vH.KC <- which(race..wa == "H" & region == "KC")
+    vB.KC <- which(race..wa == "B" & region == "KC")
+    vO.KC <- which(race..wa == "O" & region == "KC")
+    vH.OW <- which(race..wa == "H" & region == "OW")
+    vB.OW <- which(race..wa == "B" & region == "OW")
+    vO.OW <- which(race..wa == "O" & region == "OW")
+    vH.EW <- which(race..wa == "H" & region == "EW")
+    vB.EW <- which(race..wa == "B" & region == "EW")
+    vO.EW <- which(race..wa == "O" & region == "EW")
+    nH.KC <- length(vH.KC)
+    nB.KC <- length(vB.KC)
+    nO.KC <- length(vO.KC)
+    nH.OW <- length(vH.OW)
+    nB.OW <- length(vB.OW)
+    nO.OW <- length(vO.OW)
+    nH.EW <- length(vH.EW)
+    nB.EW <- length(vB.EW)
+    nO.EW <- length(vO.EW)
+    
+    num.degrees <- length(dist.H.KC)
+    
+    deg.H.KC <- apportion_lr(nH.KC, 0:(num.degrees - 1), dist.H.KC, shuffled = TRUE)
+    deg.B.KC <- apportion_lr(nB.KC, 0:(num.degrees - 1), dist.B.KC, shuffled = TRUE)
+    deg.O.KC <- apportion_lr(nO.KC, 0:(num.degrees - 1), dist.O.KC, shuffled = TRUE)
+    deg.H.OW <- apportion_lr(nH.OW, 0:(num.degrees - 1), dist.H.OW, shuffled = TRUE)
+    deg.B.OW <- apportion_lr(nB.OW, 0:(num.degrees - 1), dist.B.OW, shuffled = TRUE)
+    deg.O.OW <- apportion_lr(nO.OW, 0:(num.degrees - 1), dist.O.OW, shuffled = TRUE)
+    deg.H.EW <- apportion_lr(nH.EW, 0:(num.degrees - 1), dist.H.EW, shuffled = TRUE)
+    deg.B.EW <- apportion_lr(nB.EW, 0:(num.degrees - 1), dist.B.EW, shuffled = TRUE)
+    deg.O.EW <- apportion_lr(nO.EW, 0:(num.degrees - 1), dist.O.EW, shuffled = TRUE)
+    
+    nw <- set.vertex.attribute(nw, attrname = attr.name, value = deg.H.KC, v = vH.KC)
+    nw <- set.vertex.attribute(nw, attrname = attr.name, value = deg.B.KC, v = vB.KC)
+    nw <- set.vertex.attribute(nw, attrname = attr.name, value = deg.O.KC, v = vO.KC)
+    nw <- set.vertex.attribute(nw, attrname = attr.name, value = deg.H.OW, v = vH.OW)
+    nw <- set.vertex.attribute(nw, attrname = attr.name, value = deg.B.OW, v = vB.OW)
+    nw <- set.vertex.attribute(nw, attrname = attr.name, value = deg.O.OW, v = vO.OW)
+    nw <- set.vertex.attribute(nw, attrname = attr.name, value = deg.H.EW, v = vH.EW)
+    nw <- set.vertex.attribute(nw, attrname = attr.name, value = deg.B.EW, v = vB.EW)
+    nw <- set.vertex.attribute(nw, attrname = attr.name, value = deg.O.EW, v = vO.EW)
+  }
+  
+  if (deg.type == "pers") {
+    attr.name <- "deg.pers"
+    dist.pers <- colSums(nwstats$deg.mp)
+
+    num.degrees <- length(dist.pers)
+    
+    race..wa <- get.vertex.attribute(nw, "race..wa")
+    v <- which(race..wa %in% c("H", "B", "O"))
+    n <- length(v)
+  
+    deg.pers <-  apportion_lr(n, 0:(num.degrees - 1), dist.pers, shuffled = TRUE)
+    
+    nw <- set.vertex.attribute(nw, attrname = attr.name, value = deg.pers, v = v)
   }
 
-  race <- get.vertex.attribute(nw, "race") #-- Delete when finish debugging
-  vB <- which(race == "B")
-  vW <- which(race == "W")
-  nB <- length(vB)
-  nW <- length(vW)
-  
-  race..wa <- get.vertex.attribute(nw, "race..wa")
-  vH..wa <- which(race..wa == "H")
-  vB..wa <- which(race..wa == "B")
-  vO..wa <- which(race..wa == "O")
-  nH..wa <- length(vH..wa)
-  nB..wa <- length(vB..wa)
-  nO..wa <- length(vO..wa)
-  
-  region <- get.vertex.attribute(nw, "region")
-  vKC <- which(region == "KC")
-  vOW <- which(region == "OW")
-  vEW <- which(region == "EW")
-  nKC <- length(vKC)
-  nOW <- length(vOW)
-  nEW <- length(vEW)
-
-  num.degrees.B <- length(dist.B)
-  num.degrees.W <- length(dist.W)
-
-  deg.B <- apportion_lr(nB, 0:(num.degrees.B - 1), dist.B, shuffled = TRUE)
-  deg.W <- apportion_lr(nW, 0:(num.degrees.W - 1), dist.W, shuffled = TRUE)
-
-  if (nwstats$method == 2) {
-    deg.B <- paste0("B", deg.B)
-    deg.W <- paste0("W", deg.W)
-  }
-
-  nw <- set.vertex.attribute(nw, attrname = attr.name, value = deg.B, v = vB)
-  nw <- set.vertex.attribute(nw, attrname = attr.name, value = deg.W, v = vW)
 
   return(nw)
 }
