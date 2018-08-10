@@ -78,8 +78,7 @@ setBirthAttr_msm_whamp <- function(dat, at, nBirths) {
     dat$attr$race[newIds] <- race #-- Delete when finish de-bugging
   
   ## Vector with the proportion of Hispanic, black, and other race/ethnicity men in King County, other western WA, and eastern WA
-  prop.race.region <- c(0.0549, 0.0421, 0.4739, 0.0309, 0.0166, 0.2807, 0.0222, 0.0021)
-  prop.race.region[9] <- 1 - sum(prop.race.region[1:8]) # Set last proportion to avoid rounding errors
+  prop.race.region <- sumto1(c(0.0549, 0.0421, 0.4739, 0.0309, 0.0166, 0.2807, 0.0222, 0.0021, 0.0767))
   
   race.region <- sample(apportion_lr(nBirths, c("H.KC", "B.KC", "O.KC", "H.OW", "B.OW", "O.OW", "H.EW", "B.EW", "O.EW"), 
                                     prop.race.region))
@@ -164,8 +163,8 @@ setBirthAttr_msm_whamp <- function(dat, at, nBirths) {
   dat$attr$deg.main[newIds] <- 0
   dat$attr$deg.pers[newIds] <- 0
 
-  # One-off risk group
-  dat$attr$riskg[newIds] <- sample(1:5, nBirths, TRUE)
+  # One-off risk group (all enter at age 18 so are in the "young" group)
+  dat$attr$riskg[newIds] <- sample(c("Y1", "Y2", "Y3", "Y4"), nBirths, TRUE)
 
   # UAI group
   p1 <- dat$param$cond.pers.always.prob
