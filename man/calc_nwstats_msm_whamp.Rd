@@ -6,11 +6,11 @@
 \usage{
 calc_nwstats_msm_whamp(time.unit = 7, method = 2, num.B, num.W, num.H.KC,
   num.B.KC, num.O.KC, num.H.OW, num.B.OW, num.O.OW, num.H.EW, num.B.EW,
-  num.O.EW, agestr, deg.mp.B, deg.mp.W, mdeg.inst.B, mdeg.inst.W, qnts.B,
-  qnts.W, prop.hom.mpi.B, prop.hom.mpi.W, balance = "mean", sqrt.adiff.BB,
-  sqrt.adiff.WW, sqrt.adiff.BW, diss.main, diss.pers, durs.main, durs.pers,
-  ages, asmr.B, asmr.W, asmr.H..wa, asmr.B..wa, asmr.O..wa, role.B.prob,
-  role.W.prob)
+  num.O.EW, agestr, deg.mp, deg.mp.H, deg.mp.B, deg.mp.O, deg.mp.KC, deg.mp.OW,
+  deg.mp.EW, mdeg.inst, qnts.18to49, qnts.50to59, prop.hom.mpi.B,
+  prop.hom.mpi.W, balance = "mean", sqrt.adiff.BB, sqrt.adiff.WW,
+  sqrt.adiff.BW, diss.main, diss.pers, durs.main, durs.pers, ages, asmr.B,
+  asmr.W, asmr.H..wa, asmr.B..wa, asmr.O..wa, role.prob)
 }
 \arguments{
 \item{time.unit}{Time unit relative to 1 for daily.}
@@ -25,22 +25,33 @@ averaging over the statistics and dropping the race-specific terms.}
 
 \item{agestr}{Vector with the proportion of MSM in each age group 18-24, 25-29...50-59}
 
-\item{deg.mp.B}{Degree distribution matrix for main and casual partners for
-black MSM, as a 2 by 3 matrix.}
+\item{deg.mp}{Degree distribution matrix for main and casual partners overall,
+as a 2 by 3 matrix.}
 
-\item{deg.mp.W}{Degree distribution matrix for main and causal partners for
-white MSM, as a 2 by 3 matrix.}
+\item{deg.mp.H}{Degree distribution matrix for main and causal partners for
+Hispanic MSM, as a 2 by 3 matrix.}
 
-\item{mdeg.inst.B}{Mean degree, or rate, of one-off partnerships per day
-for black MSM.}
+\item{deg.mp.B}{Degree distribution matrix for main and causal partners for
+Black MSM, as a 2 by 3 matrix.}
 
-\item{mdeg.inst.W}{Mean degree, or rate, of one-off partnerships per day
-for white MSM.}
+\item{deg.mp.O}{Degree distribution matrix for main and causal partners for
+Other race/ethnicity MSM, as a 2 by 3 matrix.}
 
-\item{qnts.B}{Means of one-off rates split into quintiles for white MSM. Use
+\item{deg.mp.KC}{Degree distribution matrix for main and causal partners for
+King County MSM, as a 2 by 3 matrix.}
+
+\item{deg.mp.OW}{Degree distribution matrix for main and causal partners for
+other western WA MSM, as a 2 by 3 matrix.}
+
+\item{deg.mp.EW}{Degree distribution matrix for main and causal partners for
+eastern WA MSM, as a 2 by 3 matrix.}
+
+\item{mdeg.inst}{Mean degree, or rate, of one-off partnerships per day.}
+
+\item{qnts.18to49}{Means of one-off rates split into quantiles for MSM ages 18-49. Use
 \code{NA} to ignore these quantiles in the target statistics.}
 
-\item{qnts.W}{Means of one-off rates split into quintiles for black MSM. Use
+\item{qnts.50to59}{Means of one-off rates split into quantiles for MSM ages 50-59. Use
 \code{NA} to ignore these quantiles in the target statistics.}
 
 \item{prop.hom.mpi.B}{A vector of length 3 for the proportion of main, casual,
@@ -70,11 +81,9 @@ partnerships.}
 
 \item{diss.pers}{Dissolution model formula for casual partnerships.}
 
-\item{durs.main}{Vector of length 3 with the duration of BB, BW, and WW main
-partnerships in days.}
+\item{durs.main}{Duration of main partnerships in days.}
 
-\item{durs.pers}{Vector of length 3 with the duration of BB, BW, and WW
-casual partnerships in days.}
+\item{durs.pers}{Duration of persistent partnerships in days.}
 
 \item{ages}{Integer vector of ages in years that defines range of possible
 initial ages in the population.}
@@ -94,11 +103,8 @@ mortality rates for for black MSM.}
 \item{asmr.O..wa}{Vector of length 60 defining the age-specific
 mortality rates for for other race/ethnicity MSM.}
 
-\item{role.B.prob}{Vector of length 3 for the probability of sexual role as
-insertive, receptive, and versatile, for black MSM.}
-
-\item{role.W.prob}{Vector of length 3 for the probability of sexual role as
-insertive, receptive, and versatile, for white MSM.}
+\item{role.prob}{Vector of length 3 for the probability of sexual role as
+insertive, receptive, and versatile.}
 
 \item{num.H..wa}{Population size of Hispanic MSM.}
 
