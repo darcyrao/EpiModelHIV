@@ -44,19 +44,16 @@
 #' @param qnts.50to59 Means rates withing quartiles of the distribution of instantaneous partnerships
 #'        for MSM ages 50-59. Use \code{NA} to ignore these quantiles in the target statistics.
 #' @param inst.bho Mean rate of instantaneous partnerships by racial/ethnic group
-#' @param inst.region Mean rate of instantaneous partnerships by region
 #' @param prop.hom.mpi.H A vector of length 3 for the proportion of main, casual,
 #'        and one-off partnerships in same race for Hispanic MSM.
 #' @param prop.hom.mpi.B A vector of length 3 for the proportion of main, casual,
-#'        and one-off partnerships in same race for black MSM.
+#'        and instantaneous partnerships in same race for black MSM.
 #' @param prop.hom.mpi.O A vector of length 3 for the proportion of main, casual,
-#'        and one-off partnerships in same race for other race/ethnicity MSM.
-#' @param balance Method for balancing of edges by race for number of mixed-race
-#'        partnerships, with options of \code{"black"} to apply black MSM counts,
-#'        \code{"white"} to apply white MSM counts, and \code{"mean"} to take
-#'        the average of the two expectations.
+#'        and instantaneous partnerships in same race for other race/ethnicity MSM.
 #' @param sqrt.adiff.mpi Vector of length 3 with the mean absolute differences
 #'        in the square root of ages in main, casual, and instantaneous partnerships.
+#' @param prop.hom.region.mpi A vector of length 3 for the proportion of main, casual,
+#'        and instantaneous partnerships that are within-region.
 #' @param diss.main Dissolution model formula for main partnerships.
 #' @param diss.pers Dissolution model formula for casual partnerships.
 #' @param durs.main Duration of main partnerships in days.
@@ -116,12 +113,11 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
                              qnts.18to49,
                              qnts.50to59,
                              inst.bho,
-                             inst.region,
                              prop.hom.mpi.H,
                              prop.hom.mpi.B,
                              prop.hom.mpi.O,
-                             balance = "mean",
                              sqrt.adiff.mpi,
+                             prop.hom.region.mpi,
                              diss.main,
                              diss.pers,
                              durs.main,
@@ -194,12 +190,14 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   # Number of partnerships
   edges.m <- (sum(totdeg.m.by.dp)) / 2
 
-  # Mixing
-    # Nodematch target stat: number of BB, HH, and OO partnerships
-    edges.hom.m <- c((totdeg.m.by.race[1]*prop.hom.mpi.B[1] / 2), 
+  # Race mixing: nodematch target stat: number of BB, HH, and OO partnerships
+    edges.hom.m.hbo <- c((totdeg.m.by.race[1]*prop.hom.mpi.B[1] / 2), 
                      (totdeg.m.by.race[2]*prop.hom.mpi.H[1] / 2),
                      (totdeg.m.by.race[3]*prop.hom.mpi.O[1] / 2))
 
+  # Regional mixing: nodematch target stat: number of within-region partnerships
+  edges.hom.m.region <- edges.m * prop.hom.region.mpi[1]
+    
   # Sqrt absdiff term for age
   sqrt.adiff.m <- edges.m * sqrt.adiff.mpi[1]
 
@@ -252,12 +250,14 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   # Number of partnerships
   edges.p <- sum(totdeg.p.by.dm) / 2
 
-  # Mixing
-    # Nodematch target stat: number of BB, HH, and OO partnerships
-    edges.hom.p <- c((totdeg.p.by.race[1]*prop.hom.mpi.B[2] / 2), 
+  # Race mixing: nodematch target stat: number of BB, HH, and OO partnerships
+  edges.hom.p.hbo <- c((totdeg.p.by.race[1]*prop.hom.mpi.B[2] / 2), 
                    (totdeg.p.by.race[2]*prop.hom.mpi.H[2] / 2),
                    (totdeg.p.by.race[3]*prop.hom.mpi.O[2] / 2))
   
+  # Regional mixing: nodematch target stat: number of within-region partnerships
+  edges.hom.p.region <- edges.p * prop.hom.region.mpi[2]
+    
   # Sqrt absdiff term for age
   sqrt.adiff.p <- edges.p * sqrt.adiff.mpi[2]
 
@@ -297,36 +297,35 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   # Number of instant partnerships per time step by race/ethnicity
   totdeg.i.bho <- c(inst.bho[1]*num.B..wa, inst.bho[2]*num.H..wa, inst.bho[3]*num.O..wa)*time.unit
   
-  # Number of instant partnerships per time step by region
-  totdeg.i.region <- c(inst.region[1]*num.EW, inst.region[2]*num.KC, inst.region[3]*num.OW)*time.unit
-
   # Total number of instant partnerships per time step
   totdeg.i <- sum(num.inst)
 
   # Number of partnerships
   edges.i <- sum(totdeg.i) / 2
 
-  # Race mixing
-   # Nodematch target stat: number of BB, HH, and OO partnerships
-    edges.hom.i <- c((totdeg.i.bho[1]*prop.hom.mpi.B[3] / 2), 
+  # Race mixing: nodematch target stat: number of BB, HH, and OO partnerships
+  edges.hom.i.hbo <- c((totdeg.i.bho[1]*prop.hom.mpi.B[3] / 2), 
                    (totdeg.i.bho[2]*prop.hom.mpi.H[3] / 2),
                    (totdeg.i.bho[3]*prop.hom.mpi.O[3] / 2))
   
-    # Sqrt absdiff term for age
-    sqrt.adiff.i <- edges.i * sqrt.adiff.mpi[3]
+  # Regional mixing: nodematch target stat: number of within-region partnerships
+  edges.hom.i.region <- edges.i * prop.hom.region.mpi[3]
+  
+  # Sqrt absdiff term for age
+  sqrt.adiff.i <- edges.i * sqrt.adiff.mpi[3]
 
-    # Compile target stats
-      ##--FOR NOW, FIT AS EDGES-ONLY MODEL
-      stats.i <- c(edges.i)
-      
-      ##-- Desired target stats when all code is updated: edges, nodefactor(c("deg.main", "deg.pers")), nodefactor("riskg") nodematch("race"), nodemix("region"), absdiff(sqrt.age)
-      ##-- confirm which level to omit for nodefactor terms, confirm how specify target stats for offset terms
-      # if (!is.na(qnts.18to49[1]) & !is.na(qnts.50to59[1])) {
-      #   stats.i <- c(edges.i, num.inst[-1], numriskg[-1], nodematch.i.race, nodemix.i.region, sqrt.adiff.i)
-      # } else {
-      #   stats.i <- c(edges.i, num.inst[-1], nodematch.i.race, nodemix.i.region, sqrt.adiff.i)
-      # }
-      # 
+  # Compile target stats
+    ##--FOR NOW, FIT AS EDGES-ONLY MODEL
+    stats.i <- c(edges.i)
+    
+    ##-- Desired target stats when all code is updated: edges, nodefactor(c("deg.main", "deg.pers")), nodefactor("riskg") nodematch("race"), nodemix("region"), absdiff(sqrt.age)
+    ##-- confirm which level to omit for nodefactor terms, confirm how specify target stats for offset terms
+    # if (!is.na(qnts.18to49[1]) & !is.na(qnts.50to59[1])) {
+    #   stats.i <- c(edges.i, num.inst[-1], numriskg[-1], nodematch.i.race, nodemix.i.region, sqrt.adiff.i)
+    # } else {
+    #   stats.i <- c(edges.i, num.inst[-1], nodematch.i.race, nodemix.i.region, sqrt.adiff.i)
+    # }
+    # 
 
 
 
