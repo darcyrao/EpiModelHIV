@@ -55,15 +55,8 @@
 #'        partnerships, with options of \code{"black"} to apply black MSM counts,
 #'        \code{"white"} to apply white MSM counts, and \code{"mean"} to take
 #'        the average of the two expectations.
-#' @param sqrt.adiff.BB Vector of length 3 with the mean absolute differences
-#'        in the square root of ages in main, casual, and one-off black-black
-#'        partnerships.
-#' @param sqrt.adiff.WW Vector of length 3 with the mean absolute differences
-#'        in the square root of ages in main, casual, and one-off white-white
-#'        partnerships.
-#' @param sqrt.adiff.BW Vector of length 3 with the mean absolute differences
-#'        in the square root of ages in main, casual, and one-off black-white
-#'        partnerships.
+#' @param sqrt.adiff.mpi Vector of length 3 with the mean absolute differences
+#'        in the square root of ages in main, casual, and instantaneous partnerships.
 #' @param diss.main Dissolution model formula for main partnerships.
 #' @param diss.pers Dissolution model formula for casual partnerships.
 #' @param durs.main Duration of main partnerships in days.
@@ -128,9 +121,7 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
                              prop.hom.mpi.B,
                              prop.hom.mpi.O,
                              balance = "mean",
-                             sqrt.adiff.BB,
-                             sqrt.adiff.WW,
-                             sqrt.adiff.BW,
+                             sqrt.adiff.mpi,
                              diss.main,
                              diss.pers,
                              durs.main,
@@ -209,13 +200,8 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
                      (totdeg.m.by.race[2]*prop.hom.mpi.H[1] / 2),
                      (totdeg.m.by.race[3]*prop.hom.mpi.O[1] / 2))
 
-  # # Sqrt absdiff term for age
-  # if (method == 2) {
-  #   sqrt.adiff.m <- edges.nodemix.m * c(sqrt.adiff.BB[1], sqrt.adiff.BW[1], sqrt.adiff.WW[1])
-  # }
-  # if (method == 1) {
-  #   sqrt.adiff.m <- edges.m * mean(c(sqrt.adiff.BB[1], sqrt.adiff.BW[1], sqrt.adiff.WW[1]))
-  # }
+  # Sqrt absdiff term for age
+  sqrt.adiff.m <- edges.m * sqrt.adiff.mpi[1]
 
   # Compile target stats
   
@@ -272,13 +258,8 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
                    (totdeg.p.by.race[2]*prop.hom.mpi.H[2] / 2),
                    (totdeg.p.by.race[3]*prop.hom.mpi.O[2] / 2))
   
-  # # Sqrt absdiff term for age
-  # if (method == 2) {
-  #   sqrt.adiff.p <- edges.nodemix.p * c(sqrt.adiff.BB[2], sqrt.adiff.BW[2], sqrt.adiff.WW[2])
-  # }
-  # if (method == 1) {
-  #   sqrt.adiff.p <- edges.p * mean(c(sqrt.adiff.BB[2], sqrt.adiff.BW[2], sqrt.adiff.WW[2]))
-  # }
+  # Sqrt absdiff term for age
+  sqrt.adiff.p <- edges.p * sqrt.adiff.mpi[2]
 
   # Compile target statistics
   
@@ -331,13 +312,8 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
                    (totdeg.i.bho[2]*prop.hom.mpi.H[3] / 2),
                    (totdeg.i.bho[3]*prop.hom.mpi.O[3] / 2))
   
-  #   # Sqrt absdiff term for age
-  #   if (method == 2) {
-  #     sqrt.adiff.i <- edges.nodemix.i * c(sqrt.adiff.BB[3], sqrt.adiff.BW[3], sqrt.adiff.WW[3])
-  #   }
-  #   if (method == 1) {
-  #     sqrt.adiff.i <- edges.i * mean(c(sqrt.adiff.BB[3], sqrt.adiff.BW[3], sqrt.adiff.WW[3]))
-  #   }
+    # Sqrt absdiff term for age
+    sqrt.adiff.i <- edges.i * sqrt.adiff.mpi[3]
 
     # Compile target stats
       ##--FOR NOW, FIT AS EDGES-ONLY MODEL
