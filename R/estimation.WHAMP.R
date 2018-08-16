@@ -201,14 +201,9 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   # Sqrt absdiff term for age
   sqrt.adiff.m <- edges.m * sqrt.adiff.mpi[1]
 
-  # Compile target stats
-  
-    ##--FOR NOW, FIT AS EDGES-ONLY MODEL
-      stats.m <- c(edges.m)
-    
-    ##-- Desired target stats when all code is updated: edges, nodefactor("deg.pers"), nodefactor("race"), nodefactor("region"), nodematch("race"), absdiff("sqrt.age")
+  # Compile target stats: edges, nodefactor("deg.pers"), nodefactor("race"), nodefactor("region"), nodematch("race"), absdiff("sqrt.age")
           ##-- confirm which level to omit for nodefactor terms, confirm how specify target stats for offset terms
-  #   stats.m <- c(edges.m, totdeg.m.by.dp[2:3], totdeg.m.by.race[1:2], totdeg.m.by.region[2:3], nodematch.m.race, sqrt.adiff.m)
+  stats.m <- c(edges.m, totdeg.m.by.dp[2:3], totdeg.m.by.race[1:2], totdeg.m.by.region[c(1,3)], edges.hom.m.hbo, sqrt.adiff.m)
 
   # Dissolution model
    ## Expected mortality is a weighted avg of the racial/ethnic- and age-specific mortality ratios
@@ -261,15 +256,9 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   # Sqrt absdiff term for age
   sqrt.adiff.p <- edges.p * sqrt.adiff.mpi[2]
 
-  # Compile target statistics
-  
-    ##--FOR NOW, FIT AS EDGES-ONLY MODEL
-    stats.p <- c(edges.p)
-    
-    ##-- Desired target stats when all code is updated: edges, nodefactor("deg.main"), concurrent, nodematch("race"), nodemix("region"), absdiff(sqrt.age)
+  # Compile target statistics: edges, nodefactor("deg.main"), concurrent, nodematch("race"), nodematch("region"), absdiff(sqrt.age)
     ##-- confirm which level to omit for nodefactor terms, confirm how specify target stats for offset terms
-    # 
-    #   stats.p <- c(edges.p, totdeg.p.by.dm[2], conc.p, nodematch.p.race, nodemix.p.region, sqrt.adiff.p)
+  stats.p <- c(edges.p, totdeg.p.by.dm[2], conc.p, edges.hom.p.hbo, edges.hom.p.region, sqrt.adiff.p)
     
 
   # Dissolution model
@@ -295,7 +284,9 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   }
   
   # Number of instant partnerships per time step by race/ethnicity
-  totdeg.i.bho <- c(inst.bho[1]*num.B..wa, inst.bho[2]*num.H..wa, inst.bho[3]*num.O..wa)*time.unit
+  totdeg.i.bho <- c(inst.bho[1]*num.B..wa, 
+                    inst.bho[2]*num.H..wa, 
+                    inst.bho[3]*num.O..wa)*time.unit
   
   # Total number of instant partnerships per time step
   totdeg.i <- sum(num.inst)
@@ -314,18 +305,14 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   # Sqrt absdiff term for age
   sqrt.adiff.i <- edges.i * sqrt.adiff.mpi[3]
 
-  # Compile target stats
-    ##--FOR NOW, FIT AS EDGES-ONLY MODEL
-    stats.i <- c(edges.i)
-    
-    ##-- Desired target stats when all code is updated: edges, nodefactor(c("deg.main", "deg.pers")), nodefactor("riskg") nodematch("race"), nodemix("region"), absdiff(sqrt.age)
+  # Compile target stats: edges, nodefactor(c("deg.main", "deg.pers")), nodefactor("riskg") nodematch("race"), nodematch("region"), absdiff(sqrt.age)
     ##-- confirm which level to omit for nodefactor terms, confirm how specify target stats for offset terms
-    # if (!is.na(qnts.18to49[1]) & !is.na(qnts.50to59[1])) {
-    #   stats.i <- c(edges.i, num.inst[-1], numriskg[-1], nodematch.i.race, nodemix.i.region, sqrt.adiff.i)
-    # } else {
-    #   stats.i <- c(edges.i, num.inst[-1], nodematch.i.race, nodemix.i.region, sqrt.adiff.i)
-    # }
-    # 
+  if (!is.na(qnts.18to49[1]) & !is.na(qnts.50to59[1])) {
+    stats.i <- c(edges.i, num.inst[-1], numriskg[-1], edges.hom.i.hbo, edges.hom.i.region, sqrt.adiff.i)
+  } else {
+    stats.i <- c(edges.i, num.inst[-1], edges.hom.i.hbo, edges.hom.i.region, sqrt.adiff.i)
+  }
+
 
 
 
