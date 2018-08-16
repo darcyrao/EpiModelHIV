@@ -39,14 +39,18 @@
 #' @param deg.mp.EW Degree distribution matrix for main and causal partners for
 #'        eastern WA MSM, as a 2 by 3 matrix.                  
 #' @param mdeg.inst Mean degree, or rate, of one-off partnerships per day.
-#' @param qnts.18to49 Means of one-off rates split into quantiles for MSM ages 18-49. Use
-#'        \code{NA} to ignore these quantiles in the target statistics.
-#' @param qnts.50to59 Means of one-off rates split into quantiles for MSM ages 50-59. Use
-#'        \code{NA} to ignore these quantiles in the target statistics.
+#' @param qnts.18to49 Means rates withing quartiles of the distribution of instantaneous partnerships 
+#'        for MSM ages 18-49. Use \code{NA} to ignore these quantiles in the target statistics.
+#' @param qnts.50to59 Means rates withing quartiles of the distribution of instantaneous partnerships
+#'        for MSM ages 50-59. Use \code{NA} to ignore these quantiles in the target statistics.
+#' @param inst.bho Mean rate of instantaneous partnerships by racial/ethnic group
+#' @param inst.region Mean rate of instantaneous partnerships by region
+#' @param prop.hom.mpi.H A vector of length 3 for the proportion of main, casual,
+#'        and one-off partnerships in same race for Hispanic MSM.
 #' @param prop.hom.mpi.B A vector of length 3 for the proportion of main, casual,
 #'        and one-off partnerships in same race for black MSM.
-#' @param prop.hom.mpi.W A vector of length 3 for the proportion of main, casual,
-#'        and one-off partnerships in same race for white MSM.
+#' @param prop.hom.mpi.O A vector of length 3 for the proportion of main, casual,
+#'        and one-off partnerships in same race for other race/ethnicity MSM.
 #' @param balance Method for balancing of edges by race for number of mixed-race
 #'        partnerships, with options of \code{"black"} to apply black MSM counts,
 #'        \code{"white"} to apply white MSM counts, and \code{"mean"} to take
@@ -118,8 +122,11 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
                              mdeg.inst,
                              qnts.18to49,
                              qnts.50to59,
+                             inst.bho,
+                             inst.region,
+                             prop.hom.mpi.H,
                              prop.hom.mpi.B,
-                             prop.hom.mpi.W,
+                             prop.hom.mpi.O,
                              balance = "mean",
                              sqrt.adiff.BB,
                              sqrt.adiff.WW,
@@ -182,36 +189,25 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   # Persons in partnerships by casual degree
     totdeg.m.by.dp <- c(num * deg.mp[2, ])
 
-  # Persons in partnerships by race/ethnicity (H, B, O)
-    totdeg.m.by.race <- c(sum(num.H..wa * deg.mp.H[2,]), 
-                          sum(num.B..wa * deg.mp.B[2,]),
+  # Persons in partnerships by race/ethnicity (B, H, O)
+    totdeg.m.by.race <- c(sum(num.B..wa * deg.mp.B[2,]),
+                          sum(num.H..wa * deg.mp.H[2,]),
                           sum(num.O..wa * deg.mp.O[2,]))
   
-  # Persons in partnerships by region (KC, OW, EW)
-    totdeg.m.by.region <- c(sum(num.KC * deg.mp.KC[2,]),
-                            sum(num.OW * deg.mp.OW[2,]),
-                            sum(num.EW * deg.mp.EW[2,]))
+  # Persons in partnerships by region (EW, KC, OW)
+    totdeg.m.by.region <- c(sum(num.EW * deg.mp.EW[2,]),
+                            sum(num.KC * deg.mp.KC[2,]),
+                            sum(num.OW * deg.mp.OW[2,]))
     
 
   # Number of partnerships
   edges.m <- (sum(totdeg.m.by.dp)) / 2
 
   # Mixing
-  # if (method == 2) {
-  #   # Number of mixed-race partnerships, with balancing to decide
-  #   edges.m.B2W <- totdeg.m.by.race[1] * (1 - prop.hom.mpi.B[1])
-  #   edges.m.W2B <- totdeg.m.by.race[2] * (1 - prop.hom.mpi.W[1])
-  #   edges.het.m <- switch(balance,
-  #                         black = edges.m.B2W,
-  #                         white = edges.m.W2B,
-  #                         mean = (edges.m.B2W + edges.m.W2B) / 2)
-  # 
-  #   # Number of same-race partnerships
-  #   edges.hom.m <- (totdeg.m.by.race - edges.het.m) / 2
-  # 
-  #   # Nodemix target stat: numer of BB, BW, WW partnerships
-  #   edges.nodemix.m <- c(edges.hom.m[1], edges.het.m, edges.hom.m[2])
-  # }
+    # Nodematch target stat: number of BB, HH, and OO partnerships
+    edges.hom.m <- c((totdeg.m.by.race[1]*prop.hom.mpi.B[1] / 2), 
+                     (totdeg.m.by.race[2]*prop.hom.mpi.H[1] / 2),
+                     (totdeg.m.by.race[3]*prop.hom.mpi.O[1] / 2))
 
   # # Sqrt absdiff term for age
   # if (method == 2) {
@@ -259,29 +255,23 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   # Persons in partnerships by main degree
   totdeg.p.by.dm <- c(num * deg.mp[, 2] + num * deg.mp[, 3] * 2)
 
-
+  # Persons in partnerships by race/ethnicity (B, H, O)
+  totdeg.p.by.race <- c(sum(num.B..wa * deg.mp.B[, 2] + num.B..wa * deg.mp.B[, 3] * 2),
+                        sum(num.H..wa * deg.mp.H[, 2] + num.H..wa * deg.mp.H[, 3] * 2),
+                        sum(num.O..wa * deg.mp.O[, 2] + num.O..wa * deg.mp.O[, 3] * 2))
+  
   # Persons concurrent
   conc.p <- c(sum(deg.mp[, 3]) * num)
   
   # Number of partnerships
   edges.p <- sum(totdeg.p.by.dm) / 2
 
-  # # Mixing
-  # if (method == 2) {
-  #   # Number of mixed-race partnerships, with balancing to decide
-  #   edges.p.B2W <- totdeg.p.by.race[1] * (1 - prop.hom.mpi.B[2])
-  #   edges.p.W2B <- totdeg.p.by.race[2] * (1 - prop.hom.mpi.W[2])
-  #   edges.het.p <- switch(balance,
-  #                         black = edges.p.B2W, white = edges.p.W2B,
-  #                         mean = (edges.p.B2W + edges.p.W2B) / 2)
-  # 
-  #   # Number of same-race partnerships
-  #   edges.hom.p <- (totdeg.p.by.race - edges.het.p) / 2
-  # 
-  #   # Nodemix target stat: number of BB, BW, WW partnerships
-  #   edges.nodemix.p <- c(edges.hom.p[1], edges.het.p, edges.hom.p[2])
-  # }
-  # 
+  # Mixing
+    # Nodematch target stat: number of BB, HH, and OO partnerships
+    edges.hom.p <- c((totdeg.p.by.race[1]*prop.hom.mpi.B[2] / 2), 
+                   (totdeg.p.by.race[2]*prop.hom.mpi.H[2] / 2),
+                   (totdeg.p.by.race[3]*prop.hom.mpi.O[2] / 2))
+  
   # # Sqrt absdiff term for age
   # if (method == 2) {
   #   sqrt.adiff.p <- edges.nodemix.p * c(sqrt.adiff.BB[2], sqrt.adiff.BW[2], sqrt.adiff.WW[2])
@@ -313,7 +303,7 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   # Number of instant partnerships per time step, by main and casl degree
   num.inst <- num * deg.mp * mdeg.inst * time.unit
   
-  # Risk quantiles
+  # Number of instant parnterships by risk quantiles
   num.50to59 <- num*sum(agestr[7:8])
   num.18to49 <- num*sum(agestr[1:6])
   
@@ -321,32 +311,26 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
       num.riskg.50to59 <- (0.25*num.50to59) * qnts.50to59 * time.unit
       num.riskg.18to49 <- (0.25*num.18to49) * qnts.18to49 * time.unit
       num.riskg <- c(num.riskg.50to59, num.riskg.18to49)
-    }
+  }
+  
+  # Number of instant partnerships per time step by race/ethnicity
+  totdeg.i.bho <- c(inst.bho[1]*num.B..wa, inst.bho[2]*num.H..wa, inst.bho[3]*num.O..wa)*time.unit
+  
+  # Number of instant partnerships per time step by region
+  totdeg.i.region <- c(inst.region[1]*num.EW, inst.region[2]*num.KC, inst.region[3]*num.OW)*time.unit
 
-  # Number of instant partnerships per time step
+  # Total number of instant partnerships per time step
   totdeg.i <- sum(num.inst)
 
   # Number of partnerships
   edges.i <- sum(totdeg.i) / 2
 
-  # # Mixing
-  # if (method == 2) {
-  #   # Number of mixed-race partnerships, with balancing to decide
-  #   edges.i.B2W <- totdeg.i[1] * (1 - prop.hom.mpi.B[3])
-  #   edges.i.W2B <- totdeg.i[2] * (1 - prop.hom.mpi.W[3])
-  #   edges.het.i <- switch(balance,
-  #                         black = edges.i.B2W, white = edges.i.W2B,
-  #                         mean = (edges.i.B2W + edges.i.W2B) / 2)
-  # 
-  #   # Number of same-race partnerships
-  #   edges.hom.i <- edges.i - edges.het.i
-  # 
-  #   # Nodemix target stat: number of BB, BW, WW partnerships
-  #   edges.nodemix.i <- c((totdeg.i[1] - edges.het.i) / 2,
-  #                        edges.het.i,
-  #                        (totdeg.i[1] - edges.het.i) / 2)
-  # }
-  # 
+  # Race mixing
+   # Nodematch target stat: number of BB, HH, and OO partnerships
+    edges.hom.i <- c((totdeg.i.bho[1]*prop.hom.mpi.B[3] / 2), 
+                   (totdeg.i.bho[2]*prop.hom.mpi.H[3] / 2),
+                   (totdeg.i.bho[3]*prop.hom.mpi.O[3] / 2))
+  
   #   # Sqrt absdiff term for age
   #   if (method == 2) {
   #     sqrt.adiff.i <- edges.nodemix.i * c(sqrt.adiff.BB[3], sqrt.adiff.BW[3], sqrt.adiff.WW[3])
