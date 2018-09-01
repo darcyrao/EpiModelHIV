@@ -7,10 +7,10 @@
 calc_nwstats_msm_whamp(time.unit = 7, method = 2, num.B, num.W, num.H.KC,
   num.B.KC, num.O.KC, num.H.OW, num.B.OW, num.O.OW, num.H.EW, num.B.EW,
   num.O.EW, agestr, deg.mp, deg.mp.H, deg.mp.B, deg.mp.O, deg.mp.KC, deg.mp.OW,
-  deg.mp.EW, mdeg.inst, qnts.18to49, qnts.50to59, prop.hom.mpi.B,
-  prop.hom.mpi.W, balance = "mean", sqrt.adiff.BB, sqrt.adiff.WW,
-  sqrt.adiff.BW, diss.main, diss.pers, durs.main, durs.pers, ages, asmr.B,
-  asmr.W, asmr.H..wa, asmr.B..wa, asmr.O..wa, role.prob)
+  deg.mp.EW, mdeg.inst, qnts.18to49, qnts.50to59, inst.bho, prop.hom.mpi.H,
+  prop.hom.mpi.B, prop.hom.mpi.O, sqrt.adiff.mpi, prop.hom.region.mpi,
+  diss.main, diss.pers, durs.main, durs.pers, ages, asmr.B, asmr.W, asmr.H..wa,
+  asmr.B..wa, asmr.O..wa, role.prob)
 }
 \arguments{
 \item{time.unit}{Time unit relative to 1 for daily.}
@@ -48,34 +48,28 @@ eastern WA MSM, as a 2 by 3 matrix.}
 
 \item{mdeg.inst}{Mean degree, or rate, of one-off partnerships per day.}
 
-\item{qnts.18to49}{Means of one-off rates split into quantiles for MSM ages 18-49. Use
-\code{NA} to ignore these quantiles in the target statistics.}
+\item{qnts.18to49}{Means rates withing quartiles of the distribution of instantaneous partnerships 
+for MSM ages 18-49. Use \code{NA} to ignore these quantiles in the target statistics.}
 
-\item{qnts.50to59}{Means of one-off rates split into quantiles for MSM ages 50-59. Use
-\code{NA} to ignore these quantiles in the target statistics.}
+\item{qnts.50to59}{Means rates withing quartiles of the distribution of instantaneous partnerships
+for MSM ages 50-59. Use \code{NA} to ignore these quantiles in the target statistics.}
+
+\item{inst.bho}{Mean rate of instantaneous partnerships by racial/ethnic group}
+
+\item{prop.hom.mpi.H}{A vector of length 3 for the proportion of main, casual,
+and one-off partnerships in same race for Hispanic MSM.}
 
 \item{prop.hom.mpi.B}{A vector of length 3 for the proportion of main, casual,
-and one-off partnerships in same race for black MSM.}
+and instantaneous partnerships in same race for black MSM.}
 
-\item{prop.hom.mpi.W}{A vector of length 3 for the proportion of main, casual,
-and one-off partnerships in same race for white MSM.}
+\item{prop.hom.mpi.O}{A vector of length 3 for the proportion of main, casual,
+and instantaneous partnerships in same race for other race/ethnicity MSM.}
 
-\item{balance}{Method for balancing of edges by race for number of mixed-race
-partnerships, with options of \code{"black"} to apply black MSM counts,
-\code{"white"} to apply white MSM counts, and \code{"mean"} to take
-the average of the two expectations.}
+\item{sqrt.adiff.mpi}{Vector of length 3 with the mean absolute differences
+in the square root of ages in main, casual, and instantaneous partnerships.}
 
-\item{sqrt.adiff.BB}{Vector of length 3 with the mean absolute differences
-in the square root of ages in main, casual, and one-off black-black
-partnerships.}
-
-\item{sqrt.adiff.WW}{Vector of length 3 with the mean absolute differences
-in the square root of ages in main, casual, and one-off white-white
-partnerships.}
-
-\item{sqrt.adiff.BW}{Vector of length 3 with the mean absolute differences
-in the square root of ages in main, casual, and one-off black-white
-partnerships.}
+\item{prop.hom.region.mpi}{A vector of length 3 for the proportion of main, casual,
+and instantaneous partnerships that are within-region.}
 
 \item{diss.main}{Dissolution model formula for main partnerships.}
 
