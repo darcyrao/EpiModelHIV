@@ -162,14 +162,28 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
     deg.pers <- apportion_lr(num, 0:2, colSums(deg.mp))
 
   # deg main nodal attribute
-    deg.main.H <- apportion_lr(num.H..wa, c("H0", "H1"), rowSums(deg.mp.H))
-    deg.main.B <- apportion_lr(num.B..wa, c("B0", "B1"), rowSums(deg.mp.B))
-    deg.main.O <- apportion_lr(num.O..wa, c("O0", "O1"), rowSums(deg.mp.O))
     
-    deg.main.KC <- apportion_lr(num.KC, c("KC0", "KC1"), rowSums(deg.mp.KC))
-    deg.main.OW <- apportion_lr(num.OW, c("OW0", "OW1"), rowSums(deg.mp.OW))
-    deg.main.EW <- apportion_lr(num.EW, c("EW0", "EW1"), rowSums(deg.mp.EW))
-
+    #Calculate expected mean main degree for each race by region combination assuming independence
+    mdeg.main.H.KC <- sum(deg.mp.H[2,])*sum(deg.mp.KC[2,])/sum(deg.mp[2,])
+    mdeg.main.B.KC <- sum(deg.mp.B[2,])*sum(deg.mp.KC[2,])/sum(deg.mp[2,])
+    mdeg.main.O.KC <- sum(deg.mp.O[2,])*sum(deg.mp.KC[2,])/sum(deg.mp[2,])
+    mdeg.main.H.OW <- sum(deg.mp.H[2,])*sum(deg.mp.OW[2,])/sum(deg.mp[2,])
+    mdeg.main.B.OW <- sum(deg.mp.B[2,])*sum(deg.mp.OW[2,])/sum(deg.mp[2,])
+    mdeg.main.O.OW <- sum(deg.mp.O[2,])*sum(deg.mp.OW[2,])/sum(deg.mp[2,])
+    mdeg.main.H.EW <- sum(deg.mp.H[2,])*sum(deg.mp.EW[2,])/sum(deg.mp[2,])
+    mdeg.main.B.EW <- sum(deg.mp.B[2,])*sum(deg.mp.EW[2,])/sum(deg.mp[2,])
+    mdeg.main.O.EW <- sum(deg.mp.O[2,])*sum(deg.mp.EW[2,])/sum(deg.mp[2,])
+    
+    # Assign deg.main nodal attribute by race and region
+    deg.main.H.KC <- apportion_lr(num.H.KC, c("H.KC0", "H.KC1"), c((1 - mdeg.main.H.KC), mdeg.main.H.KC))
+    deg.main.B.KC <- apportion_lr(num.B.KC, c("B.KC0", "B.KC1"), c((1 - mdeg.main.B.KC), mdeg.main.B.KC))
+    deg.main.O.KC <- apportion_lr(num.O.KC, c("O.KC0", "O.KC1"), c((1 - mdeg.main.O.KC), mdeg.main.O.KC))
+    deg.main.H.OW <- apportion_lr(num.H.OW, c("H.OW0", "H.OW1"), c((1 - mdeg.main.H.OW), mdeg.main.H.OW))
+    deg.main.B.OW <- apportion_lr(num.B.OW, c("B.OW0", "B.OW1"), c((1 - mdeg.main.B.OW), mdeg.main.B.OW))
+    deg.main.O.OW <- apportion_lr(num.O.OW, c("O.OW0", "O.OW1"), c((1 - mdeg.main.O.OW), mdeg.main.O.OW))
+    deg.main.H.EW <- apportion_lr(num.H.EW, c("H.EW0", "H.EW1"), c((1 - mdeg.main.H.EW), mdeg.main.H.EW))
+    deg.main.B.EW <- apportion_lr(num.B.EW, c("B.EW0", "B.EW1"), c((1 - mdeg.main.B.EW), mdeg.main.B.EW))
+    deg.main.O.EW <- apportion_lr(num.O.EW, c("O.EW0", "O.EW1"), c((1 - mdeg.main.O.EW), mdeg.main.O.EW))
 
   # Main partnerships -------------------------------------------------------
 
@@ -308,7 +322,7 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   # Compile target stats: edges, nodefactor(c("deg.main", "deg.pers")), nodefactor("riskg") nodematch("race"), nodematch("region"), absdiff(sqrt.age)
     ##-- confirm which level to omit for nodefactor terms, confirm how specify target stats for offset terms
   if (!is.na(qnts.18to49[1]) & !is.na(qnts.50to59[1])) {
-    stats.i <- c(edges.i, num.inst[-1], numriskg[-1], edges.hom.i.hbo, edges.hom.i.region, sqrt.adiff.i)
+    stats.i <- c(edges.i, num.inst[-1], num.riskg[-1], edges.hom.i.hbo, edges.hom.i.region, sqrt.adiff.i)
   } else {
     stats.i <- c(edges.i, num.inst[-1], edges.hom.i.hbo, edges.hom.i.region, sqrt.adiff.i)
   }
@@ -320,9 +334,10 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   out <- list()
   out$method <- method
   out$deg.pers <- deg.pers
-  out$deg.main.race <- c(deg.main.H, deg.main.B, deg.main.O)
-  out$deg.main.region <- c(deg.main.KC, deg.main.OW, deg.main.EW)
-  
+  out$deg.main <- c(deg.main.H.KC, deg.main.B.KC, deg.main.O.KC, 
+                    deg.main.H.OW, deg.main.B.OW, deg.main.O.OW, 
+                    deg.main.H.EW, deg.main.B.EW, deg.main.O.EW)
+
   out$stats.m <- stats.m
   out$stats.p <- stats.p
   out$stats.i <- stats.i
@@ -441,8 +456,8 @@ base_nw_msm_whamp <- function(nwstats) {
 
   role <- sample(apportion_lr(n, c("I", "R", "V"), nwstats$role.prob)) 
 
-  riskg.50to59 <- sample(apportion_lr(num*sum(agestr[7:8]), c("O1", "O2", "O3", "O4"), rep(0.25, 4)))
-  riskg.18to49 <- sample(apportion_lr(num*sum(agestr[1:6]), c("Y1", "Y2", "Y3", "Y4"), rep(0.25, 4)))
+  riskg.50to59 <- sample(apportion_lr(n*sum(agestr[7:8]), c("O1", "O2", "O3", "O4"), rep(0.25, 4)))
+  riskg.18to49 <- sample(apportion_lr(n*sum(agestr[1:6]), c("Y1", "Y2", "Y3", "Y4"), rep(0.25, 4)))
   riskg <- rep(NA, n)
   riskg[age>=18 & age<50] <- riskg.18to49
   riskg[age>=50] <- riskg.50to59
@@ -560,6 +575,16 @@ assign_degree_whamp <- function(nw, deg.type, nwstats) {
     deg.H.EW <- apportion_lr(nH.EW, 0:(num.degrees - 1), dist.H.EW, shuffled = TRUE)
     deg.B.EW <- apportion_lr(nB.EW, 0:(num.degrees - 1), dist.B.EW, shuffled = TRUE)
     deg.O.EW <- apportion_lr(nO.EW, 0:(num.degrees - 1), dist.O.EW, shuffled = TRUE)
+    
+    deg.H.KC <- paste0("H.KC", deg.H.KC)
+    deg.B.KC <- paste0("B.KC", deg.B.KC)
+    deg.O.KC <- paste0("O.KC", deg.O.KC)
+    deg.H.OW <- paste0("H.OW", deg.H.OW)
+    deg.B.OW <- paste0("B.OW", deg.B.OW)
+    deg.O.OW <- paste0("O.OW", deg.O.OW)
+    deg.H.EW <- paste0("H.EW", deg.H.EW)
+    deg.B.EW <- paste0("B.EW", deg.B.EW)
+    deg.O.EW <- paste0("O.EW", deg.O.EW)
     
     nw <- set.vertex.attribute(nw, attrname = attr.name, value = deg.H.KC, v = vH.KC)
     nw <- set.vertex.attribute(nw, attrname = attr.name, value = deg.B.KC, v = vB.KC)
