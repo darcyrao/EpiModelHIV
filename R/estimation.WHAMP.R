@@ -208,9 +208,6 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
     edges.hom.m.hbo <- c((totdeg.m.by.race[1]*prop.hom.mpi.B[1] / 2), 
                      (totdeg.m.by.race[2]*prop.hom.mpi.H[1] / 2),
                      (totdeg.m.by.race[3]*prop.hom.mpi.O[1] / 2))
-
-  # Regional mixing: nodematch target stat: number of within-region partnerships
-  edges.hom.m.region <- edges.m * prop.hom.region.mpi[1]
     
   # Sqrt absdiff term for age
   sqrt.adiff.m <- edges.m * sqrt.adiff.mpi[1]
