@@ -44,6 +44,7 @@
 #' @param qnts.50to59 Means rates withing quartiles of the distribution of instantaneous partnerships
 #'        for MSM ages 50-59. Use \code{NA} to ignore these quantiles in the target statistics.
 #' @param inst.bho Mean rate of instantaneous partnerships by racial/ethnic group
+#' @param inst.region Mean rate of instantaneous partnerships by region
 #' @param prop.hom.mpi.H A vector of length 3 for the proportion of main, casual,
 #'        and one-off partnerships in same race for Hispanic MSM.
 #' @param prop.hom.mpi.B A vector of length 3 for the proportion of main, casual,
@@ -113,6 +114,7 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
                              qnts.18to49,
                              qnts.50to59,
                              inst.bho,
+                             inst.region,
                              prop.hom.mpi.H,
                              prop.hom.mpi.B,
                              prop.hom.mpi.O,
@@ -249,6 +251,10 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
                         sum(num.H..wa * deg.mp.H[, 2] + num.H..wa * deg.mp.H[, 3] * 2),
                         sum(num.O..wa * deg.mp.O[, 2] + num.O..wa * deg.mp.O[, 3] * 2))
   
+  # Persons in partnerships by region (EW, KC, OW)
+  totdeg.p.by.region <- c(sum(num.EW * deg.mp.EW[, 2] + num.EW * deg.mp.EW[, 3] * 2),
+                          sum(num.KC * deg.mp.KC[, 2] + num.KC * deg.mp.KC[, 3] * 2),
+                          sum(num.OW * deg.mp.OW[, 2] + num.OW * deg.mp.OW[, 3] * 2))
   # Persons concurrent
   conc.p <- c(sum(deg.mp[, 3]) * num)
   
@@ -268,7 +274,7 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
 
   # Compile target statistics: edges, nodefactor("deg.main"), concurrent, nodematch("race"), nodematch("region"), absdiff(sqrt.age)
     ##-- confirm which level to omit for nodefactor terms, confirm how specify target stats for offset terms
-  stats.p <- c(edges.p, totdeg.p.by.dm[2], conc.p, edges.hom.p.hbo, edges.hom.p.region, sqrt.adiff.p)
+  stats.p <- c(edges.p, totdeg.p.by.dm[2], totdeg.p.by.race[1:2], totdeg.p.by.region[c(1,3)], conc.p, edges.hom.p.hbo, edges.hom.p.region, sqrt.adiff.p)
     
 
   # Dissolution model
@@ -298,6 +304,11 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
                     inst.bho[2]*num.H..wa, 
                     inst.bho[3]*num.O..wa)*time.unit
   
+  # Number of instant partnerships per time step by region
+  totdeg.i.region <- c(inst.region[1]*num.EW, 
+                    inst.region[2]*num.KC, 
+                    inst.region[3]*num.OW)*time.unit
+  
   # Total number of instant partnerships per time step
   totdeg.i <- sum(num.inst)
 
@@ -318,9 +329,9 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   # Compile target stats: edges, nodefactor(c("deg.main", "deg.pers")), nodefactor("riskg") nodematch("race"), nodematch("region"), absdiff(sqrt.age)
     ##-- confirm which level to omit for nodefactor terms, confirm how specify target stats for offset terms
   if (!is.na(qnts.18to49[1]) & !is.na(qnts.50to59[1])) {
-    stats.i <- c(edges.i, num.inst[-1], num.riskg[-1], edges.hom.i.hbo, edges.hom.i.region, sqrt.adiff.i)
+    stats.i <- c(edges.i, num.inst[-1], num.riskg[-1], totdeg.i.bho[1:2], totdeg.i.region[c(1,3)], edges.hom.i.hbo, edges.hom.i.region, sqrt.adiff.i)
   } else {
-    stats.i <- c(edges.i, num.inst[-1], edges.hom.i.hbo, edges.hom.i.region, sqrt.adiff.i)
+    stats.i <- c(edges.i, num.inst[-1], totdeg.i.bho[1:2], totdeg.i.region[c(1,3)], edges.hom.i.hbo, edges.hom.i.region, sqrt.adiff.i)
   }
 
 
