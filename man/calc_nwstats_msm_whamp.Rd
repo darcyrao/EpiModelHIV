@@ -7,10 +7,10 @@
 calc_nwstats_msm_whamp(time.unit = 7, method = 2, num.B, num.W, num.H.KC,
   num.B.KC, num.O.KC, num.H.OW, num.B.OW, num.O.OW, num.H.EW, num.B.EW,
   num.O.EW, agestr, deg.mp, deg.mp.H, deg.mp.B, deg.mp.O, deg.mp.KC, deg.mp.OW,
-  deg.mp.EW, mdeg.inst, qnts.18to49, qnts.50to59, inst.bho, prop.hom.mpi.H,
-  prop.hom.mpi.B, prop.hom.mpi.O, sqrt.adiff.mpi, prop.hom.region.mpi,
-  diss.main, diss.pers, durs.main, durs.pers, ages, asmr.B, asmr.W, asmr.H..wa,
-  asmr.B..wa, asmr.O..wa, role.prob)
+  deg.mp.EW, mdeg.inst, qnts.18to49, qnts.50to59, inst.bho, inst.region,
+  prop.hom.mpi.H, prop.hom.mpi.B, prop.hom.mpi.O, sqrt.adiff.mpi,
+  prop.hom.region.mpi, diss.main, diss.pers, durs.main, durs.pers, ages, asmr.B,
+  asmr.W, asmr.H..wa, asmr.B..wa, asmr.O..wa, role.prob)
 }
 \arguments{
 \item{time.unit}{Time unit relative to 1 for daily.}
@@ -55,6 +55,8 @@ for MSM ages 18-49. Use \code{NA} to ignore these quantiles in the target statis
 for MSM ages 50-59. Use \code{NA} to ignore these quantiles in the target statistics.}
 
 \item{inst.bho}{Mean rate of instantaneous partnerships by racial/ethnic group}
+
+\item{inst.region}{Mean rate of instantaneous partnerships by region}
 
 \item{prop.hom.mpi.H}{A vector of length 3 for the proportion of main, casual,
 and one-off partnerships in same race for Hispanic MSM.}
