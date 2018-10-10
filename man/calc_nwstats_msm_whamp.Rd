@@ -6,8 +6,8 @@
 \usage{
 calc_nwstats_msm_whamp(time.unit = 7, method = 2, num.B, num.W, num.H.KC,
   num.B.KC, num.O.KC, num.H.OW, num.B.OW, num.O.OW, num.H.EW, num.B.EW,
-  num.O.EW, agestr, deg.mp, deg.mp.H, deg.mp.B, deg.mp.O, deg.mp.KC, deg.mp.OW,
-  deg.mp.EW, mdeg.inst, qnts.18to49, qnts.50to59, inst.bho, inst.region,
+  num.O.EW, agestr, deg.mp, deg.mp.H, deg.mp.B, deg.mp.O, deg.m.region,
+  deg.p.region, mdeg.inst, qnts.18to49, qnts.50to59, inst.bho, inst.region,
   prop.hom.mpi.H, prop.hom.mpi.B, prop.hom.mpi.O, sqrt.adiff.mpi,
   prop.hom.region.mpi, diss.main, diss.pers, durs.main, durs.pers, ages, asmr.B,
   asmr.W, asmr.H..wa, asmr.B..wa, asmr.O..wa, role.prob)
@@ -37,14 +37,9 @@ Black MSM, as a 2 by 3 matrix.}
 \item{deg.mp.O}{Degree distribution matrix for main and causal partners for
 Other race/ethnicity MSM, as a 2 by 3 matrix.}
 
-\item{deg.mp.KC}{Degree distribution matrix for main and causal partners for
-King County MSM, as a 2 by 3 matrix.}
+\item{deg.m.region}{Main degree distribution by region (EW, KC, OW)}
 
-\item{deg.mp.OW}{Degree distribution matrix for main and causal partners for
-other western WA MSM, as a 2 by 3 matrix.}
-
-\item{deg.mp.EW}{Degree distribution matrix for main and causal partners for
-eastern WA MSM, as a 2 by 3 matrix.}
+\item{deg.p.region}{Persistent degree distribution by region (EW, KC, OW)}
 
 \item{mdeg.inst}{Mean degree, or rate, of one-off partnerships per day.}
 
@@ -56,7 +51,7 @@ for MSM ages 50-59. Use \code{NA} to ignore these quantiles in the target statis
 
 \item{inst.bho}{Mean rate of instantaneous partnerships by racial/ethnic group}
 
-\item{inst.region}{Mean rate of instantaneous partnerships by region}
+\item{inst.region}{Distribution of instantaneous partnerships by region (EW, KC, OW)}
 
 \item{prop.hom.mpi.H}{A vector of length 3 for the proportion of main, casual,
 and one-off partnerships in same race for Hispanic MSM.}
