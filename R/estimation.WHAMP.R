@@ -32,19 +32,15 @@
 #'        Black MSM, as a 2 by 3 matrix. 
 #' @param deg.mp.O Degree distribution matrix for main and causal partners for
 #'        Other race/ethnicity MSM, as a 2 by 3 matrix.     
-#' @param deg.mp.KC Degree distribution matrix for main and causal partners for
-#'        King County MSM, as a 2 by 3 matrix. 
-#' @param deg.mp.OW Degree distribution matrix for main and causal partners for
-#'        other western WA MSM, as a 2 by 3 matrix.  
-#' @param deg.mp.EW Degree distribution matrix for main and causal partners for
-#'        eastern WA MSM, as a 2 by 3 matrix.                  
+#' @param deg.m.region Main degree distribution by region (EW, KC, OW)
+#' @param deg.p.region Persistent degree distribution by region (EW, KC, OW)                 
 #' @param mdeg.inst Mean degree, or rate, of one-off partnerships per day.
 #' @param qnts.18to49 Means rates withing quartiles of the distribution of instantaneous partnerships 
 #'        for MSM ages 18-49. Use \code{NA} to ignore these quantiles in the target statistics.
 #' @param qnts.50to59 Means rates withing quartiles of the distribution of instantaneous partnerships
 #'        for MSM ages 50-59. Use \code{NA} to ignore these quantiles in the target statistics.
 #' @param inst.bho Mean rate of instantaneous partnerships by racial/ethnic group
-#' @param inst.region Mean rate of instantaneous partnerships by region
+#' @param inst.region Distribution of instantaneous partnerships by region (EW, KC, OW)
 #' @param prop.hom.mpi.H A vector of length 3 for the proportion of main, casual,
 #'        and one-off partnerships in same race for Hispanic MSM.
 #' @param prop.hom.mpi.B A vector of length 3 for the proportion of main, casual,
@@ -107,9 +103,8 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
                              deg.mp.H,
                              deg.mp.B,
                              deg.mp.O,
-                             deg.mp.KC,
-                             deg.mp.OW,
-                             deg.mp.EW,
+                             deg.m.region,
+                             deg.p.region,
                              mdeg.inst,
                              qnts.18to49,
                              qnts.50to59,
@@ -133,15 +128,20 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
                              role.prob) {
 
   if (sum(deg.mp) != 1) {
-    stop("deg.mp must sum to 1.")
+    stop("deg.mp must sum to 1")
   }
   if (sum(deg.mp.H) != 1 | sum(deg.mp.B) !=1 | sum(deg.mp.O) !=1) {
-    stop("deg.mp terms must sum to 1.")
+    stop("deg.mp terms must sum to 1")
   }
-  if (sum(deg.mp.KC) != 1 | sum(deg.mp.OW) !=1 | sum(deg.mp.EW) !=1) {
-    stop("deg.mp terms must sum to 1.")
+  if (sum(deg.m.region) !=1) {
+    stop("deg distribution must sum to 1.")
   }
-  
+  if (sum(deg.p.region) !=1) {
+    stop("deg distribution must sum to 1.")
+  }
+  if (sum(inst.region) !=1) {
+    stop("deg distribution must sum to 1.")
+  }
   if (!(method %in% 1:2)) {      #--delete this eventually
     stop("method must either be 1 for one-race models or 2 for two-race models", call. = FALSE)
   }
@@ -160,31 +160,14 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   num.OW <- sum(num.H.OW, num.B.OW, num.O.OW)
   num.EW <- sum(num.H.EW, num.B.EW, num.O.EW)
   
-  # deg.pers nodal attribute
-    deg.pers <- apportion_lr(num, 0:2, colSums(deg.mp))
+  # Mean degree by region
+    mean.degmp.EW <- c(((sum(deg.mp[2,])*num)*deg.m.region[1])/num.EW, 
+                       ((sum(deg.mp[,2], 2*deg.mp[,3])*num)*deg.p.region[1])/num.EW)
+    mean.degmp.KC <- c(((sum(deg.mp[2,])*num)*deg.m.region[2])/num.KC, 
+                       ((sum(deg.mp[,2], 2*deg.mp[,3])*num)*deg.p.region[2])/num.KC)
+    mean.degmp.OW <- c(((sum(deg.mp[2,])*num)*deg.m.region[3])/num.OW, 
+                       ((sum(deg.mp[,2], 2*deg.mp[,3])*num)*deg.p.region[3])/num.OW)              
 
-  # deg main nodal attribute
-    
-    #Calculate expected mean main degree for each race by region combination assuming independence
-    mdeg.main.H.KC <- sum(deg.mp.H[2,])*sum(deg.mp.KC[2,])/sum(deg.mp[2,])
-    mdeg.main.B.KC <- sum(deg.mp.B[2,])*sum(deg.mp.KC[2,])/sum(deg.mp[2,])
-    mdeg.main.O.KC <- sum(deg.mp.O[2,])*sum(deg.mp.KC[2,])/sum(deg.mp[2,])
-    mdeg.main.H.OW <- sum(deg.mp.H[2,])*sum(deg.mp.OW[2,])/sum(deg.mp[2,])
-    mdeg.main.B.OW <- sum(deg.mp.B[2,])*sum(deg.mp.OW[2,])/sum(deg.mp[2,])
-    mdeg.main.O.OW <- sum(deg.mp.O[2,])*sum(deg.mp.OW[2,])/sum(deg.mp[2,])
-    mdeg.main.H.EW <- sum(deg.mp.H[2,])*sum(deg.mp.EW[2,])/sum(deg.mp[2,])
-    mdeg.main.B.EW <- sum(deg.mp.B[2,])*sum(deg.mp.EW[2,])/sum(deg.mp[2,])
-    mdeg.main.O.EW <- sum(deg.mp.O[2,])*sum(deg.mp.EW[2,])/sum(deg.mp[2,])
-    
-    deg.main.H.KC <- apportion_lr(num.H.KC, c(0, 1), c((1 - mdeg.main.H.KC), mdeg.main.H.KC))
-    deg.main.B.KC <- apportion_lr(num.B.KC, c(0, 1), c((1 - mdeg.main.B.KC), mdeg.main.B.KC))
-    deg.main.O.KC <- apportion_lr(num.O.KC, c(0, 1), c((1 - mdeg.main.O.KC), mdeg.main.O.KC))
-    deg.main.H.OW <- apportion_lr(num.H.OW, c(0, 1), c((1 - mdeg.main.H.OW), mdeg.main.H.OW))
-    deg.main.B.OW <- apportion_lr(num.B.OW, c(0, 1), c((1 - mdeg.main.B.OW), mdeg.main.B.OW))
-    deg.main.O.OW <- apportion_lr(num.O.OW, c(0, 1), c((1 - mdeg.main.O.OW), mdeg.main.O.OW))
-    deg.main.H.EW <- apportion_lr(num.H.EW, c(0, 1), c((1 - mdeg.main.H.EW), mdeg.main.H.EW))
-    deg.main.B.EW <- apportion_lr(num.B.EW, c(0, 1), c((1 - mdeg.main.B.EW), mdeg.main.B.EW))
-    deg.main.O.EW <- apportion_lr(num.O.EW, c(0, 1), c((1 - mdeg.main.O.EW), mdeg.main.O.EW))
     
   # Main partnerships -------------------------------------------------------
 
@@ -197,10 +180,9 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
                           sum(num.O..wa * deg.mp.O[2,]))
   
   # Persons in partnerships by region (EW, KC, OW)
-    totdeg.m.by.region <- c(sum(num.EW * deg.mp.EW[2,]),
-                            sum(num.KC * deg.mp.KC[2,]),
-                            sum(num.OW * deg.mp.OW[2,]))
-    
+    totdeg.m.by.region <- c(num.EW * mean.degmp.EW[1],
+                            num.KC * mean.degmp.KC[1],
+                            num.OW * mean.degmp.OW[1])
 
   # Number of partnerships
   edges.m <- (sum(totdeg.m.by.dp)) / 2
@@ -252,9 +234,10 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
                         sum(num.O..wa * deg.mp.O[, 2] + num.O..wa * deg.mp.O[, 3] * 2))
   
   # Persons in partnerships by region (EW, KC, OW)
-  totdeg.p.by.region <- c(sum(num.EW * deg.mp.EW[, 2] + num.EW * deg.mp.EW[, 3] * 2),
-                          sum(num.KC * deg.mp.KC[, 2] + num.KC * deg.mp.KC[, 3] * 2),
-                          sum(num.OW * deg.mp.OW[, 2] + num.OW * deg.mp.OW[, 3] * 2))
+  totdeg.p.by.region <- c(num.EW * mean.degmp.EW[2],
+                          num.KC * mean.degmp.KC[2],
+                          num.OW * mean.degmp.OW[2])
+  
   # Persons concurrent
   conc.p <- c(sum(deg.mp[, 3]) * num)
   
@@ -304,10 +287,8 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
                     inst.bho[2]*num.H..wa, 
                     inst.bho[3]*num.O..wa)*time.unit
   
-  # Number of instant partnerships per time step by region
-  totdeg.i.region <- c(inst.region[1]*num.EW, 
-                    inst.region[2]*num.KC, 
-                    inst.region[3]*num.OW)*time.unit
+  # Number of instant partnerships per time step by region (EW, KC, OW)
+  totdeg.i.region <- inst.region*sum(num.inst)
   
   # Total number of instant partnerships per time step
   totdeg.i <- sum(num.inst)
@@ -316,7 +297,7 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   edges.i <- sum(totdeg.i) / 2
 
   # Race mixing: nodematch target stat: number of BB, HH, and OO partnerships
-  edges.hom.i.hbo <- c((totdeg.i.bho[1]*prop.hom.mpi.B[3] / 2), 
+  edges.hom.i.bho <- c((totdeg.i.bho[1]*prop.hom.mpi.B[3] / 2), 
                    (totdeg.i.bho[2]*prop.hom.mpi.H[3] / 2),
                    (totdeg.i.bho[3]*prop.hom.mpi.O[3] / 2))
   
@@ -329,7 +310,7 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   # Compile target stats: edges, nodefactor(c("deg.main", "deg.pers")), nodefactor("riskg") nodematch("race"), nodematch("region"), absdiff(sqrt.age)
     ##-- confirm which level to omit for nodefactor terms, confirm how specify target stats for offset terms
   if (!is.na(qnts.18to49[1]) & !is.na(qnts.50to59[1])) {
-    stats.i <- c(edges.i, num.inst[-1], num.riskg[-1], totdeg.i.bho[1:2], totdeg.i.region[c(1,3)], edges.hom.i.hbo, edges.hom.i.region, sqrt.adiff.i)
+    stats.i <- c(edges.i, num.inst[-1], num.riskg[-1], totdeg.i.bho[1:2], totdeg.i.region[c(1,3)], edges.hom.i.bho, edges.hom.i.region, sqrt.adiff.i)
   } else {
     stats.i <- c(edges.i, num.inst[-1], totdeg.i.bho[1:2], totdeg.i.region[c(1,3)], edges.hom.i.hbo, edges.hom.i.region, sqrt.adiff.i)
   }
@@ -340,10 +321,6 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   # Compile results ---------------------------------------------------------
   out <- list()
   out$method <- method
-  out$deg.pers <- deg.pers
-  out$deg.main <- c(deg.main.H.KC, deg.main.B.KC, deg.main.O.KC, 
-                    deg.main.H.OW, deg.main.B.OW, deg.main.O.OW, 
-                    deg.main.H.EW, deg.main.B.EW, deg.main.O.EW)
 
   out$stats.m <- stats.m
   out$stats.p <- stats.p
@@ -378,9 +355,9 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   out$deg.mp.H <- deg.mp.H
   out$deg.mp.B <- deg.mp.B
   out$deg.mp.O <- deg.mp.O
-  out$deg.mp.KC <- deg.mp.KC
-  out$deg.mp.OW <- deg.mp.OW
-  out$deg.mp.EW <- deg.mp.EW
+  out$mean.degmp.EW <- mean.degmp.EW
+  out$mean.degmp.KC <- mean.degmp.KC
+  out$mean.degmp.OW <- mean.degmp.OW
  
   out$role.prob <- role.prob
 
@@ -511,15 +488,6 @@ assign_degree_whamp <- function(nw, deg.type, nwstats) {
   if (!isTRUE(all.equal(sum(colSums(nwstats$deg.mp.O)), 1, tolerance = 5e-6))) {
     stop("O degree distributions do not sum to 1")
   }
-  if (!isTRUE(all.equal(sum(colSums(nwstats$deg.mp.KC)), 1, tolerance = 5e-6))) {
-    stop("KC degree distributions do not sum to 1")
-  }
-  if (!isTRUE(all.equal(sum(colSums(nwstats$deg.mp.OW)), 1, tolerance = 5e-6))) {
-    stop("OW degree distributions do not sum to 1")
-  }
-  if (!isTRUE(all.equal(sum(colSums(nwstats$deg.mp.EW)), 1, tolerance = 5e-6))) {
-    stop("EW degree distributions do not sum to 1")
-  }
   if (!isTRUE(all.equal(sum(colSums(nwstats$deg.mp)), 1, tolerance = 5e-6))) {
     stop("Degree distributions do not sum to 1")
   }
@@ -530,16 +498,16 @@ assign_degree_whamp <- function(nw, deg.type, nwstats) {
     attr.name <- "deg.main"
     
     #Calculate expected mean main degree for each race by region combination assuming independence
-    mdeg.main.H.KC <- sum(nwstats$deg.mp.H[2,])*sum(nwstats$deg.mp.KC[2,])/sum(nwstats$deg.mp[2,])
-    mdeg.main.B.KC <- sum(nwstats$deg.mp.B[2,])*sum(nwstats$deg.mp.KC[2,])/sum(nwstats$deg.mp[2,])
-    mdeg.main.O.KC <- sum(nwstats$deg.mp.O[2,])*sum(nwstats$deg.mp.KC[2,])/sum(nwstats$deg.mp[2,])
-    mdeg.main.H.OW <- sum(nwstats$deg.mp.H[2,])*sum(nwstats$deg.mp.OW[2,])/sum(nwstats$deg.mp[2,])
-    mdeg.main.B.OW <- sum(nwstats$deg.mp.B[2,])*sum(nwstats$deg.mp.OW[2,])/sum(nwstats$deg.mp[2,])
-    mdeg.main.O.OW <- sum(nwstats$deg.mp.O[2,])*sum(nwstats$deg.mp.OW[2,])/sum(nwstats$deg.mp[2,])
-    mdeg.main.H.EW <- sum(nwstats$deg.mp.H[2,])*sum(nwstats$deg.mp.EW[2,])/sum(nwstats$deg.mp[2,])
-    mdeg.main.B.EW <- sum(nwstats$deg.mp.B[2,])*sum(nwstats$deg.mp.EW[2,])/sum(nwstats$deg.mp[2,])
-    mdeg.main.O.EW <- sum(nwstats$deg.mp.O[2,])*sum(nwstats$deg.mp.EW[2,])/sum(nwstats$deg.mp[2,])
-    
+    mdeg.main.H.KC <- sum(nwstats$deg.mp.H[2,])*nwstats$mean.degmp.KC[1]/sum(nwstats$deg.mp[2,])
+    mdeg.main.B.KC <- sum(nwstats$deg.mp.B[2,])*nwstats$mean.degmp.KC[1]/sum(nwstats$deg.mp[2,])
+    mdeg.main.O.KC <- sum(nwstats$deg.mp.O[2,])*nwstats$mean.degmp.KC[1]/sum(nwstats$deg.mp[2,])
+    mdeg.main.H.OW <- sum(nwstats$deg.mp.H[2,])*nwstats$mean.degmp.OW[1]/sum(nwstats$deg.mp[2,])
+    mdeg.main.B.OW <- sum(nwstats$deg.mp.B[2,])*nwstats$mean.degmp.OW[1]/sum(nwstats$deg.mp[2,])
+    mdeg.main.O.OW <- sum(nwstats$deg.mp.O[2,])*nwstats$mean.degmp.OW[1]/sum(nwstats$deg.mp[2,])
+    mdeg.main.H.EW <- sum(nwstats$deg.mp.H[2,])*nwstats$mean.degmp.EW[1]/sum(nwstats$deg.mp[2,])
+    mdeg.main.B.EW <- sum(nwstats$deg.mp.B[2,])*nwstats$mean.degmp.EW[1]/sum(nwstats$deg.mp[2,])
+    mdeg.main.O.EW <- sum(nwstats$deg.mp.O[2,])*nwstats$mean.degmp.EW[1]/sum(nwstats$deg.mp[2,])
+ 
     dist.H.KC <- c(1 - mdeg.main.H.KC, mdeg.main.H.KC)
     dist.B.KC <- c(1 - mdeg.main.B.KC, mdeg.main.B.KC)
     dist.O.KC <- c(1 - mdeg.main.O.KC, mdeg.main.O.KC)
