@@ -310,7 +310,7 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   # Compile target stats: edges, nodefactor(c("deg.main", "deg.pers")), nodefactor("riskg") nodematch("race"), nodematch("region"), absdiff(sqrt.age)
     ##-- confirm which level to omit for nodefactor terms, confirm how specify target stats for offset terms
   if (!is.na(qnts.18to49[1]) & !is.na(qnts.50to59[1])) {
-    stats.i <- c(edges.i, num.inst[-1], num.riskg[-1], totdeg.i.bho[1:2], totdeg.i.region[c(1,3)], edges.hom.i.bho, edges.hom.i.region, sqrt.adiff.i)
+    stats.i <- c(edges.i, num.inst[-1], num.riskg[-8], totdeg.i.bho[1:2], totdeg.i.region[c(1,3)], edges.hom.i.bho, edges.hom.i.region, sqrt.adiff.i)
   } else {
     stats.i <- c(edges.i, num.inst[-1], totdeg.i.bho[1:2], totdeg.i.region[c(1,3)], edges.hom.i.hbo, edges.hom.i.region, sqrt.adiff.i)
   }
