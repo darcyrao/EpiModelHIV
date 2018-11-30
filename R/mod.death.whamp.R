@@ -18,7 +18,7 @@
 #'
 #' @return
 #' This function returns the updated \code{dat} object accounting for deaths.
-#' The deaths are deactivated from the main and casual networks, as those are in
+#' The deaths are deactivated from the main and persistent networks, as those are in
 #' \code{networkDynamic} class objects; dead nodes are not deleted from the
 #' instant network until the \code{\link{simnet_msm}} module for bookkeeping
 #' purposes.
