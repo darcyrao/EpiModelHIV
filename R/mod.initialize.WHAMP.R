@@ -136,13 +136,6 @@ initialize_msm_whamp <- function(x, param, init, control, s) {
   dat$attr$prepLastRisk <- rep(NA, num)
   dat$attr$prepLastStiScreen <- rep(NA, num)
 
-  # One-off AI class
-  inst.ai.class <- rep(NA, num)
-  ncl <- param$num.inst.ai.classes
-  inst.ai.class[ids.B] <- sample(apportion_lr(num.B, 1:ncl, rep(1 / ncl, ncl)))
-  inst.ai.class[ids.W] <- sample(apportion_lr(num.W, 1:ncl, rep(1 / ncl, ncl)))
-  dat$attr$inst.ai.class <- inst.ai.class
-
   # Role class
   role.class <- get.vertex.attribute(nw[[1]], "role.class")
   dat$attr$role.class <- role.class
@@ -422,6 +415,8 @@ init_status_msm_whamp <- function(dat) {
   stage.time[selected][stage[selected] == 4] <- time.since.inf[stage[selected] == 4] -
                                                   vldo.int
 
+  
+  # Assumes a linear rate of change in VL up to peak viremia in acute phase and from peak down to set point
   vl[selected] <- (time.since.inf <= vlar.int) * (vlap * time.since.inf / vlar.int) +
                   (time.since.inf > vlar.int) * (time.since.inf <= vlar.int + vlaf.int) *
                      ((vlsp - vlap) * (time.since.inf - vlar.int) / vlaf.int + vlap) +
