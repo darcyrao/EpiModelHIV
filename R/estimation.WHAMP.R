@@ -33,7 +33,9 @@
 #' @param deg.mp.O Degree distribution matrix for main and causal partners for
 #'        Other race/ethnicity MSM, as a 2 by 3 matrix.     
 #' @param deg.m.region Main degree distribution by region (EW, KC, OW)
-#' @param deg.p.region Persistent degree distribution by region (EW, KC, OW)                 
+#' @param prop.deg.p.EW Proportion of men with persistent degree 0, 1, and 2+ who live in eastern WA
+#' @param prop.deg.p.KC Proportion of men with persistent degree 0, 1, and 2+ who live in King County
+#' @param prop.deg.p.OW Proportion of men with persistent degree 0, 1, and 2+ who live in western WA                
 #' @param mdeg.inst Mean degree, or rate, of one-off partnerships per day.
 #' @param qnts.18to49 Means rates withing quartiles of the distribution of instantaneous partnerships 
 #'        for MSM ages 18-49. Use \code{NA} to ignore these quantiles in the target statistics.
@@ -104,7 +106,9 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
                              deg.mp.B,
                              deg.mp.O,
                              deg.m.region,
-                             deg.p.region,
+                             prop.deg.p.EW,
+                             prop.deg.p.KC,
+                             prop.deg.p.OW,
                              mdeg.inst,
                              qnts.18to49,
                              qnts.50to59,
@@ -136,9 +140,6 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   if (sum(deg.m.region) !=1) {
     stop("deg distribution must sum to 1.")
   }
-  if (sum(deg.p.region) !=1) {
-    stop("deg distribution must sum to 1.")
-  }
   if (sum(inst.region) !=1) {
     stop("deg distribution must sum to 1.")
   }
@@ -160,14 +161,16 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   num.OW <- sum(num.H.OW, num.B.OW, num.O.OW)
   num.EW <- sum(num.H.EW, num.B.EW, num.O.EW)
   
-  # Mean degree by region
-    mean.degmp.EW <- c(((sum(deg.mp[2,])*num)*deg.m.region[1])/num.EW, 
-                       ((sum(deg.mp[,2], 2*deg.mp[,3])*num)*deg.p.region[1])/num.EW)
-    mean.degmp.KC <- c(((sum(deg.mp[2,])*num)*deg.m.region[2])/num.KC, 
-                       ((sum(deg.mp[,2], 2*deg.mp[,3])*num)*deg.p.region[2])/num.KC)
-    mean.degmp.OW <- c(((sum(deg.mp[2,])*num)*deg.m.region[3])/num.OW, 
-                       ((sum(deg.mp[,2], 2*deg.mp[,3])*num)*deg.p.region[3])/num.OW)              
-
+  # Degree by region
+    mean.degm.EW <- ((sum(deg.mp[2,])*num)*deg.m.region[1])/num.EW
+    mean.degm.KC <- ((sum(deg.mp[2,])*num)*deg.m.region[2])/num.KC
+    mean.degm.OW <- ((sum(deg.mp[2,])*num)*deg.m.region[3])/num.OW
+    
+    deg.p.EW <- ((colSums(deg.mp)*num)*prop.deg.p.EW)/num.EW
+    deg.p.KC <- ((colSums(deg.mp)*num)*prop.deg.p.KC)/num.KC
+    deg.p.OW <- ((colSums(deg.mp)*num)*prop.deg.p.OW)/num.OW
+    
+    
     
   # Main partnerships -------------------------------------------------------
 
@@ -180,9 +183,9 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
                           sum(num.O..wa * deg.mp.O[2,]))
   
   # Persons in partnerships by region (EW, KC, OW)
-    totdeg.m.by.region <- c(num.EW * mean.degmp.EW[1],
-                            num.KC * mean.degmp.KC[1],
-                            num.OW * mean.degmp.OW[1])
+    totdeg.m.by.region <- c(num.EW * mean.degm.EW,
+                            num.KC * mean.degm.KC,
+                            num.OW * mean.degm.OW)
 
   # Number of partnerships
   edges.m <- (sum(totdeg.m.by.dp)) / 2
@@ -234,9 +237,9 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
                         sum(num.O..wa * deg.mp.O[, 2] + num.O..wa * deg.mp.O[, 3] * 2))
   
   # Persons in partnerships by region (EW, KC, OW)
-  totdeg.p.by.region <- c(num.EW * mean.degmp.EW[2],
-                          num.KC * mean.degmp.KC[2],
-                          num.OW * mean.degmp.OW[2])
+  totdeg.p.by.region <- c(sum(num.EW * deg.p.EW[2], num.EW * deg.p.EW[3] *2),
+                          sum(num.KC * deg.p.KC[2], num.KC * deg.p.KC[3] *2),
+                          sum(num.OW * deg.p.OW[2], num.OW * deg.p.OW[3] *2))
   
   # Persons concurrent
   conc.p <- c(sum(deg.mp[, 3]) * num)
@@ -355,9 +358,12 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   out$deg.mp.H <- deg.mp.H
   out$deg.mp.B <- deg.mp.B
   out$deg.mp.O <- deg.mp.O
-  out$mean.degmp.EW <- mean.degmp.EW
-  out$mean.degmp.KC <- mean.degmp.KC
-  out$mean.degmp.OW <- mean.degmp.OW
+  out$mean.degm.EW <- mean.degm.EW
+  out$mean.degm.KC <- mean.degm.KC
+  out$mean.degm.OW <- mean.degm.OW
+  out$deg.p.EW <- deg.p.EW
+  out$deg.p.KC <- deg.p.KC
+  out$deg.p.OW <- deg.p.OW
  
   out$role.prob <- role.prob
 
@@ -498,15 +504,15 @@ assign_degree_whamp <- function(nw, deg.type, nwstats) {
     attr.name <- "deg.main"
     
     #Calculate expected mean main degree for each race by region combination assuming independence
-    mdeg.main.H.KC <- sum(nwstats$deg.mp.H[2,])*nwstats$mean.degmp.KC[1]/sum(nwstats$deg.mp[2,])
-    mdeg.main.B.KC <- sum(nwstats$deg.mp.B[2,])*nwstats$mean.degmp.KC[1]/sum(nwstats$deg.mp[2,])
-    mdeg.main.O.KC <- sum(nwstats$deg.mp.O[2,])*nwstats$mean.degmp.KC[1]/sum(nwstats$deg.mp[2,])
-    mdeg.main.H.OW <- sum(nwstats$deg.mp.H[2,])*nwstats$mean.degmp.OW[1]/sum(nwstats$deg.mp[2,])
-    mdeg.main.B.OW <- sum(nwstats$deg.mp.B[2,])*nwstats$mean.degmp.OW[1]/sum(nwstats$deg.mp[2,])
-    mdeg.main.O.OW <- sum(nwstats$deg.mp.O[2,])*nwstats$mean.degmp.OW[1]/sum(nwstats$deg.mp[2,])
-    mdeg.main.H.EW <- sum(nwstats$deg.mp.H[2,])*nwstats$mean.degmp.EW[1]/sum(nwstats$deg.mp[2,])
-    mdeg.main.B.EW <- sum(nwstats$deg.mp.B[2,])*nwstats$mean.degmp.EW[1]/sum(nwstats$deg.mp[2,])
-    mdeg.main.O.EW <- sum(nwstats$deg.mp.O[2,])*nwstats$mean.degmp.EW[1]/sum(nwstats$deg.mp[2,])
+    mdeg.main.H.KC <- sum(nwstats$deg.mp.H[2,])*nwstats$mean.degm.KC/sum(nwstats$deg.mp[2,])
+    mdeg.main.B.KC <- sum(nwstats$deg.mp.B[2,])*nwstats$mean.degm.KC/sum(nwstats$deg.mp[2,])
+    mdeg.main.O.KC <- sum(nwstats$deg.mp.O[2,])*nwstats$mean.degm.KC/sum(nwstats$deg.mp[2,])
+    mdeg.main.H.OW <- sum(nwstats$deg.mp.H[2,])*nwstats$mean.degm.OW/sum(nwstats$deg.mp[2,])
+    mdeg.main.B.OW <- sum(nwstats$deg.mp.B[2,])*nwstats$mean.degm.OW/sum(nwstats$deg.mp[2,])
+    mdeg.main.O.OW <- sum(nwstats$deg.mp.O[2,])*nwstats$mean.degm.OW/sum(nwstats$deg.mp[2,])
+    mdeg.main.H.EW <- sum(nwstats$deg.mp.H[2,])*nwstats$mean.degm.EW/sum(nwstats$deg.mp[2,])
+    mdeg.main.B.EW <- sum(nwstats$deg.mp.B[2,])*nwstats$mean.degm.EW/sum(nwstats$deg.mp[2,])
+    mdeg.main.O.EW <- sum(nwstats$deg.mp.O[2,])*nwstats$mean.degm.EW/sum(nwstats$deg.mp[2,])
  
     dist.H.KC <- c(1 - mdeg.main.H.KC, mdeg.main.H.KC)
     dist.B.KC <- c(1 - mdeg.main.B.KC, mdeg.main.B.KC)
@@ -563,18 +569,83 @@ assign_degree_whamp <- function(nw, deg.type, nwstats) {
   }
   
   if (deg.type == "pers") {
+    
     attr.name <- "deg.pers"
-    dist.pers <- colSums(nwstats$deg.mp)
-
-    num.degrees <- length(dist.pers)
+    
+    #Calculate expected proportion with pers degree 1 and 2+ for each race by region combination assuming independence
+    deg.pers1.H.KC <- sum(nwstats$deg.mp.H[,2])*nwstats$deg.p.KC[2]/sum(nwstats$deg.mp[,2])
+    deg.pers1.B.KC <- sum(nwstats$deg.mp.B[,2])*nwstats$deg.p.KC[2]/sum(nwstats$deg.mp[,2])
+    deg.pers1.O.KC <- sum(nwstats$deg.mp.O[,2])*nwstats$deg.p.KC[2]/sum(nwstats$deg.mp[,2])
+    deg.pers1.H.OW <- sum(nwstats$deg.mp.H[,2])*nwstats$deg.p.OW[2]/sum(nwstats$deg.mp[,2])
+    deg.pers1.B.OW <- sum(nwstats$deg.mp.B[,2])*nwstats$deg.p.OW[2]/sum(nwstats$deg.mp[,2])
+    deg.pers1.O.OW <- sum(nwstats$deg.mp.O[,2])*nwstats$deg.p.OW[2]/sum(nwstats$deg.mp[,2])
+    deg.pers1.H.EW <- sum(nwstats$deg.mp.H[,2])*nwstats$deg.p.EW[2]/sum(nwstats$deg.mp[,2])
+    deg.pers1.B.EW <- sum(nwstats$deg.mp.B[,2])*nwstats$deg.p.EW[2]/sum(nwstats$deg.mp[,2])
+    deg.pers1.O.EW <- sum(nwstats$deg.mp.O[,2])*nwstats$deg.p.EW[2]/sum(nwstats$deg.mp[,2])
+    
+    deg.pers2.H.KC <- sum(nwstats$deg.mp.H[,3])*nwstats$deg.p.KC[3]/sum(nwstats$deg.mp[,3])
+    deg.pers2.B.KC <- sum(nwstats$deg.mp.B[,3])*nwstats$deg.p.KC[3]/sum(nwstats$deg.mp[,3])
+    deg.pers2.O.KC <- sum(nwstats$deg.mp.O[,3])*nwstats$deg.p.KC[3]/sum(nwstats$deg.mp[,3])
+    deg.pers2.H.OW <- sum(nwstats$deg.mp.H[,3])*nwstats$deg.p.OW[3]/sum(nwstats$deg.mp[,3])
+    deg.pers2.B.OW <- sum(nwstats$deg.mp.B[,3])*nwstats$deg.p.OW[3]/sum(nwstats$deg.mp[,3])
+    deg.pers2.O.OW <- sum(nwstats$deg.mp.O[,3])*nwstats$deg.p.OW[3]/sum(nwstats$deg.mp[,3])
+    deg.pers2.H.EW <- sum(nwstats$deg.mp.H[,3])*nwstats$deg.p.EW[3]/sum(nwstats$deg.mp[,3])
+    deg.pers2.B.EW <- sum(nwstats$deg.mp.B[,3])*nwstats$deg.p.EW[3]/sum(nwstats$deg.mp[,3])
+    deg.pers2.O.EW <- sum(nwstats$deg.mp.O[,3])*nwstats$deg.p.EW[3]/sum(nwstats$deg.mp[,3])
+    
+    dist.H.KC <- c((1 - sum(deg.pers1.H.KC, deg.pers2.H.KC)), deg.pers1.H.KC, deg.pers2.H.KC)
+    dist.B.KC <- c((1 - sum(deg.pers1.B.KC, deg.pers2.B.KC)), deg.pers1.B.KC, deg.pers2.B.KC)
+    dist.O.KC <- c((1 - sum(deg.pers1.O.KC, deg.pers2.O.KC)), deg.pers1.O.KC, deg.pers2.O.KC)
+    dist.H.OW <- c((1 - sum(deg.pers1.H.OW, deg.pers2.H.OW)), deg.pers1.H.OW, deg.pers2.H.OW)
+    dist.B.OW <- c((1 - sum(deg.pers1.B.OW, deg.pers2.B.OW)), deg.pers1.B.OW, deg.pers2.B.OW)
+    dist.O.OW <- c((1 - sum(deg.pers1.O.OW, deg.pers2.O.OW)), deg.pers1.O.OW, deg.pers2.O.OW)
+    dist.H.EW <- c((1 - sum(deg.pers1.H.EW, deg.pers2.H.EW)), deg.pers1.H.EW, deg.pers2.H.EW)
+    dist.B.EW <- c((1 - sum(deg.pers1.B.EW, deg.pers2.B.EW)), deg.pers1.B.EW, deg.pers2.B.EW)
+    dist.O.EW <- c((1 - sum(deg.pers1.O.EW, deg.pers2.O.EW)), deg.pers1.O.EW, deg.pers2.O.EW)
     
     race..wa <- get.vertex.attribute(nw, "race..wa")
-    v <- which(race..wa %in% c("H", "B", "O"))
-    n <- length(v)
-  
-    deg.pers <-  apportion_lr(n, 0:(num.degrees - 1), dist.pers, shuffled = TRUE)
+    region <- get.vertex.attribute(nw, "region")
+    vH.KC <- which(race..wa == "H" & region == "KC")
+    vB.KC <- which(race..wa == "B" & region == "KC")
+    vO.KC <- which(race..wa == "O" & region == "KC")
+    vH.OW <- which(race..wa == "H" & region == "OW")
+    vB.OW <- which(race..wa == "B" & region == "OW")
+    vO.OW <- which(race..wa == "O" & region == "OW")
+    vH.EW <- which(race..wa == "H" & region == "EW")
+    vB.EW <- which(race..wa == "B" & region == "EW")
+    vO.EW <- which(race..wa == "O" & region == "EW")
+    nH.KC <- length(vH.KC)
+    nB.KC <- length(vB.KC)
+    nO.KC <- length(vO.KC)
+    nH.OW <- length(vH.OW)
+    nB.OW <- length(vB.OW)
+    nO.OW <- length(vO.OW)
+    nH.EW <- length(vH.EW)
+    nB.EW <- length(vB.EW)
+    nO.EW <- length(vO.EW)
     
-    nw <- set.vertex.attribute(nw, attrname = attr.name, value = deg.pers, v = v)
+    num.degrees <- length(dist.H.KC)
+    
+    deg.H.KC <- apportion_lr(nH.KC, 0:(num.degrees - 1), dist.H.KC, shuffled = TRUE)
+    deg.B.KC <- apportion_lr(nB.KC, 0:(num.degrees - 1), dist.B.KC, shuffled = TRUE)
+    deg.O.KC <- apportion_lr(nO.KC, 0:(num.degrees - 1), dist.O.KC, shuffled = TRUE)
+    deg.H.OW <- apportion_lr(nH.OW, 0:(num.degrees - 1), dist.H.OW, shuffled = TRUE)
+    deg.B.OW <- apportion_lr(nB.OW, 0:(num.degrees - 1), dist.B.OW, shuffled = TRUE)
+    deg.O.OW <- apportion_lr(nO.OW, 0:(num.degrees - 1), dist.O.OW, shuffled = TRUE)
+    deg.H.EW <- apportion_lr(nH.EW, 0:(num.degrees - 1), dist.H.EW, shuffled = TRUE)
+    deg.B.EW <- apportion_lr(nB.EW, 0:(num.degrees - 1), dist.B.EW, shuffled = TRUE)
+    deg.O.EW <- apportion_lr(nO.EW, 0:(num.degrees - 1), dist.O.EW, shuffled = TRUE)
+    
+    nw <- set.vertex.attribute(nw, attrname = attr.name, value = deg.H.KC, v = vH.KC)
+    nw <- set.vertex.attribute(nw, attrname = attr.name, value = deg.B.KC, v = vB.KC)
+    nw <- set.vertex.attribute(nw, attrname = attr.name, value = deg.O.KC, v = vO.KC)
+    nw <- set.vertex.attribute(nw, attrname = attr.name, value = deg.H.OW, v = vH.OW)
+    nw <- set.vertex.attribute(nw, attrname = attr.name, value = deg.B.OW, v = vB.OW)
+    nw <- set.vertex.attribute(nw, attrname = attr.name, value = deg.O.OW, v = vO.OW)
+    nw <- set.vertex.attribute(nw, attrname = attr.name, value = deg.H.EW, v = vH.EW)
+    nw <- set.vertex.attribute(nw, attrname = attr.name, value = deg.B.EW, v = vB.EW)
+    nw <- set.vertex.attribute(nw, attrname = attr.name, value = deg.O.EW, v = vO.EW)
+    
   }
 
 
