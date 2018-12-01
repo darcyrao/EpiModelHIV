@@ -122,8 +122,10 @@
 #'        disclose his status to a one-off partner.
 #' @param circ.B.prob Probablity that a black new arrival in the population
 #'        will be circumcised.
-#' @param circ.W.prob Probablity that a white new arrival in the population
+#' @param circ.H.prob Probablity that a Hispanic new arrival in the population
 #'        will be circumcised.
+#' @param circ.O.prob Probablity that an other race/ethnicity new arrival in 
+#'        the population will be circumcised.
 #' @param ccr5.B.prob Vector of length two of frequencies of the Delta 32
 #'        mutation (homozygous and heterozygous, respectively) in the CCR5 gene
 #'        among black MSM.
@@ -134,66 +136,43 @@
 #'        in the CCR5 mutation.
 #' @param num.inst.ai.classes Number of quantiles into which men should be
 #'        divided in determining their levels of one-off anal intercourse.
-#' @param base.ai.main.BB.rate Expected coital frequency in black-black main
-#'        partnerships (acts per day).
-#' @param base.ai.main.BW.rate Expected coital frequency in black-white main
-#'        partnerships (acts per day).
-#' @param base.ai.main.WW.rate Expected coital frequency in white-white main
-#'        partnerships (acts per day).
-#' @param base.ai.pers.BB.rate Expected coital frequency in black-black casual
-#'        partnerships (acts per day).
-#' @param base.ai.pers.BW.rate Expected coital frequency in black-white casual
-#'        partnerships (acts per day).
-#' @param base.ai.pers.WW.rate Expected coital frequency in white-white casual
-#'        partnerships (acts per day).
+#' @param base.ai.main.rate Expected coital frequency in main partnerships
+#'        (acts per day).
+#' @param base.ai.pers.rate Expected coital frequency in persistent partnerships
+#'        (acts per day).
 #' @param ai.scale General relative scaler for all act rates for model
 #'        calibration.
-#' @param cond.main.BB.prob Probability of condom use in a black-black main
+#' @param cond.main.YY.prob Probability of condom use in a Young-Young (18-34) main
 #'        partnership.
-#' @param cond.main.BW.prob Probability of condom use in a black-white main
-#'        partnership.
-#' @param cond.main.WW.prob Probability of condom use in a white-white main
-#'        partnership.
-#' @param cond.pers.always.prob Fraction of men in casual partnerships who always
+#' @param cond.main.other.prob Probability of condom use in main partnerships with
+#'        other age combinations.
+#' @param cond.pers.always.prob Fraction of men in persistent partnerships who always
 #'        use condoms in those partnerships.
-#' @param cond.pers.BB.prob Of men who are not consistent condom users, per-act
-#'        probability of condom use in a black-black casual partnerships.
-#' @param cond.pers.BW.prob Of men who are not consistent condom users, per-act
-#'        probability of condom use in a black-white casual partnerships.
-#' @param cond.pers.WW.prob Of men who are not consistent condom users, per-act
-#'        probability of condom use in a white-white casual partnerships.
+#' @param cond.pers.prob Of men who are not consistent condom users, per-act
+#'        probability of condom use persistent partnerships.
 #' @param cond.inst.always.prob Fraction of men in instant partnerships who always
 #'        use condoms in those partnerships.
-#' @param cond.inst.BB.prob Of men who are not consistent condom users, per-act
-#'        probability of condom use in a black-black one-off partnerships.
-#' @param cond.inst.BW.prob Of men who are not consistent condom users, per-act
-#'        probability of condom use in a black-white one-off partnerships.
-#' @param cond.inst.WW.prob Of men who are not consistent condom users, per-act
-#'        probability of condom use in a white-white one-off partnerships.
+#' @param cond.inst.prob Of men who are not consistent condom users, per-act
+#'        probability of condom use in a instantaneous partnerships.
 #' @param cond.always.prob.corr Correlation coefficient for probability of always
-#'        using condoms in both casual and one-off
-#' @param cond.rr.BB Condom probability scaler for black-black partnerships for
-#'        model calibration purposes.
-#' @param cond.rr.BW Condom probability scaler for black-white partnerships for
-#'        model calibration purposes.
-#' @param cond.rr.WW Condom probability scaler for white-white partnerships for
-#'        model calibration purposes.
+#'        using condoms in both persistent and instantaneous partnerships
+#' @param cond.rr.BB Condom probability scaler for model calibration purposes.
 #' @param cond.diag.main.beta Beta multiplier for the log odds of using a
 #'        condom in a main partnership if the HIV-infected man has been
 #'        diagnosed.
 #' @param cond.discl.main.beta Beta multiplier for the log odds of using a
 #'        condom in a main partnership if the HIV-infected man has disclosed.
 #' @param cond.diag.pers.beta Beta multiplier for the log odds of using a
-#'        condom in a casual partnership if the HIV-infected man has been
+#'        condom in a persistent partnership if the HIV-infected man has been
 #'        diagnosed.
 #' @param cond.discl.pers.beta Beta multiplier for the log odds of using a
-#'        condom in a casual partnership if the HIV-infected man has disclosed
+#'        condom in a persistent partnership if the HIV-infected man has disclosed
 #'        his status.
 #' @param cond.diag.inst.beta Beta multiplier for the log odds of using a
-#'        condom in a one-off partnership if the HIV-infected man has been
+#'        condom in an instantaneous partnership if the HIV-infected man has been
 #'        diagnosed.
 #' @param cond.discl.inst.beta Beta multiplier for the log odds of using a
-#'        condom in a one-off partnership if the HIV-infected man has disclosed
+#'        condom in an instantaneous partnership if the HIV-infected man has disclosed
 #'        his status.
 #' @param vv.iev.BB.prob Probability that in a black-black partnership of
 #'        two versatile men, they will engage in intra-event versatility
@@ -300,7 +279,7 @@ param_msm_whamp <- function(nwstats,
                       last.neg.test.W.int = 315,
                       mean.test.B.int = 301,
                       mean.test.W.int = 315,
-                      testing.pattern = "memoryless",
+                      testing.pattern = "interval",
                       test.window.int = 21,
 
                       tt.traj.B.prob = c(0.077, 0.000, 0.356, 0.567),
@@ -354,38 +333,28 @@ param_msm_whamp <- function(nwstats,
                       disc.post.diag.pers.W.prob = 0,
                       disc.inst.B.prob = 0.445,
                       disc.inst.W.prob = 0.691,
-
-                      circ.B.prob = 0.874,
-                      circ.W.prob = 0.918,
+                      
+                      circ.B.prob = 0.6449,
+                      circ.H.prob = 0.4897,
+                      circ.O.prob = 0.86,
 
                       ccr5.B.prob = c(0, 0.034),
                       ccr5.W.prob = c(0.021, 0.176),
                       ccr5.heteroz.rr = 0.3,
 
-                      num.inst.ai.classes = 1,
-                      base.ai.main.BB.rate = 0.17,
-                      base.ai.main.BW.rate = 0.26,
-                      base.ai.main.WW.rate = 0.23,
-                      base.ai.pers.BB.rate = 0.11,
-                      base.ai.pers.BW.rate = 0.16,
-                      base.ai.pers.WW.rate = 0.14,
-                      ai.scale = 1.15,
+                      num.inst.ai.classes = 4,
+                      base.ai.main.rate = 0.1864,
+                      base.ai.pers.rate = 0.118,
+                      ai.scale = 1, # set to 1 for now
 
-                      cond.main.BB.prob = 0.38,
-                      cond.main.BW.prob = 0.10,
-                      cond.main.WW.prob = 0.15,
-                      cond.pers.always.prob = 0.216,
-                      cond.pers.BB.prob = 0.26,
-                      cond.pers.BW.prob = 0.26,
-                      cond.pers.WW.prob = 0.26,
-                      cond.inst.always.prob = 0.326,
-                      cond.inst.BB.prob = 0.27,
-                      cond.inst.BW.prob = 0.27,
-                      cond.inst.WW.prob = 0.27,
-                      cond.always.prob.corr = 0.5,
-                      cond.rr.BB = 1,
-                      cond.rr.BW = 1,
-                      cond.rr.WW = 1,
+                      cond.main.YY.prob = 0.3391,
+                      cond.main.other.prob = 0.1399,
+                      cond.pers.always.prob = 0.0924,
+                      cond.pers.prob = 0.3925,
+                      cond.inst.always.prob = 0.1982,
+                      cond.inst.prob = 0.4138,
+                      cond.always.prob.corr = 0.6009,
+                      cond.rr = 1,
                       cond.diag.main.beta = -0.67,
                       cond.discl.main.beta = -0.85,
                       cond.diag.pers.beta = -0.67,
@@ -462,55 +431,6 @@ param_msm_whamp <- function(nwstats,
           call. = FALSE)
   }
 
-  if (race.method == 1) {
-    p$last.neg.test.B.int = (last.neg.test.B.int + last.neg.test.W.int)/2
-    p$last.neg.test.W.int = (last.neg.test.B.int + last.neg.test.W.int)/2
-    p$mean.test.B.int = (mean.test.W.int + mean.test.B.int)/2
-    p$mean.test.W.int = (mean.test.W.int + mean.test.B.int)/2
-    p$tt.traj.B.prob = (tt.traj.B.prob + tt.traj.W.prob)/2
-    p$tt.traj.W.prob = (tt.traj.B.prob + tt.traj.W.prob)/2
-    p$tx.init.B.prob = (tx.init.B.prob + tx.init.W.prob)/2
-    p$tx.init.W.prob = (tx.init.B.prob + tx.init.W.prob)/2
-    p$tx.halt.B.prob = (tx.halt.B.prob + tx.halt.W.prob)/2
-    p$tx.halt.W.prob = (tx.halt.B.prob + tx.halt.W.prob)/2
-    p$tx.reinit.B.prob = (tx.reinit.B.prob + tx.reinit.W.prob)/2
-    p$tx.reinit.W.prob = (tx.reinit.B.prob + tx.reinit.W.prob)/2
-    p$disc.outset.main.B.prob = (disc.outset.main.B.prob + disc.outset.main.W.prob)/2
-    p$disc.outset.main.W.prob = (disc.outset.main.B.prob + disc.outset.main.W.prob)/2
-    p$disc.outset.pers.B.prob = (disc.outset.pers.B.prob + disc.outset.pers.W.prob)/2
-    p$disc.outset.pers.W.prob = (disc.outset.pers.B.prob + disc.outset.pers.W.prob)/2
-    p$disc.inst.B.prob = (disc.inst.B.prob + disc.inst.W.prob)/2
-    p$disc.inst.W.prob = (disc.inst.B.prob + disc.inst.W.prob)/2
-    p$circ.B.prob = (circ.B.prob + circ.W.prob)/2
-    p$circ.W.prob = (circ.B.prob + circ.W.prob)/2
-    p$ccr5.B.prob = (ccr5.B.prob + ccr5.W.prob)/2
-    p$ccr5.W.prob = (ccr5.B.prob + ccr5.W.prob)/2
-    p$base.ai.main.BB.rate = (base.ai.main.BB.rate + base.ai.main.BW.rate +
-                                base.ai.main.WW.rate)/3
-    p$base.ai.main.BW.rate = (base.ai.main.BB.rate + base.ai.main.BW.rate +
-                                base.ai.main.WW.rate)/3
-    p$base.ai.main.WW.rate = (base.ai.main.BB.rate + base.ai.main.BW.rate +
-                                base.ai.main.WW.rate)/3
-    p$base.ai.pers.BB.rate = (base.ai.pers.BB.rate + base.ai.pers.BW.rate +
-                                base.ai.pers.WW.rate)/3
-    p$base.ai.pers.BW.rate = (base.ai.pers.BB.rate + base.ai.pers.BW.rate +
-                                base.ai.pers.WW.rate)/3
-    p$base.ai.pers.WW.rate = (base.ai.pers.BB.rate + base.ai.pers.BW.rate +
-                                base.ai.pers.WW.rate)/3
-    p$cond.main.BB.prob = (cond.main.BB.prob + cond.main.BW.prob + cond.main.WW.prob)/3
-    p$cond.main.BW.prob = (cond.main.BB.prob + cond.main.BW.prob + cond.main.WW.prob)/3
-    p$cond.main.WW.prob = (cond.main.BB.prob + cond.main.BW.prob + cond.main.WW.prob)/3
-    p$cond.pers.BB.prob = (cond.pers.BB.prob + cond.pers.BW.prob + cond.pers.WW.prob)/3
-    p$cond.pers.BW.prob = (cond.pers.BB.prob + cond.pers.BW.prob + cond.pers.WW.prob)/3
-    p$cond.pers.WW.prob = (cond.pers.BB.prob + cond.pers.BW.prob + cond.pers.WW.prob)/3
-    p$cond.inst.BB.prob = (cond.inst.BB.prob + cond.inst.BW.prob + cond.inst.WW.prob)/3
-    p$cond.inst.BW.prob = (cond.inst.BB.prob + cond.inst.BW.prob + cond.inst.WW.prob)/3
-    p$cond.inst.WW.prob = (cond.inst.BB.prob + cond.inst.BW.prob + cond.inst.WW.prob)/3
-    p$vv.iev.BB.prob = (vv.iev.BB.prob + vv.iev.BW.prob + vv.iev.WW.prob)/3
-    p$vv.iev.BW.prob = (vv.iev.BB.prob + vv.iev.BW.prob + vv.iev.WW.prob)/3
-    p$vv.iev.WW.prob = (vv.iev.BB.prob + vv.iev.BW.prob + vv.iev.WW.prob)/3
-  }
-
   p$time.unit <- nwstats$time.unit
 
   intvars <- grep(names(p), pattern = ".int", fixed = TRUE)
@@ -575,8 +495,8 @@ param_msm_whamp <- function(nwstats,
 #'
 #' @export
 init_msm_whamp <- function(nwstats,
-                     prev.B = 0.253,
-                     prev.W = 0.253,
+                     prev.B = 0.253, #-- Delete this old code eventually
+                     prev.W = 0.253, #-- Delete this old code eventually
                      prev.H..wa = 0.08, #-- Use data on PLWHA and estimated MSM pop size to construct. Note PLWHA is only diagnosed, so will underestimate, but want to start a bit below true prevalence to reach equilibrium faster
                      prev.B..wa = 0.08,
                      prev.O..wa = 0.08,
@@ -694,8 +614,8 @@ control_msm_whamp <- function(simno = 1,
                         roleclass.FUN = NULL,
                         resim_nets.FUN = simnet_msm,
                         disclose.FUN = disclose_msm,
-                        acts.FUN = acts_msm,
-                        condoms.FUN = condoms_msm,
+                        acts.FUN = acts_msm_whamp,
+                        condoms.FUN = condoms_msm_whamp,
                         riskhist.FUN = riskhist_msm,
                         position.FUN = position_msm,
                         trans.FUN = trans_msm,
