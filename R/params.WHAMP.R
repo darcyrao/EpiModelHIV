@@ -130,8 +130,6 @@
 #'        among white MSM.
 #' @param ccr5.heteroz.rr Relative risk of infection for men who are heterozygous
 #'        in the CCR5 mutation.
-#' @param num.inst.ai.classes Number of quantiles into which men should be
-#'        divided in determining their levels of one-off anal intercourse.
 #' @param base.ai.main.rate Expected coital frequency in main partnerships
 #'        (acts per day).
 #' @param base.ai.pers.rate Expected coital frequency in persistent partnerships
@@ -170,15 +168,9 @@
 #' @param cond.discl.inst.beta Beta multiplier for the log odds of using a
 #'        condom in an instantaneous partnership if the HIV-infected man has disclosed
 #'        his status.
-#' @param vv.iev.BB.prob Probability that in a black-black partnership of
-#'        two versatile men, they will engage in intra-event versatility
-#'        ("flipping") given that they're having AI.
-#' @param vv.iev.BW.prob Probability that in a black-white partnership of
-#'        two versatile men, they will engage in intra-event versatility
-#'        ("flipping") given that they're having AI.
-#' @param vv.iev.WW.prob Probability that in a white-white partnership of
-#'        two versatile men, they will engage in intra-event versatility
-#'        ("flipping") given that they're having AI.
+#' @param vv.iev.prob Probability that in a partnership of two versatile men,
+#'        they will engage in intra-event versatility ("flipping") given that 
+#'        they're having AI.
 #'
 #' @param prep.start Time step at which the PrEP intervention should start.
 #' @param prep.elig.model Modeling approach for determining who is eligible for
@@ -335,7 +327,6 @@ param_msm_whamp <- function(nwstats,
                       ccr5.W.prob = c(0.021, 0.176),
                       ccr5.heteroz.rr = 0.3,
 
-                      num.inst.ai.classes = 4,
                       base.ai.main.rate = 0.1864,
                       base.ai.pers.rate = 0.118,
                       ai.scale = 1, # set to 1 for now
@@ -355,9 +346,7 @@ param_msm_whamp <- function(nwstats,
                       cond.diag.inst.beta = -0.67,
                       cond.discl.inst.beta = -0.85,
 
-                      vv.iev.BB.prob = 0.42,
-                      vv.iev.BW.prob = 0.56,
-                      vv.iev.WW.prob = 0.49,
+                      vv.iev.prob = 0.42,
 
                       prep.start = Inf,
                       prep.elig.model = "base",
@@ -432,8 +421,7 @@ param_msm_whamp <- function(nwstats,
   ratevars <- grep(names(p), pattern = ".rate", fixed = TRUE)
   p[ratevars] <- lapply(p[ratevars], FUN = function(x) x * p$time.unit)
 
-  p$role.B.prob <- nwstats$role.B.prob
-  p$role.W.prob <- nwstats$role.W.prob
+  p$role.prob <- nwstats$role.prob
 
   p$inst.trans.matrix <- matrix(1, nrow = 1)
   p$role.trans.matrix <- matrix(c(1, 0, 0,
@@ -603,7 +591,7 @@ control_msm_whamp <- function(simno = 1,
                         prep.FUN = prep_msm,
                         progress.FUN = progress_msm,
                         vl.FUN = vl_msm,
-                        aiclass.FUN = NULL,
+                        aiclass.FUN = update_aiclass_msm_whamp,
                         roleclass.FUN = NULL,
                         resim_nets.FUN = simnet_msm,
                         disclose.FUN = disclose_msm,
