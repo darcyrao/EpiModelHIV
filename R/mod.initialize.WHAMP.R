@@ -281,8 +281,8 @@ remove_bad_roles_msm <- function(nw) {
 #'
 init_status_msm_whamp <- function(dat) {
 
-  num.B <- dat$init$num.B
-  num.W <- dat$init$num.W
+  num.B <- dat$init$num.B #-- Delete this old code eventually 
+  num.W <- dat$init$num.W #-- Delete this old code eventually 
   num.H..wa <- dat$init$num.H..wa
   num.B..wa <- dat$init$num.B..wa
   num.O..wa <- dat$init$num.O..wa
@@ -295,7 +295,7 @@ init_status_msm_whamp <- function(dat) {
   ids.O..wa <- which(dat$attr$race..wa == "O")
   
   age <- dat$attr$age
-  race <- dat$attr$race
+  race <- dat$attr$race #-- Delete this old code when finish debugging
   race..wa <- dat$attr$race..wa
   region <- dat$attr$region
 
@@ -347,6 +347,9 @@ init_status_msm_whamp <- function(dat) {
   }
   dat$attr$status <- status
 
+  # Calculate intertest interval as a function of age
+  centered.age <- (age - mean(age))
+  avg.test.int <- dat$param$iti.coefs[1] + centered.age * dat$param$iti.coefs[2] + centered.age^2 * dat$param$iti.coefs[3]
 
   # Treatment trajectory
   tt.traj <- rep(NA, num)
@@ -433,13 +436,11 @@ init_status_msm_whamp <- function(dat) {
   if (dat$param$testing.pattern == "interval") {
     ttntest <- ceiling(runif(length(selected),
                              min = 0,
-                             max = dat$param$mean.test.B.int * (race[selected] == "B") +
-                                   dat$param$mean.test.W.int * (race[selected] == "W")))
+                             max = avg.test.int))
   }
   if (dat$param$testing.pattern == "memoryless") {
     ttntest <- rgeom(length(selected),
-                     1 / (dat$param$mean.test.B.int * (race[selected] == "B") +
-                          dat$param$mean.test.W.int * (race[selected] == "W")))
+                     1 / (avg.test.int))
   }
 
   twind.int <- dat$param$test.window.int
@@ -453,9 +454,10 @@ init_status_msm_whamp <- function(dat) {
   ### Full adherent type
 
   # Create set of expected values for (cum.time.off.tx, cum.time.on.tx)
-
-  tx.init.time.B <- twind.int + dat$param$last.neg.test.B.int + 1 / dat$param$tx.init.B.prob
-  tx.init.time.W <- twind.int + dat$param$last.neg.test.W.int + 1 / dat$param$tx.init.W.prob
+  centered.agesq <- (age - mean(age))^2
+  avg.test.int <- dat$param$iti.coefs[1] + centered.agesq * iti.coefs[2] + centered.agesq^2 * iti.coefs[3]
+  
+  tx.init.time.B <- twind.int + avg.test.int + 1 / dat$param$tx.init.B.prob
 
   # Stage for Blacks
   prop.time.on.tx.B <- dat$param$tx.reinit.B.prob /
@@ -549,16 +551,15 @@ init_status_msm_whamp <- function(dat) {
 
   # Diagnosis
   selected <- which(status == 1 & tt.traj == 4)
+  
   if (dat$param$testing.pattern == "interval") {
     ttntest <- ceiling(runif(length(selected),
                              min = 0,
-                             max = dat$param$mean.test.B.int * (race[selected] == "B") +
-                                   dat$param$mean.test.W.int * (race[selected] == "W")))
+                             max = avg.test.int))
   }
   if (dat$param$testing.pattern == "memoryless") {
     ttntest <- rgeom(length(selected),
-                     1 / (dat$param$mean.test.B.int * (race[selected] == "B") +
-                          dat$param$mean.test.W.int * (race[selected] == "W")))
+                     1 / (avg.test.int))
   }
 
   diag.status[selected][ttntest > cum.time.off.tx[selected] - twind.int] <- 0
@@ -669,14 +670,12 @@ init_status_msm_whamp <- function(dat) {
   if (dat$param$testing.pattern == "interval") {
     ttntest <- ceiling(runif(length(selected),
                              min = 0,
-                             max = dat$param$mean.test.B.int * (race[selected] == "B") +
-                                   dat$param$mean.test.W.int * (race[selected] == "W")))
+                             max = avg.test.int))
   }
 
   if (dat$param$testing.pattern == "memoryless") {
     ttntest <- rgeom(length(selected),
-                     1 / (dat$param$mean.test.B.int * (race[selected] == "B") +
-                          dat$param$mean.test.W.int * (race[selected] == "W")))
+                     1 / (avg.test.int))
   }
 
 
@@ -695,13 +694,11 @@ init_status_msm_whamp <- function(dat) {
   if (dat$param$testing.pattern == "interval") {
     tslt <- ceiling(runif(length(selected),
                           min = 0,
-                          max = dat$param$mean.test.B.int * (race[selected] == "B") +
-                                dat$param$mean.test.W.int * (race[selected] == "W")))
+                          max = avg.test.int))
   }
   if (dat$param$testing.pattern == "memoryless") {
     tslt <- rgeom(length(selected),
-                  1 / (dat$param$mean.test.B.int * (race[selected] == "B") +
-                       dat$param$mean.test.W.int * (race[selected] == "W")))
+                  1 / (avg.test.int))
   }
   last.neg.test[selected] <- -tslt
 
