@@ -19,11 +19,12 @@
 #'
 #' @export
 #'
-test_msm <- function(dat, at) {
+test_msm_whamp <- function(dat, at) {
 
   ## Variables
 
   # Attributes
+  age <- dat$attr$age
   diag.status <- dat$attr$diag.status
   race <- dat$attr$race #-- Delete when finish debugging
   race..wa <- dat$attr$race..wa
@@ -36,45 +37,34 @@ test_msm <- function(dat, at) {
 
   # Parameters
   testing.pattern <- dat$param$testing.pattern
-  mean.test.B.int <- dat$param$mean.test.B.int
-  mean.test.W.int <- dat$param$mean.test.W.int
+  iti.coefs <- dat$param$iti.coefs
   twind.int <- dat$param$test.window.int
 
   tsincelntst <- at - dat$attr$last.neg.test
   tsincelntst[is.na(tsincelntst)] <- at - dat$attr$arrival.time[is.na(tsincelntst)]
 
+  # Calculate intertest interval as a function of age
+  centered.age <- (age - mean(age))
+  avg.test.int <- iti.coefs[1] + centered.age * iti.coefs[2] + centered.age^2 * iti.coefs[3]
+  
   ## Process
 
   if (testing.pattern == "memoryless") {
-    elig.B <- which(race == "B" &
-                    tt.traj != 1 &
+    elig <- which(tt.traj != 1 &
                     (diag.status == 0 | is.na(diag.status)) &
                     prepStat == 0)
-    rates.B <- rep(1/mean.test.B.int, length(elig.B))
-    tst.B <- elig.B[rbinom(length(elig.B), 1, rates.B) == 1]
+    rates <- rep(1/avg.test.int, length(elig))
+    tst <- elig[rbinom(length(elig), 1, rates) == 1]
 
-    elig.W <- which(race == "W" &
-                    tt.traj != 1 &
-                    (diag.status == 0 | is.na(diag.status)) &
-                    prepStat == 0)
-    rates.W <- rep(1/mean.test.W.int, length(elig.W))
-    tst.W <- elig.W[rbinom(length(elig.W), 1, rates.W) == 1]
-    tst.nprep <- c(tst.B, tst.W)
+    tst.nprep <- tst
   }
 
   if (testing.pattern == "interval") {
-    tst.B <- which(race == "B" &
-                   tt.traj != 1 &
+    tst <- which(tt.traj != 1 &
                    (diag.status == 0 | is.na(diag.status)) &
-                   tsincelntst >= 2*(mean.test.B.int) &
+                   tsincelntst >= 2*(avg.test.int) &
                    prepStat == 0)
-
-    tst.W <- which(race == "W" &
-                   tt.traj != 1 &
-                   (diag.status == 0 | is.na(diag.status)) &
-                   tsincelntst >= 2*(mean.test.W.int) &
-                   prepStat == 0)
-    tst.nprep <- c(tst.B, tst.W)
+    tst.nprep <- tst
   }
 
   # PrEP testing
