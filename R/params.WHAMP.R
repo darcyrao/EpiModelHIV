@@ -10,12 +10,8 @@
 #'        \code{nwstats} output from \code{\link{calc_nwstats_msm}}.
 #' @param race.method Number of races in the model, with options of 1 or 2. If    #-- Delete this when finish debugging
 #'        1, then race-specific parameters will be averaged.
-#' @param last.neg.test.B.int Time range in days for last negative test for
-#'        black men.
-#' @param mean.test.B.int Mean intertest interval in days for black MSM who test.
-#' @param last.neg.test.W.int Time range in days for last negative test for
-#'        white men.
-#' @param mean.test.W.int Mean intertest interval in days for white MSM who test.
+#' @param iti.coefs GLM coefficients for median intertest interval among men who test  
+#'        (intercept, centered age, centered age squared)
 #' @param testing.pattern Method for HIV testing, with options \code{"memoryless"}
 #'        for constant hazard without regard to time since previous test, or
 #'        \code{"interval"} deterministic fixed intervals.
@@ -275,10 +271,7 @@
 #'
 param_msm_whamp <- function(nwstats,
                       race.method = 1, #-- Delete this when finish debugging
-                      last.neg.test.B.int = 301,
-                      last.neg.test.W.int = 315,
-                      mean.test.B.int = 301,
-                      mean.test.W.int = 315,
+                      iti.coefs = c(415.796063738122, 5.46732489852761, -0.318623224804563),
                       testing.pattern = "interval",
                       test.window.int = 21,
 
@@ -605,7 +598,7 @@ control_msm_whamp <- function(simno = 1,
                         aging.FUN = aging_msm,
                         deaths.FUN = deaths_msm_whamp,
                         births.FUN = births_msm_whamp,
-                        test.FUN = test_msm,
+                        test.FUN = test_msm_whamp,
                         tx.FUN = tx_msm,
                         prep.FUN = prep_msm,
                         progress.FUN = progress_msm,
