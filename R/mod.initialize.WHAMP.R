@@ -348,7 +348,7 @@ init_status_msm_whamp <- function(dat) {
   dat$attr$status <- status
 
   # Calculate intertest interval as a function of age
-  centered.age <- (age - mean(age))
+  centered.age <- (age - dat$param$mean.age.iti)
   avg.test.int <- dat$param$iti.coefs[1] + centered.age * dat$param$iti.coefs[2] + centered.age^2 * dat$param$iti.coefs[3]
 
   # Treatment trajectory
@@ -439,8 +439,7 @@ init_status_msm_whamp <- function(dat) {
                              max = avg.test.int))
   }
   if (dat$param$testing.pattern == "memoryless") {
-    ttntest <- rgeom(length(selected),
-                     1 / (avg.test.int))
+    stop("Intertest interval parameter calculated assuming interval method. Revise parameter estimation procedure for memoryless process.")
   }
 
   twind.int <- dat$param$test.window.int
@@ -454,9 +453,6 @@ init_status_msm_whamp <- function(dat) {
   ### Full adherent type
 
   # Create set of expected values for (cum.time.off.tx, cum.time.on.tx)
-  centered.agesq <- (age - mean(age))^2
-  avg.test.int <- dat$param$iti.coefs[1] + centered.agesq * iti.coefs[2] + centered.agesq^2 * iti.coefs[3]
-  
   tx.init.time.B <- twind.int + avg.test.int + 1 / dat$param$tx.init.B.prob
 
   # Stage for Blacks
@@ -558,8 +554,7 @@ init_status_msm_whamp <- function(dat) {
                              max = avg.test.int))
   }
   if (dat$param$testing.pattern == "memoryless") {
-    ttntest <- rgeom(length(selected),
-                     1 / (avg.test.int))
+    stop("Intertest interval parameter calculated assuming interval method. Revise parameter estimation procedure for memoryless process.")
   }
 
   diag.status[selected][ttntest > cum.time.off.tx[selected] - twind.int] <- 0
@@ -674,8 +669,7 @@ init_status_msm_whamp <- function(dat) {
   }
 
   if (dat$param$testing.pattern == "memoryless") {
-    ttntest <- rgeom(length(selected),
-                     1 / (avg.test.int))
+    stop("Intertest interval parameter calculated assuming interval method. Revise parameter estimation procedure for memoryless process.")
   }
 
 
@@ -697,8 +691,7 @@ init_status_msm_whamp <- function(dat) {
                           max = avg.test.int))
   }
   if (dat$param$testing.pattern == "memoryless") {
-    tslt <- rgeom(length(selected),
-                  1 / (avg.test.int))
+    stop("Intertest interval parameter calculated assuming interval method. Revise parameter estimation procedure for memoryless process.")
   }
   last.neg.test[selected] <- -tslt
 
