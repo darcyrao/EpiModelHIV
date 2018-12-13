@@ -12,6 +12,8 @@
 #'        1, then race-specific parameters will be averaged.
 #' @param iti.coefs GLM coefficients for median intertest interval among men who test  
 #'        (intercept, centered age, centered age squared)
+#' @param mean.age.iti Mean age from the sample used to fit the GLM tor median ITI, 
+#'        for use in calculating centered age.
 #' @param testing.pattern Method for HIV testing, with options \code{"memoryless"}
 #'        for constant hazard without regard to time since previous test, or
 #'        \code{"interval"} deterministic fixed intervals.
@@ -39,7 +41,7 @@
 #' @param max.time.off.tx.full.int Number of days off treatment for a full
 #'        suppressor before onset of AIDS, including time before diagnosis.
 #' @param max.time.on.tx.part.int Number of days on treatment for a
-#'        partial suppressor beofre onset of AIDS.
+#'        partial suppressor before onset of AIDS.
 #' @param max.time.off.tx.part.int Nnumber of days off treatment for a
 #'        partial suppressor before onset of AIDS, including time before
 #'        diagnosis.
@@ -264,6 +266,7 @@
 param_msm_whamp <- function(nwstats,
                       race.method = 1, #-- Delete this when finish debugging
                       iti.coefs = c(415.796063738122, 5.46732489852761, -0.318623224804563),
+                      mean.age.iti = 36.77193,
                       testing.pattern = "interval",
                       test.window.int = 21,
 
@@ -423,7 +426,6 @@ param_msm_whamp <- function(nwstats,
 
   p$role.prob <- nwstats$role.prob
 
-  p$inst.trans.matrix <- matrix(1, nrow = 1)
   p$role.trans.matrix <- matrix(c(1, 0, 0,
                                   0, 1, 0,
                                   0, 0, 1),
