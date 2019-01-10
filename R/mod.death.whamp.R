@@ -48,7 +48,7 @@ deaths_msm_whamp <- function(dat, at) {
   death.O.prob..wa.neg <-  dat$param$asmr.O..wa[age.O..wa.neg]
   deaths.O..wa.neg <- alive.O..wa.neg[rbinom(length(death.O.prob..wa.neg), 1, death.O.prob..wa.neg) == 1]
   
-  dth.gen..wa <- c(deaths.H..wa.neg, deaths.B..wa.neg, deaths.O..wa.neg)
+  dth.neg..wa <- c(deaths.H..wa.neg, deaths.B..wa.neg, deaths.O..wa.neg)
 
 
   ## Disease deaths among HIV-pos
@@ -103,7 +103,7 @@ deaths_msm_whamp <- function(dat, at) {
   
   ## Combine
   dth.all..wa <- NULL
-  dth.all..wa <- unique(c(dth.gen..wa, dth.pos..wa))
+  dth.all..wa <- unique(c(dth.neg..wa, dth.pos..wa))
 
   if (length(dth.all..wa) > 0) {
     dat$attr$active[dth.all..wa] <- 0
@@ -122,7 +122,7 @@ deaths_msm_whamp <- function(dat, at) {
   dth.age.pos <- which(age >= dat$param$exit.age & status == 1)
   
   ## Summary Output
-  dat$epi$dth.gen..wa[at] <- max(0, length(dth.gen..wa) - length(dth.age.neg)) #subtract age deaths to track them separately, b/c dth.gen and dth.pos include aging out
+  dat$epi$dth.neg..wa[at] <- max(0, length(dth.neg..wa) - length(dth.age.neg)) #subtract age deaths to track them separately, b/c dth.neg and dth.pos include aging out
   dat$epi$dth.pos..wa[at] <- max(0, length(dth.pos..wa) - length(dth.age.pos))
   dat$epi$dth.age[at] <- max(0, length(dth.age))
   dat$epi$dth.pos.bkg[at] <- max(0, dth.pos.bkg - length(dth.age.pos))
