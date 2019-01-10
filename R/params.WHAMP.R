@@ -71,6 +71,8 @@
 #'        viral load rises per time step from treatment halting until expected value.
 #' @param birth.age Age (in years) of new arrivals.
 #' @param exit.age Age (in years) at which individuals age out of the network
+#' @param asmr.rr.pos Relative increase in age-specific mortality for HIV-positive men
+#'        (for age groups 18-44, 45-54, 55-59)
 #' @param b.method Method for calculating the number of expected births at each
 #'        time step, with \code{"fixed"} based on the number of persons at the
 #'        initial time step and \code{"varying"} based on the current time step.
@@ -300,6 +302,7 @@ param_msm_whamp <- function(nwstats,
                       birth.age = 18,
                       exit.age = 60,
                       b.method = "fixed",
+                      asmr.rr.pos = c(3.791, 2.974, 1.984)
 
                       URAI.prob = 0.0082 * 1.09,
                       UIAI.prob = 0.0031 * 1.09,
