@@ -86,12 +86,24 @@ deaths_msm_whamp <- function(dat, at) {
   death.O.prob..wa.pos <-  asmr.O..wa.pos[age.O..wa.pos]
   deaths.O..wa.pos <- alive.O..wa.pos[rbinom(length(death.O.prob..wa.pos), 1, death.O.prob..wa.pos) == 1]
   
-  dth.dis..wa <- c(deaths.H..wa.pos, deaths.B..wa.pos, deaths.O..wa.pos)
+  dth.pos..wa <- c(deaths.H..wa.pos, deaths.B..wa.pos, deaths.O..wa.pos)
   
+  ### Calculate the excepted number of deaths among HIV-pos if they experienced the background general pop ASMRs 
+  ### (for use in determining the number of births to balance out background mortality
+  death.H.prob..wa.pos.bkg <-  dat$param$asmr.H..wa[age.H..wa.pos]
+  deaths.H..wa.pos.bkg <- length(rbinom(length(death.H.prob..wa.pos.bkg), 1, death.H.prob..wa.pos.bkg) == 1)
+  
+  death.B.prob..wa.pos.bkg <-  dat$param$asmr.B..wa[age.B..wa.pos]
+  deaths.B..wa.pos.bkg <- length(rbinom(length(death.B.prob..wa.pos.bkg), 1, death.B.prob..wa.pos.bkg) == 1)
+  
+  death.O.prob..wa.pos.bkg <-  dat$param$asmr.O..wa[age.O..wa.pos]
+  deaths.O..wa.pos.bkg <- length(rbinom(length(death.O.prob..wa.pos.bkg), 1, death.O.prob..wa.pos.bkg) == 1)
+  
+  dth.pos.bkg <- sum(deaths.H..wa.pos.bkg, deaths.B..wa.pos.bkg, deaths.O..wa.pos.bkg)
   
   ## Combine
   dth.all..wa <- NULL
-  dth.all..wa <- unique(c(dth.gen..wa, dth.dis..wa))
+  dth.all..wa <- unique(c(dth.gen..wa, dth.pos..wa))
 
   if (length(dth.all..wa) > 0) {
     dat$attr$active[dth.all..wa] <- 0
@@ -110,9 +122,10 @@ deaths_msm_whamp <- function(dat, at) {
   dth.age.pos <- which(age >= dat$param$exit.age & status == 1)
   
   ## Summary Output
-  dat$epi$dth.gen..wa[at] <- max(0, length(dth.gen..wa) - length(dth.age.neg)) #subtract age deaths to track them separately, b/c dth.gen and dth.dis include aging out
-  dat$epi$dth.dis..wa[at] <- max(0, length(dth.dis..wa) - length(dth.age.pos))
+  dat$epi$dth.gen..wa[at] <- max(0, length(dth.gen..wa) - length(dth.age.neg)) #subtract age deaths to track them separately, b/c dth.gen and dth.pos include aging out
+  dat$epi$dth.pos..wa[at] <- max(0, length(dth.pos..wa) - length(dth.age.pos))
   dat$epi$dth.age[at] <- max(0, length(dth.age))
+  dat$epi$dth.pos.bkg[at] <- max(0, dth.pos.bkg - length(dth.age.pos))
 
   return(dat)
 }
