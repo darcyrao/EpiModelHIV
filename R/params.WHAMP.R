@@ -302,7 +302,7 @@ param_msm_whamp <- function(nwstats,
                       birth.age = 18,
                       exit.age = 60,
                       b.method = "fixed",
-                      asmr.rr.pos = c(3.791, 2.974, 1.984)
+                      asmr.rr.pos = c(3.791, 2.974, 1.984),
 
                       URAI.prob = 0.0082 * 1.09,
                       UIAI.prob = 0.0031 * 1.09,
