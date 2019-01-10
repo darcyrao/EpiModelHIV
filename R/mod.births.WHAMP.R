@@ -8,7 +8,11 @@
 #'
 #' @details
 #' New population members are added based on expected numbers of entries,
-#' stochastically determined with draws from Poisson distributions.
+#' stochastically determined with draws from Poisson distributions. The 
+#' expected number of entries is set to balance exits due to aging out and  
+#' background mortality, defined as the number of deaths among HIV-negative men plus
+#' the expected number of deaths among HIV+ if they were subject to general pop
+#' age-specific mortality (i.e. subtracting excess mortality due to disease).
 #' For each new entry, a set of attributes is added for that node,
 #' and the nodes are added onto the network objects. Only attributes that are
 #' a part of the network model formulae are updated as vertex attributes on the
@@ -25,7 +29,7 @@ births_msm_whamp <- function(dat, at){
 
   ## Determine the number of births needed to balance general mortality and the number aging out
   
-  nBirths.gen <- dat$epi$dth.gen..wa[at] # Births to replace those who died from general mortality
+  nBirths.gen <- dat$epi$dth.neg..wa[at] + dat$epi$dth.pos.bkg[at] # Births to replace those who died from general mortality
   nBirths.age <- dat$epi$dth.age[at] # Births to replace those who aged out
   nBirths <- nBirths.gen + nBirths.age
 
@@ -116,9 +120,6 @@ setBirthAttr_msm_whamp <- function(dat, at, nBirths) {
 
   # Disease status and related
   dat$attr$status[newIds] <- rep(0, nBirths)
-
-  dat$attr$inst.ai.class[newIds] <- sample(1:dat$param$num.inst.ai.classes,
-                                           nBirths, replace = TRUE)
 
   dat$attr$tt.traj[newIds[newB]] <- sample(c(1, 2, 3, 4),
                                            nBirths.B, replace = TRUE,
