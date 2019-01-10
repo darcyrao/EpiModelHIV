@@ -9,12 +9,12 @@
 #'
 #' @details
 #' Deaths are divided into two categories: general deaths, for which demographic
-#' data on age-specific mortality rates applies; and disease-related diseases,
-#' for which the rate of death is a function of progression to end-stage AIDS.
-#' Which nodes have died is determined stochastically for general deaths using
-#' draws from a binomial distribution, and deterministically for disease-related
-#' deaths after nodes have reach a maximum viral load value set in the
-#' \code{vl.fatal} parameter. This module also tracks nodes that age out of the network.
+#' data on age-specific mortality rates applies; and disease-related deaths,
+#' which are calculated by multiplying general age-specific mortality rates by a 
+#' scalar for persons living with HIV.
+#' Which nodes have died is determined stochastically using draws from binomial 
+#' distributions for both general and HIV-related deaths. This module also tracks 
+#' nodes that age out of the network.
 #'
 #' @return
 #' This function returns the updated \code{dat} object accounting for deaths.
@@ -28,49 +28,70 @@
 #'
 deaths_msm_whamp <- function(dat, at) {
 
-  ## General deaths (includes deaths from aging out of the population b/c asmr = 1 at age 60)
+  ## General deaths among HIV-neg (includes deaths from aging out of the population b/c asmr = 1 at age 60)
   age <- floor(dat$attr$age)
-  race <- dat$attr$race   #-- Delete this old code eventually
   race..wa <- dat$attr$race..wa
+  status <- dat$attr$status
   
-  #-- Delete this old code eventually
-    alive.B <- which(race == "B")
-    age.B <- age[alive.B]
-    death.B.prob <- dat$param$asmr.B[age.B]
-    deaths.B <- alive.B[rbinom(length(death.B.prob), 1, death.B.prob) == 1]
+  alive.H..wa.neg <- which(race..wa == "H" & status == 0)
+  age.H..wa.neg <- age[alive.H..wa.neg]
+  death.H.prob..wa.neg <-  dat$param$asmr.H..wa[age.H..wa.neg]
+  deaths.H..wa.neg <- alive.H..wa.neg[rbinom(length(death.H.prob..wa.neg), 1, death.H.prob..wa.neg) == 1]
   
-    alive.W <- which(race == "W")
-    age.W <- age[alive.W]
-    death.W.prob <- dat$param$asmr.W[age.W]
-    deaths.W <- alive.W[rbinom(length(death.W.prob), 1, death.W.prob) == 1]
+  alive.B..wa.neg <- which(race..wa == "B" & status == 0)
+  age.B..wa.neg <- age[alive.B..wa.neg]
+  death.B.prob..wa.neg <-  dat$param$asmr.B..wa[age.B..wa.neg]
+  deaths.B..wa.neg <- alive.B..wa.neg[rbinom(length(death.B.prob..wa.neg), 1, death.B.prob..wa.neg) == 1]
   
-  alive.H..wa <- which(race..wa == "H")
-  age.H..wa <- age[alive.H..wa]
-  death.H.prob..wa <-  dat$param$asmr.H..wa[age.H..wa]
-  deaths.H..wa <- alive.H..wa[rbinom(length(death.H.prob..wa), 1, death.H.prob..wa) == 1]
+  alive.O..wa.neg <- which(race..wa == "O" & status == 0)
+  age.O..wa.neg <- age[alive.O..wa.neg]
+  death.O.prob..wa.neg <-  dat$param$asmr.O..wa[age.O..wa.neg]
+  deaths.O..wa.neg <- alive.O..wa.neg[rbinom(length(death.O.prob..wa.neg), 1, death.O.prob..wa.neg) == 1]
   
-  alive.B..wa <- which(race..wa == "B")
-  age.B..wa <- age[alive.B..wa]
-  death.B.prob..wa <-  dat$param$asmr.B..wa[age.B..wa]
-  deaths.B..wa <- alive.B..wa[rbinom(length(death.B.prob..wa), 1, death.B.prob..wa) == 1]
-  
-  alive.O..wa <- which(race..wa =="O")
-  age.O..wa <- age[alive.O..wa]
-  death.O.prob..wa <-  dat$param$asmr.O..wa[age.O..wa]
-  deaths.O..wa <- alive.O..wa[rbinom(length(death.O.prob..wa), 1, death.O.prob..wa) == 1]
-
-  dth.gen <- c(deaths.B, deaths.W) #-- Delete this when finish debugging
-  dth.gen..wa <- c(deaths.H..wa, deaths.B..wa, deaths.O..wa)
+  dth.gen..wa <- c(deaths.H..wa.neg, deaths.B..wa.neg, deaths.O..wa.neg)
 
 
-  ## Disease deaths
-  dth.dis <- which(dat$attr$stage == 4 &
-                   dat$attr$vl >= dat$param$vl.fatal)
-
-  dth.all <- NULL  #-- Delete this when finish debugging
-  dth.all <- unique(c(dth.gen, dth.dis)) #-- Delete this when finish debugging
+  ## Disease deaths among HIV-pos
+  asmr.H..wa.pos <-  c(dat$param$asmr.H..wa[1:17], 
+                       dat$param$asmr.H..wa[18:44]*dat$param$asmr.rr.pos[1], 
+                       dat$param$asmr.H..wa[45:54]*dat$param$asmr.rr.pos[2],
+                       dat$param$asmr.H..wa[55:59]*dat$param$asmr.rr.pos[3],
+                       dat$param$asmr.H..wa[60])
+  
+  asmr.B..wa.pos <-  c(dat$param$asmr.B..wa[1:17], 
+                       dat$param$asmr.B..wa[18:44]*dat$param$asmr.rr.pos[1], 
+                       dat$param$asmr.B..wa[45:54]*dat$param$asmr.rr.pos[2],
+                       dat$param$asmr.B..wa[55:59]*dat$param$asmr.rr.pos[3],
+                       dat$param$asmr.B..wa[60])
+  
+  asmr.O..wa.pos <-  c(dat$param$asmr.O..wa[1:17], 
+                       dat$param$asmr.O..wa[18:44]*dat$param$asmr.rr.pos[1], 
+                       dat$param$asmr.O..wa[45:54]*dat$param$asmr.rr.pos[2],
+                       dat$param$asmr.O..wa[55:59]*dat$param$asmr.rr.pos[3],
+                       dat$param$asmr.O..wa[60])
+  
+  
+  alive.H..wa.pos <- which(race..wa == "H" & status == 1)
+  age.H..wa.pos <- age[alive.H..wa.pos]
+  death.H.prob..wa.pos <-  asmr.H..wa.pos[age.H..wa.pos]
+  deaths.H..wa.pos <- alive.H..wa.pos[rbinom(length(death.H.prob..wa.pos), 1, death.H.prob..wa.pos) == 1]
+  
+  alive.B..wa.pos <- which(race..wa == "B" & status == 1)
+  age.B..wa.pos <- age[alive.B..wa.pos]
+  death.B.prob..wa.pos <-  asmr.B..wa.pos[age.B..wa.pos]
+  deaths.B..wa.pos <- alive.B..wa.pos[rbinom(length(death.B.prob..wa.pos), 1, death.B.prob..wa.pos) == 1]
+  
+  alive.O..wa.pos <- which(race..wa == "O" & status == 1)
+  age.O..wa.pos <- age[alive.O..wa.pos]
+  death.O.prob..wa.pos <-  asmr.O..wa.pos[age.O..wa.pos]
+  deaths.O..wa.pos <- alive.O..wa.pos[rbinom(length(death.O.prob..wa.pos), 1, death.O.prob..wa.pos) == 1]
+  
+  dth.dis..wa <- c(deaths.H..wa.pos, deaths.B..wa.pos, deaths.O..wa.pos)
+  
+  
+  ## Combine
   dth.all..wa <- NULL
-  dth.all..wa <- unique(c(dth.gen..wa, dth.dis))
+  dth.all..wa <- unique(c(dth.gen..wa, dth.dis..wa))
 
   if (length(dth.all..wa) > 0) {
     dat$attr$active[dth.all..wa] <- 0
@@ -84,11 +105,13 @@ deaths_msm_whamp <- function(dat, at) {
   }
 
   ## Aging out of the network
-  dth.age<-which(age >= dat$param$exit.age)
+  dth.age <- which(age >= dat$param$exit.age)
+  dth.age.neg <- which(age >= dat$param$exit.age & status == 0) # define these separately so can subract them below
+  dth.age.pos <- which(age >= dat$param$exit.age & status == 1)
   
   ## Summary Output
-  dat$epi$dth.gen..wa[at] <- max(0, length(dth.gen..wa)-length(dth.age)) #subtract age deaths to track them separately, b/c dth.gen includes # aging out
-  dat$epi$dth.dis[at] <- max(0, length(dth.dis))
+  dat$epi$dth.gen..wa[at] <- max(0, length(dth.gen..wa) - length(dth.age.neg)) #subtract age deaths to track them separately, b/c dth.gen and dth.dis include aging out
+  dat$epi$dth.dis..wa[at] <- max(0, length(dth.dis..wa) - length(dth.age.pos))
   dat$epi$dth.age[at] <- max(0, length(dth.age))
 
   return(dat)
