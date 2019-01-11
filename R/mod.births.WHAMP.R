@@ -31,8 +31,12 @@ births_msm_whamp <- function(dat, at){
   
   nBirths.gen <- dat$epi$dth.neg..wa[at] + dat$epi$dth.pos.bkg[at] # Births to replace those who died from general mortality
   nBirths.age <- dat$epi$dth.age[at] # Births to replace those who aged out
-  nBirths <- nBirths.gen + nBirths.age
+  
+  ## Determine the number of additional births to add to achieve the specified population growth
+  nBirths.growth <- sum(dat$epi$num.H..wa[at - 1], dat$epi$num.B..wa[at - 1], dat$epi$num.O..wa[at - 1])*(dat$param$growth.rate - 1)
 
+  nBirths <- nBirths.gen + nBirths.age + nBirths.growth
+  
   ## Update Attr
   
   if (nBirths > 0) {
