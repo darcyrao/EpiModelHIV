@@ -297,7 +297,7 @@ param_msm_whamp <- function(nwstats,
                       part.supp.down.slope = 0.25,
                       part.supp.up.slope = 0.25,
 
-                      growth.rate = 1.000144,
+                      growth.rate = 1.0001441,
                       birth.age = 18,
                       exit.age = 60,
                       asmr.rr.pos = c(3.791, 2.974, 1.984),
