@@ -481,9 +481,9 @@ param_msm_whamp <- function(nwstats,
 init_msm_whamp <- function(nwstats,
                      prev.B = 0.253, #-- Delete this old code eventually
                      prev.W = 0.253, #-- Delete this old code eventually
-                     prev.H..wa = 0.08, #-- Use data on PLWHA and estimated MSM pop size to construct. Note PLWHA is only diagnosed, so will underestimate, but want to start a bit below true prevalence to reach equilibrium faster
-                     prev.B..wa = 0.08,
-                     prev.O..wa = 0.08,
+                     prev.H..wa = 0.07, #-- Surveillance data on prevalent diagnoses suggest 7.7% prevalence for Other, 17.3% for Black, 12.0% for Hispanic. Note PLWHA is only diagnosed, so will underestimate, but want to start a bit below true prevalence to reach equilibrium faster
+                     prev.B..wa = 0.07,
+                     prev.O..wa = 0.07,
                      prev.ugc = 0.005,
                      prev.rgc = 0.005,
                      prev.uct = 0.013,
