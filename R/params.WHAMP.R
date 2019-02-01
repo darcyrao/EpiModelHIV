@@ -481,13 +481,13 @@ param_msm_whamp <- function(nwstats,
 init_msm_whamp <- function(nwstats,
                      prev.B = 0.253, #-- Delete this old code eventually
                      prev.W = 0.253, #-- Delete this old code eventually
-                     prev.H..wa = 0.07, #-- Surveillance data on prevalent diagnoses suggest 7.7% prevalence for Other, 17.3% for Black, 12.0% for Hispanic. Note PLWHA is only diagnosed, so will underestimate, but want to start a bit below true prevalence to reach equilibrium faster
-                     prev.B..wa = 0.07,
-                     prev.O..wa = 0.07,
-                     prev.ugc = 0.005,
-                     prev.rgc = 0.005,
-                     prev.uct = 0.013,
-                     prev.rct = 0.013,
+                     prev.H..wa = 0.08, #-- Surveillance data on prevalent diagnoses suggest 7.7% prevalence for Other, 17.3% for Black, 12.0% for Hispanic. Note this underestimates true prevalence bc it only counts diagnosed cases. We set starting prevalence to 70% of this for each group to reach equilibrium faster
+                     prev.B..wa = 0.12,
+                     prev.O..wa = 0.049,
+                     prev.ugc = 0, #--This model will not represent STIs
+                     prev.rgc = 0,
+                     prev.uct = 0,
+                     prev.rct = 0,
                      ...) {
 
   p <- get_args(formal.args = formals(sys.function()),
