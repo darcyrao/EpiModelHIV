@@ -18,11 +18,29 @@
 #'        for constant hazard without regard to time since previous test, or
 #'        \code{"interval"} deterministic fixed intervals.
 #' @param test.window.int Length of the HIV test window period in days.
-#' @param tt.traj.B.prob Proportion of black MSM who enter one of four
-#'        testing/treatment trajectories: never test or treat, test and never
-#'        initiate treatment, test and treated with partial viral suppression,
-#'        and test and treated with full suppression.
-#' @param tt.traj.W.prob Proportion of white MSM who enter into the four
+#' @param tt.traj.KC.B.prob Proportion of black MSM in King County who enter one of four
+#'        testing/treatment trajectories: non-tester treated with partial viral suppression,
+#'        non-tester treated with full viral suppression, regular tester treated with partial
+#'        suppression, and regular tester treated with full suppression
+#' @param tt.traj.KC.H.prob Proportion of Hispanic MSM in King County who enter into the four
+#'        testing/treatment trajectories, as defined above.
+#' @param tt.traj.KC.O.prob Proportion of other MSM in King County who enter into the four
+#'        testing/treatment trajectories, as defined above.
+#' @param tt.traj.OW.B.prob Proportion of black MSM in Western WA who enter one of four
+#'        testing/treatment trajectories: non-tester treated with partial viral suppression,
+#'        non-tester treated with full viral suppression, regular tester treated with partial
+#'        suppression, and regular tester treated with full suppression
+#' @param tt.traj.OW.H.prob Proportion of Hispanic MSM in Western WA who enter into the four
+#'        testing/treatment trajectories, as defined above.
+#' @param tt.traj.OW.O.prob Proportion of other MSM in Western WA who enter into the four
+#'        testing/treatment trajectories, as defined above.
+#' @param tt.traj.EW.B.prob Proportion of black MSM in Eastern WA who enter one of four
+#'        testing/treatment trajectories: non-tester treated with partial viral suppression,
+#'        non-tester treated with full viral suppression, regular tester treated with partial
+#'        suppression, and regular tester treated with full suppression
+#' @param tt.traj.EW.H.prob Proportion of Hispanic MSM in Eastern WA who enter into the four
+#'        testing/treatment trajectories, as defined above.
+#' @param tt.traj.EW.O.prob Proportion of other MSM in Eastern WA who enter into the four
 #'        testing/treatment trajectories, as defined above.
 #' @param tx.init.B.prob Probability per time step that a black MSM who has
 #'        tested positive will initiate treatment.
@@ -270,9 +288,16 @@ param_msm_whamp <- function(nwstats,
                       testing.pattern = "interval",
                       test.window.int = 21,
 
-                      tt.traj.B.prob = c(0.077, 0.000, 0.356, 0.567),
-                      tt.traj.W.prob = c(0.052, 0.000, 0.331, 0.617),
-
+                      tt.traj.KC.B.prob = c(0.081*(1-0.838), 0.081*(0.838), (1-0.081)*(1-0.838), (1-0.081)*(0.838)),
+                      tt.traj.KC.H.prob = c(0.064*(1-0.902), 0.064*(0.902), (1-0.064)*(1-0.902), (1-0.064)*(0.902)),
+                      tt.traj.KC.O.prob = c(0.105*(1-0.92), 0.105*(0.92), (1-0.105)*(1-0.92), (1-0.105)*(0.92)),
+                      tt.traj.OW.B.prob = c(0.121*(1-0.809), 0.121*(0.809), (1-0.121)*(1-0.809), (1-0.121)*(0.809)),
+                      tt.traj.OW.H.prob = c(0.102*(1-0.885), 0.102*(0.885), (1-0.102)*(1-0.885), (1-0.102)*(0.885)),
+                      tt.traj.OW.O.prob = c(0.148*(1-0.905), 0.148*(0.905), (1-0.148)*(1-0.905), (1-0.148)*(0.905)),
+                      tt.traj.EW.B.prob = c(0.162*(1-0.758), 0.162*(0.758), (1-0.162)*(1-0.758), (1-0.162)*(0.758)),
+                      tt.traj.EW.H.prob = c(0.14*(1-0.846), 0.14*(0.846), (1-0.14)*(1-0.846), (1-0.14)*(0.846)),
+                      tt.traj.EW.O.prob = c(0.192*(1-0.874), 0.192*(0.874), (1-0.192)*(1-0.874), (1-0.192)*(0.874)),
+                      
                       tx.init.B.prob = 0.092,
                       tx.init.W.prob = 0.127,
                       tx.halt.B.prob = 0.0102,
