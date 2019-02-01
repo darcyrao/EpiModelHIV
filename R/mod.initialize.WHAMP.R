@@ -151,67 +151,67 @@ initialize_msm_whamp <- function(x, param, init, control, s) {
   # HIV-related attributes
   dat <- init_status_msm_whamp(dat)
 
-  ## GC/CT status
-  idsUreth <- which(role.class %in% c("I", "V"))
-  idsRect <- which(role.class %in% c("R", "V"))
-
-  uGC <- rGC <- rep(0, num)
-  uCT <- rCT <- rep(0, num)
-
-  # Initialize GC infection at both sites
-  idsUGC <- sample(idsUreth, size = round(init$prev.ugc * num), FALSE)
-  uGC[idsUGC] <- 1
-
-  idsRGC <- sample(setdiff(idsRect, idsUGC), size = round(init$prev.rgc * num), FALSE)
-  rGC[idsRGC] <- 1
-
-  dat$attr$rGC <- rGC
-  dat$attr$uGC <- uGC
-
-  dat$attr$rGC.sympt <- dat$attr$uGC.sympt <- rep(NA, num)
-  dat$attr$rGC.sympt[rGC == 1] <- rbinom(sum(rGC == 1), 1, dat$param$rgc.sympt.prob)
-  dat$attr$uGC.sympt[uGC == 1] <- rbinom(sum(uGC == 1), 1, dat$param$ugc.sympt.prob)
-
-  dat$attr$rGC.infTime <- dat$attr$uGC.infTime <- rep(NA, length(dat$attr$active))
-  dat$attr$rGC.infTime[rGC == 1] <- 1
-  dat$attr$uGC.infTime[uGC == 1] <- 1
-
-  dat$attr$rGC.timesInf <- rep(0, num)
-  dat$attr$rGC.timesInf[rGC == 1] <- 1
-  dat$attr$uGC.timesInf <- rep(0, num)
-  dat$attr$uGC.timesInf[uGC == 1] <- 1
-
-  dat$attr$rGC.tx <- dat$attr$uGC.tx <- rep(NA, num)
-  dat$attr$rGC.tx.prep <- dat$attr$uGC.tx.prep <- rep(NA, num)
-  dat$attr$GC.cease <- rep(NA, num)
-
-  # Initialize CT infection at both sites
-  idsUCT <- sample(idsUreth, size = round(init$prev.uct * num), FALSE)
-  uCT[idsUCT] <- 1
-
-  idsRCT <- sample(setdiff(idsRect, idsUCT), size = round(init$prev.rct * num), FALSE)
-  rCT[idsRCT] <- 1
-
-  dat$attr$rCT <- rCT
-  dat$attr$uCT <- uCT
-
-  dat$attr$rCT.sympt <- dat$attr$uCT.sympt <- rep(NA, num)
-  dat$attr$rCT.sympt[rCT == 1] <- rbinom(sum(rCT == 1), 1, dat$param$rct.sympt.prob)
-  dat$attr$uCT.sympt[uCT == 1] <- rbinom(sum(uCT == 1), 1, dat$param$uct.sympt.prob)
-
-  dat$attr$rCT.infTime <- dat$attr$uCT.infTime <- rep(NA, num)
-  dat$attr$rCT.infTime[dat$attr$rCT == 1] <- 1
-  dat$attr$uCT.infTime[dat$attr$uCT == 1] <- 1
-
-  dat$attr$rCT.timesInf <- rep(0, num)
-  dat$attr$rCT.timesInf[rCT == 1] <- 1
-  dat$attr$uCT.timesInf <- rep(0, num)
-  dat$attr$uCT.timesInf[uCT == 1] <- 1
-
-  dat$attr$rCT.tx <- dat$attr$uCT.tx <- rep(NA, num)
-  dat$attr$rCT.tx.prep <- dat$attr$uCT.tx.prep <- rep(NA, num)
-  dat$attr$CT.cease <- rep(NA, num)
-
+  # ## GC/CT status
+  # idsUreth <- which(role.class %in% c("I", "V"))
+  # idsRect <- which(role.class %in% c("R", "V"))
+  # 
+  # uGC <- rGC <- rep(0, num)
+  # uCT <- rCT <- rep(0, num)
+  # 
+  # # Initialize GC infection at both sites
+  # idsUGC <- sample(idsUreth, size = round(init$prev.ugc * num), FALSE)
+  # uGC[idsUGC] <- 1
+  # 
+  # idsRGC <- sample(setdiff(idsRect, idsUGC), size = round(init$prev.rgc * num), FALSE)
+  # rGC[idsRGC] <- 1
+  # 
+  # dat$attr$rGC <- rGC
+  # dat$attr$uGC <- uGC
+  # 
+  # dat$attr$rGC.sympt <- dat$attr$uGC.sympt <- rep(NA, num)
+  # dat$attr$rGC.sympt[rGC == 1] <- rbinom(sum(rGC == 1), 1, dat$param$rgc.sympt.prob)
+  # dat$attr$uGC.sympt[uGC == 1] <- rbinom(sum(uGC == 1), 1, dat$param$ugc.sympt.prob)
+  # 
+  # dat$attr$rGC.infTime <- dat$attr$uGC.infTime <- rep(NA, length(dat$attr$active))
+  # dat$attr$rGC.infTime[rGC == 1] <- 1
+  # dat$attr$uGC.infTime[uGC == 1] <- 1
+  # 
+  # dat$attr$rGC.timesInf <- rep(0, num)
+  # dat$attr$rGC.timesInf[rGC == 1] <- 1
+  # dat$attr$uGC.timesInf <- rep(0, num)
+  # dat$attr$uGC.timesInf[uGC == 1] <- 1
+  # 
+  # dat$attr$rGC.tx <- dat$attr$uGC.tx <- rep(NA, num)
+  # dat$attr$rGC.tx.prep <- dat$attr$uGC.tx.prep <- rep(NA, num)
+  # dat$attr$GC.cease <- rep(NA, num)
+  # 
+  # # Initialize CT infection at both sites
+  # idsUCT <- sample(idsUreth, size = round(init$prev.uct * num), FALSE)
+  # uCT[idsUCT] <- 1
+  # 
+  # idsRCT <- sample(setdiff(idsRect, idsUCT), size = round(init$prev.rct * num), FALSE)
+  # rCT[idsRCT] <- 1
+  # 
+  # dat$attr$rCT <- rCT
+  # dat$attr$uCT <- uCT
+  # 
+  # dat$attr$rCT.sympt <- dat$attr$uCT.sympt <- rep(NA, num)
+  # dat$attr$rCT.sympt[rCT == 1] <- rbinom(sum(rCT == 1), 1, dat$param$rct.sympt.prob)
+  # dat$attr$uCT.sympt[uCT == 1] <- rbinom(sum(uCT == 1), 1, dat$param$uct.sympt.prob)
+  # 
+  # dat$attr$rCT.infTime <- dat$attr$uCT.infTime <- rep(NA, num)
+  # dat$attr$rCT.infTime[dat$attr$rCT == 1] <- 1
+  # dat$attr$uCT.infTime[dat$attr$uCT == 1] <- 1
+  # 
+  # dat$attr$rCT.timesInf <- rep(0, num)
+  # dat$attr$rCT.timesInf[rCT == 1] <- 1
+  # dat$attr$uCT.timesInf <- rep(0, num)
+  # dat$attr$uCT.timesInf[uCT == 1] <- 1
+  # 
+  # dat$attr$rCT.tx <- dat$attr$uCT.tx <- rep(NA, num)
+  # dat$attr$rCT.tx.prep <- dat$attr$uCT.tx.prep <- rep(NA, num)
+  # dat$attr$CT.cease <- rep(NA, num)
+  # 
 
   # CCR5
   dat <- init_ccr5_msm_whamp(dat)
@@ -281,23 +281,42 @@ remove_bad_roles_msm <- function(nw) {
 #'
 init_status_msm_whamp <- function(dat) {
 
-  num.B <- dat$init$num.B #-- Delete this old code eventually 
-  num.W <- dat$init$num.W #-- Delete this old code eventually 
-  num.H..wa <- dat$init$num.H..wa
-  num.B..wa <- dat$init$num.B..wa
-  num.O..wa <- dat$init$num.O..wa
-  num <- num.H..wa + num.B..wa + num.O..wa
-  
-  ids.B <- which(dat$attr$race == "B")
-  ids.W <- which(dat$attr$race == "W")
-  ids.H..wa <- which(dat$attr$race..wa == "H")
-  ids.B..wa <- which(dat$attr$race..wa == "B")
-  ids.O..wa <- which(dat$attr$race..wa == "O")
-  
   age <- dat$attr$age
   race <- dat$attr$race #-- Delete this old code when finish debugging
   race..wa <- dat$attr$race..wa
   region <- dat$attr$region
+  
+  ids.B <- which(dat$attr$race == "B")
+  ids.W <- which(dat$attr$race == "W")
+  ids.B..wa <- which(dat$attr$race..wa == "B")
+  ids.H..wa <- which(dat$attr$race..wa == "H")
+  ids.O..wa <- which(dat$attr$race..wa == "O")
+  ids.KC.B <- which(dat$attr$race..wa == "B" & dat$attr$region == "KC")
+  ids.KC.H <- which(dat$attr$race..wa == "H" & dat$attr$region == "KC")
+  ids.KC.O <- which(dat$attr$race..wa == "O" & dat$attr$region == "KC")
+  ids.OW.B <- which(dat$attr$race..wa == "B" & dat$attr$region == "OW")
+  ids.OW.H <- which(dat$attr$race..wa == "H" & dat$attr$region == "OW")
+  ids.OW.O <- which(dat$attr$race..wa == "O" & dat$attr$region == "OW")
+  ids.EW.B <- which(dat$attr$race..wa == "B" & dat$attr$region == "EW")
+  ids.EW.H <- which(dat$attr$race..wa == "H" & dat$attr$region == "EW")
+  ids.EW.O <- which(dat$attr$race..wa == "O" & dat$attr$region == "EW")
+  
+  num.B <- dat$init$num.B #-- Delete this old code eventually 
+  num.W <- dat$init$num.W #-- Delete this old code eventually 
+  num.B..wa <- dat$init$num.B..wa
+  num.H..wa <- dat$init$num.H..wa
+  num.O..wa <- dat$init$num.O..wa
+  num.KC.B <- length(ids.KC.B)
+  num.KC.H <- length(ids.KC.H)
+  num.KC.O <- length(ids.KC.O)
+  num.OW.B <- length(ids.OW.B)
+  num.OW.H <- length(ids.OW.H)
+  num.OW.O <- length(ids.OW.O)
+  num.EW.B <- length(ids.EW.B)
+  num.EW.H <- length(ids.EW.H)
+  num.EW.O <- length(ids.EW.O)
+  
+  num <- num.H..wa + num.B..wa + num.O..wa
 
   # Number initially infected by race/ethnicity
     nInfB <- round(dat$init$prev.B * num.B) #-- Delete this old code when finish debugging
@@ -354,10 +373,24 @@ init_status_msm_whamp <- function(dat) {
   # Treatment trajectory
   tt.traj <- rep(NA, num)
 
-  tt.traj[ids.B] <- sample(apportion_lr(num.B, c(1, 2, 3, 4),
-                                        dat$param$tt.traj.B.prob))
-  tt.traj[ids.W] <- sample(apportion_lr(num.W, c(1, 2, 3, 4),
-                                        dat$param$tt.traj.W.prob))
+  tt.traj[ids.KC.B] <- sample(apportion_lr(num.KC.B, c(1, 2, 3, 4),
+                                        dat$param$tt.traj.KC.B.prob))
+  tt.traj[ids.KC.H] <- sample(apportion_lr(num.KC.H, c(1, 2, 3, 4),
+                                           dat$param$tt.traj.KC.H.prob))
+  tt.traj[ids.KC.O] <- sample(apportion_lr(num.KC.O, c(1, 2, 3, 4),
+                                           dat$param$tt.traj.KC.O.prob))
+  tt.traj[ids.OW.B] <- sample(apportion_lr(num.OW.B, c(1, 2, 3, 4),
+                                           dat$param$tt.traj.OW.B.prob))
+  tt.traj[ids.OW.H] <- sample(apportion_lr(num.OW.H, c(1, 2, 3, 4),
+                                           dat$param$tt.traj.OW.H.prob))
+  tt.traj[ids.OW.O] <- sample(apportion_lr(num.OW.O, c(1, 2, 3, 4),
+                                           dat$param$tt.traj.OW.O.prob))
+  tt.traj[ids.EW.B] <- sample(apportion_lr(num.EW.B, c(1, 2, 3, 4),
+                                           dat$param$tt.traj.EW.B.prob))
+  tt.traj[ids.EW.H] <- sample(apportion_lr(num.EW.H, c(1, 2, 3, 4),
+                                           dat$param$tt.traj.EW.H.prob))
+  tt.traj[ids.EW.O] <- sample(apportion_lr(num.EW.O, c(1, 2, 3, 4),
+                                           dat$param$tt.traj.EW.O.prob))
   dat$attr$tt.traj <- tt.traj
 
 
