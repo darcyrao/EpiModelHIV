@@ -42,38 +42,48 @@
 #'        testing/treatment trajectories, as defined above.
 #' @param tt.traj.EW.O.prob Proportion of other MSM in Eastern WA who enter into the four
 #'        testing/treatment trajectories, as defined above.
-#' @param tx.init.B.prob Probability per time step that a black MSM who has
-#'        tested positive will initiate treatment.
-#' @param tx.init.W.prob Probability per time step that a white MSM who has
-#'        tested positive will initiate treatment.
-#' @param tx.halt.B.prob Probability per time step that a black MSM who is
+#' @param tx.init.int.KC.B Days from diagnosis to treatment initiation for Black MSM in King County
+#' @param tx.init.int.KC.H Days from diagnosis to treatment initiation for Hispanic MSM in King County
+#' @param tx.init.int.KC.O Days from diagnosis to treatment initiation for Other MSM in King County
+#' @param tx.init.int.OW.B Days from diagnosis to treatment initiation for Black MSM in other western WA
+#' @param tx.init.int.OW.H Days from diagnosis to treatment initiation for Hispanic MSM in other western WA
+#' @param tx.init.int.OW.O Days from diagnosis to treatment initiation for Other MSM in other western WA
+#' @param tx.init.int.EW.B Days from diagnosis to treatment initiation for Black MSM in eastern WA
+#' @param tx.init.int.EW.H Days from diagnosis to treatment initiation for Hispanic MSM in eastern WA
+#' @param tx.init.int.EW.O Days from diagnosis to treatment initiation for Other MSM in eastern WA
+#' @param tx.halt.full Probability per time step that a full suppressor who is
 #'        currently on treatment will halt treatment.
-#' @param tx.halt.W.prob Probability per time step that a white MSM who is
-#'        currently on treatment will halt treatment.
-#' @param tx.reinit.B.prob Probability per time step that a black MSM who is
-#'        not currently on treatment but who has been in the past will
-#'        re-initiate treatment.
-#' @param tx.reinit.W.prob Probability per time step that a white MSM who is
-#'        not currently on treatment but who has been in the past will
-#'        re-initiate treatment.
-#' @param max.time.off.tx.full.int Number of days off treatment for a full
-#'        suppressor before onset of AIDS, including time before diagnosis.
-#' @param max.time.on.tx.part.int Number of days on treatment for a
-#'        partial suppressor before onset of AIDS.
-#' @param max.time.off.tx.part.int Nnumber of days off treatment for a
-#'        partial suppressor before onset of AIDS, including time before
-#'        diagnosis.
-#' @param vl.acute.rise.int Number of days to peak viremia during acute
-#'        infection.
-#' @param vl.acute.peak Peak viral load (in log10 units) at the height of acute
-#'        infection.
+#' @param tx.halt.part.rr Relative risk of halting treatment per time step for a partial suppressor
+#'        currently on treatment, as compared to a full suppressor
+#' @param tx.reinit.full.KC.B Probability per time step that black MSM in KC who are full suppressors and
+#'        not currently on treatment but who have been in the past will re-initiate
+#' @param tx.reinit.full.KC.H Probability per time step that Hispanic MSM in KC who are full suppressors and
+#'        not currently on treatment but who have been in the past will re-initiate
+#' @param tx.reinit.full.KC.O Probability per time step that other MSM in KC who are full suppressors and
+#'        not currently on treatment but who have been in the past will re-initiate
+#' @param tx.reinit.full.OW.B Probability per time step that black MSM in OW who are full suppressors and
+#'        not currently on treatment but who have been in the past will re-initiate
+#' @param tx.reinit.full.OW.H Probability per time step that Hispanic MSM in OW who are full suppressors and
+#'        not currently on treatment but who have been in the past will re-initiate
+#' @param tx.reinit.full.OW.O Probability per time step that other MSM in OW who are full suppressors and
+#'        not currently on treatment but who have been in the past will re-initiate
+#' @param tx.reinit.full.EW.B Probability per time step that black MSM in EW who are full suppressors and
+#'        not currently on treatment but who have been in the past will re-initiate
+#' @param tx.reinit.full.EW.H Probability per time step that Hispanic MSM in EW who are full suppressors and
+#'        not currently on treatment but who have been in the past will re-initiate
+#' @param tx.reinit.full.EW.O Probability per time step that other MSM in EW who are full suppressors and
+#'        not currently on treatment but who have been in the past will re-initiate
+#' @param tx.reinit.part.rr Relative risk of reinitiating treatment per time step for a partial suppressor
+#'        currently on treatment, as compared to a full suppressor
+#' @param max.time.off.tx.full.int Number of days off treatment for a before onset of AIDS, 
+#'        including time before diagnosis.
+#' @param vl.acute.rise.int Number of days to peak viremia during acute infection.
+#' @param vl.acute.peak Peak viral load (in log10 units) at the height of acute infection.
 #' @param vl.acute.fall.int Number of days from peak viremia to set-point
 #'        viral load during the acute infection period.
 #' @param vl.set.point Set point viral load (in log10 units).
 #' @param vl.aids.onset.int Number of days to AIDS for a treatment-naive
 #'        patient.
-#' @param vl.aids.int Duration of AIDS stage infection in days.
-#' @param vl.fatal Viral load in AIDS at which death occurs.
 #' @param vl.full.supp Log10 viral load at full suppression on ART.
 #' @param vl.part.supp Log10 viral load at partial suppression on ART.
 #' @param full.supp.down.slope For full suppressors, number of log10 units that
@@ -87,7 +97,7 @@
 #'        re-initiation until the level in \code{vl.part.supp}.
 #' @param part.supp.up.slope For partial suppressors, number of log10 units that
 #'        viral load rises per time step from treatment halting until expected value.
-#' @param growth.rate Rate of population growth per time step.        
+#' @param growth.rate Rate of population growth per day.        
 #' @param birth.age Age (in years) of new arrivals.
 #' @param exit.age Age (in years) at which individuals age out of the network
 #' @param asmr.rr.pos Relative increase in age-specific mortality for HIV-positive men
@@ -298,31 +308,42 @@ param_msm_whamp <- function(nwstats,
                       tt.traj.EW.H.prob = c(0.14*(1-0.846), 0.14*(0.846), (1-0.14)*(1-0.846), (1-0.14)*(0.846)),
                       tt.traj.EW.O.prob = c(0.192*(1-0.874), 0.192*(0.874), (1-0.192)*(1-0.874), (1-0.192)*(0.874)),
                       
-                      tx.init.B.prob = 0.092,
-                      tx.init.W.prob = 0.127,
-                      tx.halt.B.prob = 0.0102,
-                      tx.halt.W.prob = 0.0071,
-                      tx.reinit.B.prob = 0.00066,
-                      tx.reinit.W.prob = 0.00291,
+                      tx.init.int.KC.B = 102 - 7*8,
+                      tx.init.int.KC.H = 99 - 7*8,
+                      tx.init.int.KC.O = 103 - 7*8,
+                      tx.init.int.OW.B = 112 - 7*8,
+                      tx.init.int.OW.H = 109 - 7*8,
+                      tx.init.int.OW.O = 113 - 7*8,
+                      tx.init.int.EW.B = 109 - 7*8,
+                      tx.init.int.EW.H = 106 - 7*8,
+                      tx.init.int.EW.O = 109 - 7*8,
+                      
+                      tx.halt.full = 0.0043,
+                      tx.halt.part.rr = 2,
+                      tx.reinit.full.KC.B = 0.0487,
+                      tx.reinit.full.KC.H = 0.0471,
+                      tx.reinit.full.KC.O = 0.0546,
+                      tx.reinit.full.OW.B = 0.0403,
+                      tx.reinit.full.OW.H = 0.0390,
+                      tx.reinit.full.OW.O = 0.0443,
+                      tx.reinit.full.EW.B = 0.0443,
+                      tx.reinit.full.EW.H = 0.0417,
+                      tx.reinit.full.EW.O = 0.0472,
 
-                      max.time.off.tx.full.int = 520 * 7,
-                      max.time.on.tx.part.int = 52 * 15 * 7,
-                      max.time.off.tx.part.int = 520 * 7,
+                      max.time.off.tx.int = 520 * 7,
                       vl.acute.rise.int = 45,
                       vl.acute.peak = 6.886,
                       vl.acute.fall.int = 45,
                       vl.set.point = 4.5,
                       vl.aids.onset.int = 520 * 7,
-                      vl.aids.int = 52 * 2 * 7,
-                      vl.fatal = 7,
                       vl.full.supp = 1.5,
                       vl.part.supp = 3.5,
-                      full.supp.down.slope = 0.25,
-                      full.supp.up.slope = 0.25,
+                      full.supp.down.slope = 0.75,
+                      full.supp.up.slope = 0.75,
                       part.supp.down.slope = 0.25,
                       part.supp.up.slope = 0.25,
 
-                      growth.rate = 1.0001441,
+                      growth.rate = 1.0001441 / 7,
                       birth.age = 18,
                       exit.age = 60,
                       asmr.rr.pos = c(3.791, 2.974, 1.984),
