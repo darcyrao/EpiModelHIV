@@ -75,8 +75,9 @@
 #'        not currently on treatment but who have been in the past will re-initiate
 #' @param tx.reinit.part.rr Relative risk of reinitiating treatment per time step for a partial suppressor
 #'        currently on treatment, as compared to a full suppressor
-#' @param max.time.off.tx.full.int Number of days off treatment for a before onset of AIDS, 
+#' @param max.time.off.tx.int Number of days off treatment for a before onset of AIDS, 
 #'        including time before diagnosis.
+#' @param sympt.onset.int Number of days from infection to symptom onset in the absence of ART
 #' @param vl.acute.rise.int Number of days to peak viremia during acute infection.
 #' @param vl.acute.peak Peak viral load (in log10 units) at the height of acute infection.
 #' @param vl.acute.fall.int Number of days from peak viremia to set-point
@@ -84,6 +85,8 @@
 #' @param vl.set.point Set point viral load (in log10 units).
 #' @param vl.aids.onset.int Number of days to AIDS for a treatment-naive
 #'        patient.
+#' @param vl.aids.int Time from AIDS onset to peak AIDS VL in days.
+#' @param vl.aids.peak Peak VL in AIDS.
 #' @param vl.full.supp Log10 viral load at full suppression on ART.
 #' @param vl.part.supp Log10 viral load at partial suppression on ART.
 #' @param full.supp.down.slope For full suppressors, number of log10 units that
@@ -331,11 +334,14 @@ param_msm_whamp <- function(nwstats,
                       tx.reinit.full.EW.O = 0.0472,
 
                       max.time.off.tx.int = 520 * 7,
+                      sympt.onset.int = 2737.5
                       vl.acute.rise.int = 45,
                       vl.acute.peak = 6.886,
                       vl.acute.fall.int = 45,
                       vl.set.point = 4.5,
                       vl.aids.onset.int = 520 * 7,
+                      vl.aids.int = 52 * 2 * 7,
+                      vl.aids.peak = 7,
                       vl.full.supp = 1.5,
                       vl.part.supp = 3.5,
                       full.supp.down.slope = 0.75,
