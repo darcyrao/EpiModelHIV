@@ -368,7 +368,7 @@ init_status_msm_whamp <- function(dat) {
 
   # Calculate intertest interval as a function of age
   centered.age <- (age - dat$param$mean.age.iti)
-  avg.test.int <- dat$param$iti.coefs[1] + centered.age * dat$param$iti.coefs[2] + centered.age^2 * dat$param$iti.coefs[3]
+  exp.test.int <- dat$param$iti.coefs[1] + centered.age * dat$param$iti.coefs[2] + centered.age^2 * dat$param$iti.coefs[3]
 
   # Treatment trajectory
   tt.traj <- rep(NA, num)
@@ -470,7 +470,7 @@ init_status_msm_whamp <- function(dat) {
 ##--> REPLACE 1/TX.INIT.PROB WITH ESTIMATED TIME TO INITIATION
   
   # Create set of expected values for (cum.time.off.tx, cum.time.on.tx)
-  tx.init.time.B <- twind.int + avg.test.int/2 + 1 / dat$param$tx.init.B.prob
+  tx.init.time.B <- twind.int + exp.test.int/2 + 1 / dat$param$tx.init.B.prob
 
   # Stage for Blacks
   prop.time.on.tx.B <- dat$param$tx.reinit.B.prob /
@@ -537,7 +537,7 @@ init_status_msm_whamp <- function(dat) {
   if (dat$param$testing.pattern == "interval") {
     ttntest <- ceiling(runif(length(selected),
                              min = 0,
-                             max = avg.test.int))
+                             max = exp.test.int))
   }
   if (dat$param$testing.pattern == "memoryless") {
     stop("Intertest interval parameter calculated assuming interval method. Revise parameter estimation procedure for memoryless process.")
@@ -557,7 +557,7 @@ init_status_msm_whamp <- function(dat) {
   if (dat$param$testing.pattern == "interval") {
     tslt <- ceiling(runif(length(selected),
                           min = 0,
-                          max = avg.test.int))
+                          max = exp.test.int))
   }
   if (dat$param$testing.pattern == "memoryless") {
     stop("Intertest interval parameter calculated assuming interval method. Revise parameter estimation procedure for memoryless process.")
