@@ -19,25 +19,21 @@
 #'        \code{"interval"} deterministic fixed intervals.
 #' @param test.window.int Length of the HIV test window period in days.
 #' @param tt.traj.KC.B.prob Proportion of black MSM in King County who enter one of four
-#'        testing/treatment trajectories: non-tester treated with partial viral suppression,
-#'        non-tester treated with full viral suppression, regular tester treated with partial
-#'        suppression, and regular tester treated with full suppression
+#'        testing/treatment trajectories: non-screener treated with partial viral suppression,
+#'        non-screener treated with full viral suppression, regular screener treated with partial
+#'        suppression, and regular screener treated with full suppression
 #' @param tt.traj.KC.H.prob Proportion of Hispanic MSM in King County who enter into the four
 #'        testing/treatment trajectories, as defined above.
 #' @param tt.traj.KC.O.prob Proportion of other MSM in King County who enter into the four
 #'        testing/treatment trajectories, as defined above.
 #' @param tt.traj.OW.B.prob Proportion of black MSM in Western WA who enter one of four
-#'        testing/treatment trajectories: non-tester treated with partial viral suppression,
-#'        non-tester treated with full viral suppression, regular tester treated with partial
-#'        suppression, and regular tester treated with full suppression
+#'        testing/treatment trajectories, as defined above
 #' @param tt.traj.OW.H.prob Proportion of Hispanic MSM in Western WA who enter into the four
 #'        testing/treatment trajectories, as defined above.
 #' @param tt.traj.OW.O.prob Proportion of other MSM in Western WA who enter into the four
 #'        testing/treatment trajectories, as defined above.
 #' @param tt.traj.EW.B.prob Proportion of black MSM in Eastern WA who enter one of four
-#'        testing/treatment trajectories: non-tester treated with partial viral suppression,
-#'        non-tester treated with full viral suppression, regular tester treated with partial
-#'        suppression, and regular tester treated with full suppression
+#'        testing/treatment trajectories, as defined above
 #' @param tt.traj.EW.H.prob Proportion of Hispanic MSM in Eastern WA who enter into the four
 #'        testing/treatment trajectories, as defined above.
 #' @param tt.traj.EW.O.prob Proportion of other MSM in Eastern WA who enter into the four
@@ -85,7 +81,7 @@
 #' @param vl.set.point Set point viral load (in log10 units).
 #' @param vl.aids.onset.int Number of days to AIDS for a treatment-naive
 #'        patient.
-#' @param vl.aids.int Time from AIDS onset to peak AIDS VL in days.
+#' @param vl.aids.int Time from AIDS onset to peak AIDS VL in untreated infection in days.
 #' @param vl.aids.peak Peak VL in AIDS.
 #' @param vl.full.supp Log10 viral load at full suppression on ART.
 #' @param vl.part.supp Log10 viral load at partial suppression on ART.
@@ -311,15 +307,15 @@ param_msm_whamp <- function(nwstats,
                       tt.traj.EW.H.prob = c(0.14*(1-0.846), 0.14*(0.846), (1-0.14)*(1-0.846), (1-0.14)*(0.846)),
                       tt.traj.EW.O.prob = c(0.192*(1-0.874), 0.192*(0.874), (1-0.192)*(1-0.874), (1-0.192)*(0.874)),
                       
-                      tx.init.int.KC.B = 102 - 7*8,
-                      tx.init.int.KC.H = 99 - 7*8,
-                      tx.init.int.KC.O = 103 - 7*8,
-                      tx.init.int.OW.B = 112 - 7*8,
-                      tx.init.int.OW.H = 109 - 7*8,
-                      tx.init.int.OW.O = 113 - 7*8,
-                      tx.init.int.EW.B = 109 - 7*8,
-                      tx.init.int.EW.H = 106 - 7*8,
-                      tx.init.int.EW.O = 109 - 7*8,
+                      tx.init.int.KC.B = 46,
+                      tx.init.int.KC.H = 43,
+                      tx.init.int.KC.O = 47,
+                      tx.init.int.OW.B = 56,
+                      tx.init.int.OW.H = 53,
+                      tx.init.int.OW.O = 57,
+                      tx.init.int.EW.B = 53,
+                      tx.init.int.EW.H = 50,
+                      tx.init.int.EW.O = 53,
                       
                       tx.halt.full = 0.0043,
                       tx.halt.part.rr = 2,
