@@ -403,6 +403,7 @@ init_status_msm_whamp <- function(dat) {
 
   ## Infection-related attributes
   stage <- rep(NA, num)
+  stage.time <- rep(NA, num)
   inf.time <- rep(NA, num)
   vl <- rep(NA, num)
   diag.status <- rep(NA, num)
@@ -604,6 +605,8 @@ init_status_msm_whamp <- function(dat) {
   ### All tt.traj groups: Calculate cumulative time on and off tx to determine progression to AIDS
   selected <- which(status == 1)
   
+  exp.aids.time <- rep(NA, length(selected))
+  
   # If not yet initiated treatment, cum.time.off = time since infection and cum time on = 0
   cum.time.off.tx[selected][time.since.inf[selected] < time.to.tx[selected]] <- time.since.inf[selected]
   cum.time.on.tx[selected][time.since.inf[selected] < time.to.tx[selected]] <- 0
@@ -616,13 +619,24 @@ init_status_msm_whamp <- function(dat) {
     round(time.to.tx[selected][time.since.inf[selected] >= time.to.tx[selected]] + offon[abs(tx.init.time[selected][time.since.inf[selected] >= time.to.tx[selected]]), 1])
   cum.time.on.tx[selected][time.since.inf[selected] >= time.to.tx[selected]] <-
     round(offon[abs(tx.init.time[selected][time.since.inf[selected] >= time.to.tx[selected]]), 2])
+  exp.aids.time[time.since.inf[selected] >= time.to.tx[selected]] <- time.to.tx[selected][time.since.inf[selected] >= time.to.tx[selected]] +
+    min(which(offon[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected][time.since.inf[selected] >= time.to.tx[selected]])))
 
   ### All tt.traj groups: Assign stage of infection 
   stage[selected] <- (time.since.inf[selected] <= vlar.int) * 1 +
       (time.since.inf[selected] > vlar.int) * (time.since.inf[selected] <= vl.acute.int) * 2 +
       (time.since.inf[selected] > vl.acute.int) * (cum.time.off.tx[selected] < dat$param$max.time.off.tx.int) * 3 +
       (time.since.inf[selected] > vl.acute.int) * (cum.time.off.tx[selected] >= dat$param$max.time.off.tx.int) * 4
-      
+  stage.time[selected][stage[selected] == 1] <- time.since.inf[selected][stage[selected] == 1]
+  stage.time[selected][stage[selected] == 2] <- time.since.inf[selected][stage[selected] == 2] - vlar.int
+  stage.time[selected][stage[selected] == 3] <- time.since.inf[selected][stage[selected] == 3] - vl.acute.int
+  stage.time[selected][stage[selected] == 4 & (time.since.inf[selected] < time.to.tx[selected])] <- 
+      time.since.inf[selected][stage[selected] == 4 & (time.since.inf[selected] < time.to.tx[selected])] - dat$param$max.time.off.tx.int
+  stage.time[selected][stage[selected] == 4 & (time.since.inf[selected] >= time.to.tx[selected])] <- 
+    time.since.inf[selected][stage[selected] == 4 & (time.since.inf[selected] >= time.to.tx[selected])] - 
+    exp.aids.time[stage[selected] == 4 & (time.since.inf[selected] >= time.to.tx[selected])]
+  
+  
   ### All tt.traj groups: Assign VL (assuming a linear rate of change in VL up to peak viremia in acute phase and from peak down to set point)
 
   ##' To set VL in the AIDS phase, define a variable average consecutive time off tx
@@ -679,6 +693,7 @@ init_status_msm_whamp <- function(dat) {
 
   ### Set all onto dat$attr
   dat$attr$stage <- stage
+  dat$attr$stage.time <- stage.time
   dat$attr$inf.time <- inf.time
   dat$attr$vl <- vl
   dat$attr$diag.status <- diag.status
