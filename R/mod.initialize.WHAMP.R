@@ -272,7 +272,14 @@ remove_bad_roles_msm <- function(nw) {
 #'
 #' @description Sets the initial individual-level disease status of persons
 #'              in the network, as well as disease-related attributes for
-#'              infected persons.
+#'              infected persons. This function works by 1) assigning time since 
+#'              infection as a draw from a uniform distribution with the max being
+#'              the time since sexual debut, 2) assigning diagnosis based on time 
+#'              since last test, which is sampled from a uniform distribution, or, 
+#'              for non-screener types, time to symptomatic infection, 3) assigning treatment
+#'              status, 4) assigning stage of infection based on time since infection and
+#'              expected cumulative time on/off treatment, 5) assigning viral load  based on 
+#'              stage of infection and treatment status
 #'
 #' @param dat Data object created in initialization module.
 #'
@@ -394,11 +401,8 @@ init_status_msm_whamp <- function(dat) {
   dat$attr$tt.traj <- tt.traj
 
 
-
   ## Infection-related attributes
-
   stage <- rep(NA, num)
-  stage.time <- rep(NA, num)
   inf.time <- rep(NA, num)
   vl <- rep(NA, num)
   diag.status <- rep(NA, num)
@@ -414,11 +418,13 @@ init_status_msm_whamp <- function(dat) {
   inf.diag <- rep(NA, num)
   inf.tx <- rep(NA, num)
   inf.stage <- rep(NA, num)
-
-  time.sex.active <- pmax(1,
-                          round((365 / dat$param$time.unit) * age - (365 / dat$param$time.unit) *
-                                  min(dat$init$ages), 0))
-
+  
+  ## Define vectors and values used to calculate and assign the above attributes
+  time.since.inf <- rep(NA, num)
+  time.to.dx <- rep(NA, num)
+  time.to.tx <- rep(NA, num)
+  prop.time.on.tx <- rep(NA, num)
+ 
   vlar.int <- dat$param$vl.acute.rise.int
   vlap <- dat$param$vl.acute.peak
   vlaf.int <- dat$param$vl.acute.fall.int
@@ -429,145 +435,250 @@ init_status_msm_whamp <- function(dat) {
   sympt.int <- dat$param$sympt.onset.int
   vlds <- (vlaidsp - vlsp) / vl.aids.int
   vl.acute.int <- vlar.int + vlaf.int
+  tx.halt.full <- dat$param$tx.halt.full
+  tx.halt.part.rr <- dat$param$tx.halt.part.rr
+  tx.reinit.part.rr <- dat$param$tx.reinit.part.rr
   
+  tx.init.int <- rep(NA, num)
+  tx.init.int[race..wa == "B" & region == "KC"] <- dat$param$tx.init.int.KC.B
+  tx.init.int[race..wa == "H" & region == "KC"] <- dat$param$tx.init.int.KC.H
+  tx.init.int[race..wa == "O" & region == "KC"] <- dat$param$tx.init.int.KC.O
+  tx.init.int[race..wa == "B" & region == "OW"] <- dat$param$tx.init.int.OW.B
+  tx.init.int[race..wa == "H" & region == "OW"] <- dat$param$tx.init.int.OW.H
+  tx.init.int[race..wa == "O" & region == "OW"] <- dat$param$tx.init.int.OW.O
+  tx.init.int[race..wa == "B" & region == "EW"] <- dat$param$tx.init.int.EW.B
+  tx.init.int[race..wa == "H" & region == "EW"] <- dat$param$tx.init.int.EW.H
+  tx.init.int[race..wa == "O" & region == "EW"] <- dat$param$tx.init.int.EW.O
+  
+  tx.reinit.full <- rep(NA, num)
+  tx.reinit.full[race..wa == "B" & region == "KC"] <- dat$param$tx.reinit.full.KC.B
+  tx.reinit.full[race..wa == "H" & region == "KC"] <- dat$param$tx.reinit.full.KC.H
+  tx.reinit.full[race..wa == "O" & region == "KC"] <- dat$param$tx.reinit.full.KC.O
+  tx.reinit.full[race..wa == "B" & region == "OW"] <- dat$param$tx.reinit.full.OW.B
+  tx.reinit.full[race..wa == "H" & region == "OW"] <- dat$param$tx.reinit.full.OW.H
+  tx.reinit.full[race..wa == "O" & region == "OW"] <- dat$param$tx.reinit.full.OW.O
+  tx.reinit.full[race..wa == "B" & region == "EW"] <- dat$param$tx.reinit.full.EW.B
+  tx.reinit.full[race..wa == "H" & region == "EW"] <- dat$param$tx.reinit.full.EW.H
+  tx.reinit.full[race..wa == "O" & region == "EW"] <- dat$param$tx.reinit.full.EW.O
 
-  ### Non-tester type: partial suppressor
-##--> DO THIS FOR EACH GROUP (INDEX PARAMS BY REGION.HBO)
-  selected <- which(status == 1 & tt.traj %in% 1)
-  max.inf.time <- pmin(time.sex.active[selected], vldo.int + vl.aids.int)
-  time.since.inf <- ceiling(runif(length(selected), max = max.inf.time))
-  inf.time[selected] <- 1 - time.since.inf
+  time.sex.active <- pmax(1,
+                          round((365 / dat$param$time.unit) * age - (365 / dat$param$time.unit) *
+                                    min(dat$init$ages), 0))
   
+  ### 1. Non-screener type - partial suppressors
+  selected <- which(status == 1 & tt.traj == 1)
+ 
+  ## Assign infection time
+  time.since.inf[selected] <- ceiling(runif(length(selected), max = time.sex.active[selected])) # set max time since infection to time since sexual debut (assumed to be age 18)
+  inf.time[selected] <- 1 - time.since.inf[selected]
+  
+  ## Assign diagnosis status
   diag.status[selected] <- 0
-  diag.status[selected][time.since.inf >= sympt.int] <- 1
+  diag.status[selected][time.since.inf[selected] >= sympt.int] <- 1
+  time.to.dx[selected][diag.status[selected] == 1] <- sympt.int
+  
+  ## Assign treatment status
+  time.to.tx[selected][diag.status[selected] == 1] <- sympt.int + tx.init.int[selected]
+  prop.time.on.tx[selected] <- (tx.reinit.full[selected] * tx.reinit.part.rr) /
+      ((tx.halt.full * tx.halt.part.rr) + (tx.reinit.full[selected] * tx.reinit.part.rr))
   tx.status[selected] <- 0
-  tx.status[selected][time.since.inf > sympt.int] <- 1
-  cum.time.on.tx[selected] <- 0
-  cum.time.off.tx[selected] <- time.since.inf
+  tx.status[selected][time.since.inf[selected] >= time.to.tx[selected]] <-
+      rbinom(sum(time.since.inf[selected] >= time.to.tx[selected]),
+             1, prop.time.on.tx[selected][time.since.inf[selected] >= time.to.tx[selected]])
+  tx.init.time[selected][time.since.inf[selected] >= time.to.tx[selected]] <- 
+      1 - time.since.inf[selected][time.since.inf[selected] >= time.to.tx[selected]] + time.to.tx[selected][time.since.inf[selected] >= time.to.tx[selected]]
 
-  stage[selected[time.since.inf <= vlar.int]] <- 1
-  stage[selected[time.since.inf > vlar.int & time.since.inf <= vl.acute.int]] <- 2
-  stage[selected[time.since.inf > vl.acute.int & time.since.inf <= vldo.int]] <- 3
-  stage[selected[time.since.inf > vldo.int]] <- 4
-
-  stage.time[selected][stage[selected] == 1] <- time.since.inf[stage[selected] == 1]
-  stage.time[selected][stage[selected] == 2] <- time.since.inf[stage[selected] == 2] -
-                                                   vlar.int
-  stage.time[selected][stage[selected] == 3] <- time.since.inf[stage[selected] == 3] -
-                                                  vl.acute.int
-  stage.time[selected][stage[selected] == 4] <- time.since.inf[stage[selected] == 4] -
-                                                  vldo.int
-  vl[selected] <- (time.since.inf <= vlar.int) * (vlap * time.since.inf / vlar.int) +
-                  (time.since.inf > vlar.int) * (time.since.inf <= vlar.int + vlaf.int) *
-                     ((vlsp - vlap) * (time.since.inf - vlar.int) / vlaf.int + vlap) +
-                  (time.since.inf > vlar.int + vlaf.int) * (time.since.inf <= vldo.int) * (vlsp) +
-                  (time.since.inf > vldo.int) * (vlsp + (time.since.inf - vldo.int) * vlds)
-  vl[selected][tx.status[selected] == 1] <- dat$param$vl.part.supp
+  ### 2. Non-screener type - full suppressors
+  selected <- which(status == 1 & tt.traj == 2)
   
-
-  ### Reg tester full adherent type
-##--> REPLACE .B WITH REGION.HBO IDENTIFIER AND REPEAT FOR EACH GROUP 
-##--> REPLACE 1/TX.INIT.PROB WITH ESTIMATED TIME TO INITIATION
+  ## Assign infection time
+  time.since.inf[selected] <- ceiling(runif(length(selected), max = time.sex.active[selected])) # set max time since infection to time since sexual debut (assumed to be age 18)
+  inf.time[selected] <- 1 - time.since.inf[selected]
   
-  # Create set of expected values for (cum.time.off.tx, cum.time.on.tx)
-  tx.init.time.B <- twind.int + exp.test.int/2 + 1 / dat$param$tx.init.B.prob
-
-  # Stage for Blacks
-  prop.time.on.tx.B <- dat$param$tx.reinit.B.prob /
-                       (dat$param$tx.halt.B.prob + dat$param$tx.reinit.B.prob)
-  offon.B <- matrix(c(1:tx.init.time.B, rep(0, tx.init.time.B)),
-                    nrow = tx.init.time.B)
-  numsteps.B <- (dat$param$max.time.off.tx.int - tx.init.time.B) / # Expected num steps remaining until AIDS, given rates of tx halting and reinitiating
-                (1 - prop.time.on.tx.B)
-  offon.B <- rbind(offon.B,
-                   cbind(tx.init.time.B + (1 - prop.time.on.tx.B) * 1:numsteps.B,
-                         prop.time.on.tx.B * 1:numsteps.B))
-  offon.B <- round(offon.B)
-  exp.dur.chronic.B <- nrow(offon.B) - vl.acute.int
-  exp.onset.aids.B <- nrow(offon.B)
-  selected <- which(status == 1 & tt.traj == 4 & race == "B")
-  time.since.inf <- ceiling(runif(length(selected), max = time.sex.active)) # set max time since infection to time since sexual debut (assumed to be age 18)
-  inf.time[selected] <- 1 - time.since.inf
-  exp.dur.AIDS.B <- pmax(0, 
-                         round(((365 / dat$param$time.unit) * dat$param$exit.age) - 
-                            ((365 / dat$param$time.unit) * age - time.since.inf + vl.acute.int + exp.dur.chronic.B))) # set expected duration of AIDS to remaining time until exit the model after chronic phase
-  offon.last.B <- offon.B[nrow(offon.B), ]
-  if(exp.dur.AIDS.B > 0){
-    offon.B <- rbind(offon.B,
-                   matrix(c(offon.last.B[1] + (1:exp.dur.AIDS.B),
-                            rep(offon.last.B[2], vl.aids.int)),
-                          ncol = 2))
-  }
-  max.possible.inf.time.B <- nrow(offon.B)
-  offon.B[, 2] <- (1:max.possible.inf.time.B) - offon.B[, 1]
+  ## Assign diagnosis status
+  diag.status[selected] <- 0
+  diag.status[selected][time.since.inf[selected] >= sympt.int] <- 1
+  time.to.dx[selected][diag.status[selected] == 1] <- sympt.int
   
-  stage.B <- rep(c(1, 2, 3, 4), c(vlar.int, vlaf.int, exp.dur.chronic.B, exp.dur.AIDS.B))
-  stage.time.B <- c(1:vlar.int, 1:vlaf.int, 1:exp.dur.chronic.B, 1:exp.dur.AIDS.B)
-
-
-  # Vl for Blacks
-  cum.time.on.tx[selected] <- offon.B[time.since.inf, 2]
-  cum.time.off.tx[selected] <- offon.B[time.since.inf, 1]
-  stage[selected] <- stage.B[time.since.inf]
-  stage.time[selected] <- stage.time.B[time.since.inf]
+  ## Assign treatment status
+  time.to.tx[selected][diag.status[selected] == 1] <- sympt.int + tx.init.int[selected]
+  prop.time.on.tx[selected] <- (tx.reinit.full[selected]) /
+      ((tx.halt.full) + (tx.reinit.full[selected]))
   tx.status[selected] <- 0
-  tx.status[selected][cum.time.on.tx[selected] > 0] <-
-    rbinom(sum(cum.time.on.tx[selected] > 0),
-           1, prop.time.on.tx.B)
+  tx.status[selected][time.since.inf[selected] >= time.to.tx[selected]] <-
+      rbinom(sum(time.since.inf[selected] >= time.to.tx[selected]),
+             1, prop.time.on.tx[selected][time.since.inf[selected] >= time.to.tx[selected]])
+  tx.init.time[selected][time.since.inf[selected] >= time.to.tx[selected]] <- 
+      1 - time.since.inf[selected][time.since.inf[selected] >= time.to.tx[selected]] + time.to.tx[selected][time.since.inf[selected] >= time.to.tx[selected]]
   
-   #-- Assumes a linear rate of change in VL up to peak viremia in acute phase and from peak down to set point
-  vl[selected] <- (time.since.inf <= vlar.int) * (vlap * time.since.inf / vlar.int) +
-                  (time.since.inf > vlar.int) * (time.since.inf <= vlar.int + vlaf.int) *
-                    ((vlsp - vlap) * (time.since.inf - vlar.int) / vlaf.int + vlap) +
-                  (time.since.inf > vlar.int + vlaf.int) *
-                  (time.since.inf <= exp.onset.aids.B) * (vlsp) +
-                  (time.since.inf > exp.onset.aids.B) *
-                  (vlsp + (time.since.inf - exp.onset.aids.B) * vlds)
-  vl[selected][tx.status[selected] == 1] <- dat$param$vl.full.supp
-
-
-################
-# ?? SHOULDN'T DIAGNOSIS BE SET BEFORE TX IS SET? WHY DOES IT USE THE cum.time.off.tx VECTOR TO DETERMINE IF DIAGNOSIS
-#    WOULD HAVE OCCURRED? THIS VECTOR ALREADY MAKES AN ASSUMPTOIN ABOUT WHEN DIAGNOSIS AND TX OCCURED...
-###############
+  ### 3. Regular screeners - partial suppressors
+  selected <- which(status == 1 & tt.traj == 3)
   
-  # Diagnosis
-  selected <- which(status == 1 & tt.traj == 4)
+  ## Assign infection time
+  time.since.inf[selected] <- ceiling(runif(length(selected), max = time.sex.active[selected])) # set max time since infection to time since sexual debut (assumed to be age 18)
+  inf.time[selected] <- 1 - time.since.inf[selected]
   
+  ## Assign diagnosis status
   if (dat$param$testing.pattern == "interval") {
-    ttntest <- ceiling(runif(length(selected),
-                             min = 0,
-                             max = exp.test.int))
+      tslt <- ceiling(runif(length(selected),
+                            min = 0,
+                            max = exp.test.int))
   }
   if (dat$param$testing.pattern == "memoryless") {
-    stop("Intertest interval parameter calculated assuming interval method. Revise parameter estimation procedure for memoryless process.")
+      stop("Intertest interval parameter calculated assuming interval method. Revise parameter estimation procedure for memoryless process.")
   }
+  
+  diag.status[selected][tslt > time.since.inf[selected]] <- 0 # Last test before infection
+  diag.status[selected][time.since.inf[selected] < dat$param$test.window.int] <- 0 # Infection < test window period
+  diag.status[selected][tslt <= time.since.inf[selected] & tslt > (time.since.inf[selected] - dat$param$test.window.int)] <- 0 # Last test < test window period
+  diag.status[selected][tslt <= (time.since.inf[selected] - dat$param$test.window.int)] <- 1 # Last test occurred since infection but after the window period
 
-  diag.status[selected][ttntest > cum.time.off.tx[selected] - twind.int] <- 0
-  last.neg.test[selected][ttntest > cum.time.off.tx[selected] - twind.int] <-
-                           -ttntest[ttntest > cum.time.off.tx[selected] - twind.int]
-  diag.status[selected][ttntest <= cum.time.off.tx[selected] - twind.int] <- 1
-  diag.status[selected][cum.time.on.tx[selected] > 0] <- 1
-  last.neg.test[selected][cum.time.on.tx[selected] > 0] <- NA
-
-
-  # Last neg test before present for negatives
-  selected <- which(status == 0 & tt.traj %in% c(2, 3, 4))
-
+  ##' Time to dx - calculate time to first test based on expected test interval (assigned last test used for determining if diagnosis would have occurred may not have been first pos test 
+  ##' if infection occurred long ago. So calculate time to first post test as: time since infection - (time since last test + floor((time since infection - time since last test - test.window) / exp.test.int) * exp.test.int)
+  time.to.dx[selected][diag.status[selected] == 1] <- runif(sum(diag.status[selected] == 1), min = dat$param$test.window.int, max = exp.test.int)
+   <- time.since.inf[selected][diag.status[selected] == 1] - 
+      (tslt[diag.status[selected] == 1] + floor((time.since.inf[selected][diag.status[selected] == 1] - tslt[diag.status[selected] == 1] - dat$param$test.window.int)/exp.test.int) * exp.test.int)  
+  
+  diag.time[selected][diag.status[selected] == 1] <- 1 - time.since.inf[selected][diag.status[selected] == 1] + time.to.dx[selected][diag.status[selected] == 1]
+  
+  last.neg.test[selected][diag.status[selected] == 0] <- -tslt[diag.status[selected] == 0]
+  last.neg.test[selected][diag.status[selected] == 1] <- NA
+  
+  # Assign treatment status
+  time.to.tx[selected][diag.status[selected] == 1] <- time.to.dx[selected][diag.status[selected] == 1] + tx.init.int[selected][diag.status[selected] == 1]
+  prop.time.on.tx[selected] <- (tx.reinit.full[selected] * tx.reinit.part.rr) /
+      ((tx.halt.full * tx.halt.part.rr) + (tx.reinit.full[selected] * tx.reinit.part.rr))
+  tx.status[selected] <- 0
+  tx.status[selected][time.since.inf[selected] >= time.to.tx[selected]] <-
+      rbinom(sum(time.since.inf[selected] >= time.to.tx[selected]),
+             1, prop.time.on.tx[selected][time.since.inf[selected] >= time.to.tx[selected]])
+  tx.init.time[selected][time.since.inf[selected] >= time.to.tx[selected]] <- 
+      1 - time.since.inf[selected][time.since.inf[selected] >= time.to.tx[selected]] + 
+      time.to.tx[selected][time.since.inf[selected] >= time.to.tx[selected]]
+  
+  ### 4. Regular screeners - full suppressors
+  selected <- which(status == 1 & tt.traj == 3)
+  
+  ## Assign infection time
+  time.since.inf[selected] <- ceiling(runif(length(selected), max = time.sex.active[selected])) # set max time since infection to time since sexual debut (assumed to be age 18)
+  inf.time[selected] <- 1 - time.since.inf[selected]
+  
+  ## Assign diagnosis status
   if (dat$param$testing.pattern == "interval") {
-    tslt <- ceiling(runif(length(selected),
-                          min = 0,
-                          max = exp.test.int))
+      tslt <- ceiling(runif(length(selected),
+                            min = 0,
+                            max = exp.test.int))
   }
   if (dat$param$testing.pattern == "memoryless") {
-    stop("Intertest interval parameter calculated assuming interval method. Revise parameter estimation procedure for memoryless process.")
+      stop("Intertest interval parameter calculated assuming interval method. Revise parameter estimation procedure for memoryless process.")
+  }
+  
+  diag.status[selected][tslt > time.since.inf[selected]] <- 0 # Last test before infection
+  diag.status[selected][time.since.inf[selected] < dat$param$test.window.int] <- 0 # Infection < test window period
+  diag.status[selected][tslt <= time.since.inf[selected] & tslt > (time.since.inf[selected] - dat$param$test.window.int)] <- 0 # Last test < test window period
+  diag.status[selected][tslt <= (time.since.inf[selected] - dat$param$test.window.int)] <- 1 # Last test occurred since infection but after the window period
+  
+  ##' Time to dx - calculate time to first test based on expected test interval (assigned last test used for determining if diagnosis would have occurred may not have been first pos test 
+  ##' if infection occurred long ago. So calculate time to first post test as: time since infection - (time since last test + floor((time since infection - time since last test - test.window) / exp.test.int) * exp.test.int)
+  time.to.dx[selected][diag.status[selected] == 1] <- runif(sum(diag.status[selected] == 1), min = dat$param$test.window.int, max = exp.test.int)
+  <- time.since.inf[selected][diag.status[selected] == 1] - 
+      (tslt[diag.status[selected] == 1] + floor((time.since.inf[selected][diag.status[selected] == 1] - tslt[diag.status[selected] == 1] - dat$param$test.window.int)/exp.test.int) * exp.test.int)  
+  
+  diag.time[selected][diag.status[selected] == 1] <- 1 - time.since.inf[selected][diag.status[selected] == 1] + time.to.dx[selected][diag.status[selected] == 1]
+  
+  last.neg.test[selected][diag.status[selected] == 0] <- -tslt[diag.status[selected] == 0]
+  last.neg.test[selected][diag.status[selected] == 1] <- NA
+  
+  # Assign treatment status
+  time.to.tx[selected][diag.status[selected] == 1] <- time.to.dx[selected][diag.status[selected] == 1] + tx.init.int[selected][diag.status[selected] == 1]
+  prop.time.on.tx[selected] <- (tx.reinit.full[selected]) /
+      ((tx.halt.full) + (tx.reinit.full[selected]))
+  tx.status[selected] <- 0
+  tx.status[selected][time.since.inf[selected] >= time.to.tx[selected]] <-
+      rbinom(sum(time.since.inf[selected] >= time.to.tx[selected]),
+             1, prop.time.on.tx[selected][time.since.inf[selected] >= time.to.tx[selected]])
+  tx.init.time[selected][time.since.inf[selected] >= time.to.tx[selected]] <- 
+      1 - time.since.inf[selected][time.since.inf[selected] >= time.to.tx[selected]] + 
+      time.to.tx[selected][time.since.inf[selected] >= time.to.tx[selected]]
+  
+  ### All tt.traj groups: Calculate cumulative time on and off tx to determine progression to AIDS
+  selected <- which(status == 1)
+  
+  # If not yet initiated treatment, cum.time.off = time since infection and cum time on = 0
+  cum.time.off.tx[selected][time.since.inf[selected] < time.to.tx[selected]] <- time.since.inf[selected]
+  cum.time.on.tx[selected][time.since.inf[selected] < time.to.tx[selected]] <- 0
+
+  # If intitated tx, cum.time.off = time to tx initiation + expected cuml time off since starting tx (as estimated with offon)
+  max.steps <- (dat$param$max.time.off.tx.int - tx.init.int[selected]) / (1 - min(prop.time.on.tx[selected])) # determine the max number of steps to extend out the vector to make sure it covers everyone's possible time from tx to AIDS
+  offon <- cbind((1 - prop.time.on.tx[selected]) * 1:max.steps, 
+               prop.time.on.tx[selected] * 1:max.steps)
+  cum.time.off.tx[selected][time.since.inf[selected] >= time.to.tx[selected]] <- 
+    round(time.to.tx[selected][time.since.inf[selected] >= time.to.tx[selected]] + offon[abs(tx.init.time[selected][time.since.inf[selected] >= time.to.tx[selected]]), 1])
+  cum.time.on.tx[selected][time.since.inf[selected] >= time.to.tx[selected]] <-
+    round(offon[abs(tx.init.time[selected][time.since.inf[selected] >= time.to.tx[selected]]), 2])
+
+  ### All tt.traj groups: Assign stage of infection 
+  stage[selected] <- (time.since.inf[selected] <= vlar.int) * 1 +
+      (time.since.inf[selected] > vlar.int) * (time.since.inf[selected] <= vl.acute.int) * 2 +
+      (time.since.inf[selected] > vl.acute.int) * (cum.time.off.tx[selected] < dat$param$max.time.off.tx.int) * 3 +
+      (time.since.inf[selected] > vl.acute.int) * (cum.time.off.tx[selected] >= dat$param$max.time.off.tx.int) * 4
+      
+  ### All tt.traj groups: Assign VL (assuming a linear rate of change in VL up to peak viremia in acute phase and from peak down to set point)
+
+  ##' To set VL in the AIDS phase, define a variable average consecutive time off tx
+  ##' - For those who not yet inititated tx, set time.off.tx to time since infected.
+  ##' - For those who disontinued, set to avg time off before reinitiating
+  cons.time.off.tx <- rep(NA, length(selected))
+  cons.time.off.tx[tx.status[selected] == 1] <- 0
+  cons.time.off.tx[time.since.inf[selected] < time.to.tx[selected]] <- time.since.inf[selected]
+  cons.time.off.tx[tx.status[selected] == 0 & (time.since.inf[selected] >= time.to.tx[selected]) & tt.traj[selected] %in% c(1,3)] <- 
+    (1 / (tx.reinit.full[selected] * tx.reinit.part.rr))
+  cons.time.off.tx[tx.status[selected] == 0 & (time.since.inf[selected] >= time.to.tx[selected]) & tt.traj[selected] %in% c(2,4)] <- 
+      (1 / (tx.reinit.full[selected]))
+  
+  ##' Assume that, upon stopping ART in the AIDS phase, VL rises at the same rate as it would in the chronic phase up to set point and then
+  ##' rises at the slope that VL rises in untreated AIDS to go from set point to the fatal level in 2 years. To implement this, first define 
+  ##' the time it takes for VL to go back to set point
+  vl.supp <- rep(NA, length(selected))
+  vl.supp[tt.traj[selected] %in% c(1,3)] <- dat$param$vl.part.supp
+  vl.supp[tt.traj[selected] %in% c(2,4)] <- dat$param$vl.full.supp
+  vl.up.slope[tt.traj[selected] %in% c(1,3)] <- dat$param$part.supp.up.slope
+  vl.up.slope[tt.traj[selected] %in% c(2,4)] <- dat$param$full.supp.up.slope
+  
+  vl.rise.int <- rep(NA, length(selected))
+  vl.rise.int <- (vlsp - vl.supp)/vl.up.slope
+
+  ## if stage 4, set vl according to slope of change in VL and time since tx. If in stage 3, assume all off tx are at set point
+  vl[selected] <- (time.since.inf[selected] <= vlar.int) * (vlap * time.since.inf[selected] / vlar.int) +
+    (time.since.inf[selected] > vlar.int) * (time.since.inf[selected] <= vl.acute.int) *
+    ((vlsp - vlap) * (time.since.inf[selected] - vlar.int) / vlaf.int + vlap) +
+    (time.since.inf[selected] > vl.acute.int) * (cum.time.off.tx[selected] < dat$param$max.time.off.tx.int) * vlsp +
+    (cum.time.off.tx[selected] >= dat$param$max.time.off.tx.int) * (cons.time.off.tx < vl.rise.int) * 
+      (vl.supp + (cons.time.off.tx * vl.up.slope)) + 
+    (cum.time.off.tx[selected] >= dat$param$max.time.off.tx.int) * (cons.time.off.tx >= vl.rise.int) * 
+      (vlsp + (cons.time.off.tx - vl.rise.int) * vlds)
+  ##' We assume that all who are on tx are at their suppressed levels. This doesn't account for the fact that some people may have 
+  ##' recently reinitiated and not yet achieved on-treatment levels. But we assume all men in the chronic phase who are off tx are 
+  ##' at set point, so it balances out for them.
+  vl[selected][tx.status[selected] == 1] <- vl.supp
+
+
+  ### Last neg test before present for negatives
+  selected <- which(status == 0 & tt.traj %in% c(3, 4))
+  
+  if (dat$param$testing.pattern == "interval") {
+      tslt <- ceiling(runif(length(selected),
+                            min = 0,
+                            max = exp.test.int))
+  }
+  if (dat$param$testing.pattern == "memoryless") {
+      stop("Intertest interval parameter calculated assuming interval method. Revise parameter estimation procedure for memoryless process.")
   }
   last.neg.test[selected] <- -tslt
+  
 
-
-  ## Set all onto dat$attr
+  ### Set all onto dat$attr
   dat$attr$stage <- stage
-  dat$attr$stage.time <- stage.time
   dat$attr$inf.time <- inf.time
   dat$attr$vl <- vl
   dat$attr$diag.status <- diag.status
