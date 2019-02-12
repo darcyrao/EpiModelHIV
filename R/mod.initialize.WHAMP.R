@@ -743,54 +743,84 @@ init_ccr5_msm_whamp <- function(dat) {
   
   race <- dat$attr$race #-- Delete this code eventually
   race..wa <- dat$attr$race..wa
-  region <- dat$attr$region
   status <- dat$attr$status
 
-  nInfB <- sum(race == "B" & status == 1)
-  nInfW <- sum(race == "W" & status == 1)
-
+  nInfB <- sum(race..wa == "B" & status == 1)
+  nInfH <- sum(race..wa == "H" & status == 1)
+  nInfO <- sum(race..wa == "O" & status == 1)
+  
   ##  CCR5 genotype
   ccr5.heteroz.rr <- dat$param$ccr5.heteroz.rr
   ccr5 <- rep("WW", num)
 
+  ### Black MSM
   # homozygotes for deletion
-  num.ccr5.DD.B <- dat$param$ccr5.B.prob[1] * num.B
+  num.ccr5.DD.B <- dat$param$ccr5.B.prob[1] * num.B..wa
   # heterozygotes
-  num.ccr5.DW.B <- dat$param$ccr5.B.prob[2] * num.B
+  num.ccr5.DW.B <- dat$param$ccr5.B.prob[2] * num.B..wa
   # homozygotes for deletion
-  num.ccr5.WW.B <- num.B - num.ccr5.DD.B - num.ccr5.DW.B
+  num.ccr5.WW.B <- num.B..wa - num.ccr5.DD.B - num.ccr5.DW.B
   # DD's can't be infected
   num.uninf.ccr5.DD.B <- round(num.ccr5.DD.B)
   # Unique solution to get relative risk right in init pop
   num.inf.ccr5.DW.B <- round(num.ccr5.DW.B * nInfB * ccr5.heteroz.rr /
                              (num.ccr5.WW.B + num.ccr5.DW.B * ccr5.heteroz.rr))
   num.uninf.ccr5.DW.B <- round(num.ccr5.DW.B - num.inf.ccr5.DW.B)
-  inf.B <- which(status == 1 & race == "B")
+  inf.B <- which(status == 1 & race..wa == "B")
   inf.ccr5.DW.B <- sample(inf.B, num.inf.ccr5.DW.B, replace = FALSE)
   ccr5[inf.ccr5.DW.B] <- "DW"
-  uninf.B <- which(status == 0 & race == "B")
-  uninf.ccr5.DWDD.B <- sample(uninf.B, num.uninf.ccr5.DW.B + num.uninf.ccr5.DD.B)
+  uninf.B <- which(status == 0 & race..wa == "B")
+  uninf.ccr5.DWDD.B <- sample(uninf.B, num.uninf.ccr5.DW.B + num.uninf.ccr5.DD.B, replace = FALSE)
   uninf.ccr5.DW.B <- sample(uninf.ccr5.DWDD.B, num.uninf.ccr5.DW.B)
   uninf.ccr5.DD.B <- setdiff(uninf.ccr5.DWDD.B, uninf.ccr5.DW.B)
   ccr5[uninf.ccr5.DW.B] <- "DW"
   ccr5[uninf.ccr5.DD.B] <- "DD"
-
-  num.ccr5.DD.W <- dat$param$ccr5.W.prob[1] * num.W
-  num.ccr5.DW.W <- dat$param$ccr5.W.prob[2] * num.W
-  num.ccr5.WW.W <- num.W - num.ccr5.DD.W - num.ccr5.DW.W
-  num.uninf.ccr5.DD.W <- round(num.ccr5.DD.W)
-  num.inf.ccr5.DW.W <- round(num.ccr5.DW.W * nInfW * ccr5.heteroz.rr /
-                             (num.ccr5.WW.W + num.ccr5.DW.W * ccr5.heteroz.rr))
-  num.uninf.ccr5.DW.W <- round(num.ccr5.DW.W - num.inf.ccr5.DW.W)
-  inf.W <- which(status == 1 & race == "W")
-  inf.ccr5.DW.W <- sample(inf.W, num.inf.ccr5.DW.W)
-  ccr5[inf.ccr5.DW.W] <- "DW"
-  uninf.W <- which(status == 0 & race == "W")
-  uninf.ccr5.DWDD.W <- sample(uninf.W, num.uninf.ccr5.DW.W + num.uninf.ccr5.DD.W)
-  uninf.ccr5.DW.W <- sample(uninf.ccr5.DWDD.W, num.uninf.ccr5.DW.W)
-  uninf.ccr5.DD.W <- setdiff(uninf.ccr5.DWDD.W, uninf.ccr5.DW.W)
-  ccr5[uninf.ccr5.DW.W] <- "DW"
-  ccr5[uninf.ccr5.DD.W] <- "DD"
+  
+  ### Hispanic MSM
+  # homozygotes for deletion
+  num.ccr5.DD.H <- dat$param$ccr5.H.prob[1] * num.H..wa
+  # heterozygotes
+  num.ccr5.DW.H <- dat$param$ccr5.H.prob[2] * num.H..wa
+  # homozygotes for deletion
+  num.ccr5.WW.H <- num.H..wa - num.ccr5.DD.H - num.ccr5.DW.H
+  # DD's can't be infected
+  num.uninf.ccr5.DD.H <- round(num.ccr5.DD.H)
+  # Unique solution to get relative risk right in init pop
+  num.inf.ccr5.DW.H <- round(num.ccr5.DW.H * nInfH * ccr5.heteroz.rr /
+                               (num.ccr5.WW.H + num.ccr5.DW.H * ccr5.heteroz.rr))
+  num.uninf.ccr5.DW.H <- round(num.ccr5.DW.H - num.inf.ccr5.DW.H)
+  inf.H <- which(status == 1 & race..wa == "H")
+  inf.ccr5.DW.H <- sample(inf.H, num.inf.ccr5.DW.H, replace = FALSE)
+  ccr5[inf.ccr5.DW.H] <- "DW"
+  uninf.H <- which(status == 0 & race..wa == "H")
+  uninf.ccr5.DWDD.H <- sample(uninf.H, num.uninf.ccr5.DW.H + num.uninf.ccr5.DD.H, replace = FALSE)
+  uninf.ccr5.DW.H <- sample(uninf.ccr5.DWDD.H, num.uninf.ccr5.DW.H)
+  uninf.ccr5.DD.H <- setdiff(uninf.ccr5.DWDD.H, uninf.ccr5.DW.H)
+  ccr5[uninf.ccr5.DW.H] <- "DW"
+  ccr5[uninf.ccr5.DD.H] <- "DD"
+  
+  ### Other MSM
+  # homozygotes for deletion
+  num.ccr5.DD.O <- dat$param$ccr5.O.prob[1] * num.O..wa
+  # heterozygotes
+  num.ccr5.DW.O <- dat$param$ccr5.O.prob[2] * num.O..wa
+  # homozygotes for deletion
+  num.ccr5.WW.O <- num.O..wa - num.ccr5.DD.O - num.ccr5.DW.O
+  # DD's can't be infected
+  num.uninf.ccr5.DD.O <- round(num.ccr5.DD.O)
+  # Unique solution to get relative risk right in init pop
+  num.inf.ccr5.DW.O <- round(num.ccr5.DW.O * nInfO * ccr5.heteroz.rr /
+                               (num.ccr5.WW.O + num.ccr5.DW.O * ccr5.heteroz.rr))
+  num.uninf.ccr5.DW.O <- round(num.ccr5.DW.O - num.inf.ccr5.DW.O)
+  inf.O <- which(status == 1 & race..wa == "O")
+  inf.ccr5.DW.O <- sample(inf.O, num.inf.ccr5.DW.O, replace = FALSE)
+  ccr5[inf.ccr5.DW.O] <- "DW"
+  uninf.O <- which(status == 0 & race..wa == "O")
+  uninf.ccr5.DWDD.O <- sample(uninf.O, num.uninf.ccr5.DW.O + num.uninf.ccr5.DD.O, replace = FALSE)
+  uninf.ccr5.DW.O <- sample(uninf.ccr5.DWDD.O, num.uninf.ccr5.DW.O)
+  uninf.ccr5.DD.O <- setdiff(uninf.ccr5.DWDD.O, uninf.ccr5.DW.O)
+  ccr5[uninf.ccr5.DW.O] <- "DW"
+  ccr5[uninf.ccr5.DD.O] <- "DD"
 
   dat$attr$ccr5 <- ccr5
 
