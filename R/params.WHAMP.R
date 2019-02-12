@@ -182,7 +182,7 @@
 #'        probability of condom use in a instantaneous partnerships.
 #' @param cond.always.prob.corr Correlation coefficient for probability of always
 #'        using condoms in both persistent and instantaneous partnerships
-#' @param cond.rr.BB Condom probability scaler for model calibration purposes.
+#' @param cond.rr Condom probability scaler for model calibration purposes.
 #' @param cond.diag.main.beta Beta multiplier for the log odds of using a
 #'        condom in a main partnership if the HIV-infected man has been
 #'        diagnosed.
