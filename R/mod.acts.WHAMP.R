@@ -69,10 +69,10 @@ acts_msm_whamp <- function(dat, at) {
       ai.rate <- rep(NA, nrow(el))
       ai.rate <- base.ai.rate * ai.scale
 
-      ## STI associated cessation of activity
-      idsCease <- which(dat$attr$GC.cease == 1 | dat$attr$CT.cease == 1)
-      noActs <- el[, "p1"] %in% idsCease | el[, "p2"] %in% idsCease
-      ai.rate[noActs] <- 0
+      # ## STI associated cessation of activity
+      # idsCease <- which(dat$attr$GC.cease == 1 | dat$attr$CT.cease == 1)
+      # noActs <- el[, "p1"] %in% idsCease | el[, "p2"] %in% idsCease
+      # ai.rate[noActs] <- 0
 
       # Final act number
       if (fixed == FALSE) {
