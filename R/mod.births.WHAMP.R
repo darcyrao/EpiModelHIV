@@ -153,16 +153,20 @@ setBirthAttr_msm_whamp <- function(dat, at, nBirths) {
 
   # CCR5
   ccr5.B.prob <- dat$param$ccr5.B.prob
-  ccr5.W.prob <- dat$param$ccr5.W.prob
-  dat$attr$ccr5[newIds[newB]] <- sample(c("WW", "DW", "DD"),
-                                        nBirths.B, replace = TRUE,
+  ccr5.H.prob <- dat$param$ccr5.H.prob
+  ccr5.O.prob <- dat$param$ccr5.O.prob
+  dat$attr$ccr5[newIds[newB..wa]] <- sample(c("WW", "DW", "DD"),
+                                        nBirths.B..wa, replace = TRUE,
                                         prob = c(1 - sum(ccr5.B.prob),
                                                  ccr5.B.prob[2], ccr5.B.prob[1]))
-  dat$attr$ccr5[newIds[newW]] <- sample(c("WW", "DW", "DD"),
-                                        nBirths.W, replace = TRUE,
-                                        prob = c(1 - sum(ccr5.W.prob),
-                                                 ccr5.W.prob[2], ccr5.W.prob[1]))
-
+  dat$attr$ccr5[newIds[newH..wa]] <- sample(c("WW", "DW", "DD"),
+                                        nBirths.H..wa, replace = TRUE,
+                                        prob = c(1 - sum(ccr5.H.prob),
+                                                 ccr5.H.prob[2], ccr5.H.prob[1]))
+  dat$attr$ccr5[newIds[newO..wa]] <- sample(c("WW", "DW", "DD"),
+                                        nBirths.O..wa, replace = TRUE,
+                                        prob = c(1 - sum(ccr5.O.prob),
+                                                  ccr5.O.prob[2], ccr5.O.prob[1]))
 
   # Degree
   dat$attr$deg.main[newIds] <- 0
