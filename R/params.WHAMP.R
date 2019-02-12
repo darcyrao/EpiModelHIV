@@ -154,9 +154,12 @@
 #' @param ccr5.B.prob Vector of length two of frequencies of the Delta 32
 #'        mutation (homozygous and heterozygous, respectively) in the CCR5 gene
 #'        among black MSM.
-#' @param ccr5.W.prob Vector of length two of frequencies of the Delta 32
+#' @param ccr5.H.prob Vector of length two of frequencies of the Delta 32
 #'        mutation (homozygous and heterozygous, respectively) in the CCR5 gene
-#'        among white MSM.
+#'        among hispanic MSM.
+#' @param ccr5.O.prob Vector of length two of frequencies of the Delta 32
+#'        mutation (homozygous and heterozygous, respectively) in the CCR5 gene
+#'        among other race/ethnicity MSM.
 #' @param ccr5.heteroz.rr Relative risk of infection for men who are heterozygous
 #'        in the CCR5 mutation.
 #' @param base.ai.main.rate Expected coital frequency in main partnerships
@@ -376,7 +379,8 @@ param_msm_whamp <- function(nwstats,
                       circ.O.prob = 0.86,
 
                       ccr5.B.prob = c(0, 0.034),
-                      ccr5.W.prob = c(0.021, 0.176),
+                      ccr5.H.prob = c(0.003, 0.050),
+                      ccr5.O.prob = c(0.017, 0.164), 
                       ccr5.heteroz.rr = 0.3,
 
                       base.ai.main.rate = 0.1864,
