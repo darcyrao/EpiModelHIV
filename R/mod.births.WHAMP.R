@@ -126,13 +126,6 @@ setBirthAttr_msm_whamp <- function(dat, at, nBirths) {
   nBirths.EW.H <- length(new.EW.H)
   nBirths.EW.O <- length(new.EW.O)
   
-  # newKC <- which(region == "KC") #-- May not need this section of code. if don't use it in other parts of this file, delete
-  # newOW <- which(region == "OW")
-  # newEW <- which(region == "EW")
-  # nBirths.KC <- length(newKC)
-  # nBirths.OW <- length(newOW)
-  # nBirths.EW <- length(newEW)
-  
   dat$attr$race..wa[newIds] <- race..wa
   dat$attr$region[newIds] <- region
   
@@ -164,17 +157,15 @@ setBirthAttr_msm_whamp <- function(dat, at, nBirths) {
                                                             prob = dat$param$tt.traj.EW.O.prob))
   
   # Circumcision
-  dat$attr$circ[newIds[newB]] <- rbinom(nBirths.B, 1, dat$param$circ.B.prob)
-  dat$attr$circ[newIds[newW]] <- rbinom(nBirths.W, 1, dat$param$circ.W.prob)
-
+  dat$attr$circ[newIds[newB..wa]] <- rbinom(nBirths.B..wa, 1, dat$param$circ.B.prob)
+  dat$attr$circ[newIds[newH..wa]] <- rbinom(nBirths.H..wa, 1, dat$param$circ.H.prob)
+  dat$attr$circ[newIds[newO..wa]] <- rbinom(nBirths.O..wa, 1, dat$param$circ.O.prob)
+  
   # Role
-  dat$attr$role.class[newIds[newB]] <- sample(c("I", "R", "V"),
-                                              nBirths.B, replace = TRUE,
-                                              prob = dat$param$role.B.prob)
-  dat$attr$role.class[newIds[newW]] <- sample(c("I", "R", "V"),
-                                              nBirths.W, replace = TRUE,
-                                              prob = dat$param$role.W.prob)
-
+  dat$attr$role.class[newIds] <- sample(c("I", "R", "V"),
+                                              nBirths, replace = TRUE,
+                                              prob = dat$param$role.prob)
+  
   ins.quot <- rep(NA, nBirths)
   ins.quot[dat$attr$role.class[newIds] == "I"]  <- 1
   ins.quot[dat$attr$role.class[newIds] == "R"]  <- 0
