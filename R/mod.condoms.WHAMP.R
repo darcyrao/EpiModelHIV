@@ -47,7 +47,7 @@ condoms_msm_whamp <- function(dat, at) {
       el.main <- el[el[, "ptype"] == 1, ]
       age.p1 <- ifelse(age[el.main[, 1]] %in% c(18:34), "Y", "O")
       age.p2 <- ifelse(age[el.main[, 2]] %in% c(18:34), "Y", "O")
-      num.YY <- (age.p1 == "Y") + (age.p1 == "Y")
+      num.YY <- (age.p1 == "Y") + (age.p2 == "Y")
       cond.prob <- (num.YY == 2) * (dat$param$cond.main.YY.prob) +
         (num.B == 1) * (dat$param$cond.main.other.prob) +
         (num.B == 0) * (dat$param$cond.main.other.prob)
