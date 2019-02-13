@@ -477,6 +477,7 @@ init_status_msm_whamp <- function(dat) {
   diag.status[selected] <- 0
   diag.status[selected][time.since.inf[selected] >= sympt.int] <- 1
   time.to.dx[selected][diag.status[selected] == 1] <- sympt.int
+  diag.time[selected][diag.status[selected] == 1] <- 1 - time.since.inf[selected][diag.status[selected] == 1] + sympt.int
   
   ## Assign treatment status
   time.to.tx[selected][diag.status[selected] == 1] <- sympt.int + tx.init.int[selected]
@@ -500,6 +501,7 @@ init_status_msm_whamp <- function(dat) {
   diag.status[selected] <- 0
   diag.status[selected][time.since.inf[selected] >= sympt.int] <- 1
   time.to.dx[selected][diag.status[selected] == 1] <- sympt.int
+  diag.time[selected][diag.status[selected] == 1] <- 1 - time.since.inf[selected][diag.status[selected] == 1] + sympt.int
   
   ## Assign treatment status
   time.to.tx[selected][diag.status[selected] == 1] <- sympt.int + tx.init.int[selected]
