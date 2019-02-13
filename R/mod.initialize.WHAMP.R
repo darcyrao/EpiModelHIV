@@ -375,7 +375,7 @@ init_status_msm_whamp <- function(dat) {
 
   # Calculate intertest interval as a function of age
   centered.age <- (age - dat$param$mean.age.iti)
-  exp.test.int <- dat$param$iti.coefs[1] + centered.age * dat$param$iti.coefs[2] + centered.age^2 * dat$param$iti.coefs[3]
+  test.int <- dat$param$iti.coefs[1] + centered.age * dat$param$iti.coefs[2] + centered.age^2 * dat$param$iti.coefs[3]
 
   # Treatment trajectory
   tt.traj <- rep(NA, num)
@@ -525,7 +525,7 @@ init_status_msm_whamp <- function(dat) {
   if (dat$param$testing.pattern == "interval") {
       tslt <- ceiling(runif(length(selected),
                             min = 0,
-                            max = exp.test.int))
+                            max = test.int[selected]))
   }
   if (dat$param$testing.pattern == "memoryless") {
       stop("Intertest interval parameter calculated assuming interval method. Revise parameter estimation procedure for memoryless process.")
@@ -536,11 +536,10 @@ init_status_msm_whamp <- function(dat) {
   diag.status[selected][tslt <= time.since.inf[selected] & tslt > (time.since.inf[selected] - dat$param$test.window.int)] <- 0 # Last test < test window period
   diag.status[selected][tslt <= (time.since.inf[selected] - dat$param$test.window.int)] <- 1 # Last test occurred since infection but after the window period
 
-  ##' Time to dx - calculate time to first test based on expected test interval (assigned last test used for determining if diagnosis would have occurred may not have been first pos test 
-  ##' if infection occurred long ago. So calculate time to first post test as: time since infection - (time since last test + floor((time since infection - time since last test - test.window) / exp.test.int) * exp.test.int)
-  time.to.dx[selected][diag.status[selected] == 1] <- runif(sum(diag.status[selected] == 1), min = dat$param$test.window.int, max = exp.test.int)
-   <- time.since.inf[selected][diag.status[selected] == 1] - 
-      (tslt[diag.status[selected] == 1] + floor((time.since.inf[selected][diag.status[selected] == 1] - tslt[diag.status[selected] == 1] - dat$param$test.window.int)/exp.test.int) * exp.test.int)  
+  ##' Time to dx - calculate time to first test based on test interval (assigned last test used for determining if diagnosis would have occurred may not have been first pos test 
+  ##' if infection occurred long ago. So calculate time to first post test as: time since infection - (time since last test + floor((time since infection - time since last test - test.window) / test.int) * test.int)
+  time.to.dx[selected][diag.status[selected] == 1] <- time.since.inf[selected][diag.status[selected] == 1] - 
+      (tslt[diag.status[selected] == 1] + floor((time.since.inf[selected][diag.status[selected] == 1] - tslt[diag.status[selected] == 1] - dat$param$test.window.int)/test.int[selected][diag.status[selected] == 1]) * test.int[selected][diag.status[selected] == 1])  
   
   diag.time[selected][diag.status[selected] == 1] <- 1 - time.since.inf[selected][diag.status[selected] == 1] + time.to.dx[selected][diag.status[selected] == 1]
   
@@ -570,7 +569,7 @@ init_status_msm_whamp <- function(dat) {
   if (dat$param$testing.pattern == "interval") {
       tslt <- ceiling(runif(length(selected),
                             min = 0,
-                            max = exp.test.int))
+                            max = test.int[selected]))
   }
   if (dat$param$testing.pattern == "memoryless") {
       stop("Intertest interval parameter calculated assuming interval method. Revise parameter estimation procedure for memoryless process.")
@@ -581,11 +580,10 @@ init_status_msm_whamp <- function(dat) {
   diag.status[selected][tslt <= time.since.inf[selected] & tslt > (time.since.inf[selected] - dat$param$test.window.int)] <- 0 # Last test < test window period
   diag.status[selected][tslt <= (time.since.inf[selected] - dat$param$test.window.int)] <- 1 # Last test occurred since infection but after the window period
   
-  ##' Time to dx - calculate time to first test based on expected test interval (assigned last test used for determining if diagnosis would have occurred may not have been first pos test 
-  ##' if infection occurred long ago. So calculate time to first post test as: time since infection - (time since last test + floor((time since infection - time since last test - test.window) / exp.test.int) * exp.test.int)
-  time.to.dx[selected][diag.status[selected] == 1] <- runif(sum(diag.status[selected] == 1), min = dat$param$test.window.int, max = exp.test.int)
-  <- time.since.inf[selected][diag.status[selected] == 1] - 
-      (tslt[diag.status[selected] == 1] + floor((time.since.inf[selected][diag.status[selected] == 1] - tslt[diag.status[selected] == 1] - dat$param$test.window.int)/exp.test.int) * exp.test.int)  
+  ##' Time to dx - calculate time to first test based on test interval (assigned last test used for determining if diagnosis would have occurred may not have been first pos test 
+  ##' if infection occurred long ago. So calculate time to first post test as: time since infection - (time since last test + floor((time since infection - time since last test - test.window) / test.int) * test.int)
+  time.to.dx[selected][diag.status[selected] == 1] <- time.since.inf[selected][diag.status[selected] == 1] - 
+    (tslt[diag.status[selected] == 1] + floor((time.since.inf[selected][diag.status[selected] == 1] - tslt[diag.status[selected] == 1] - dat$param$test.window.int)/test.int[selected][diag.status[selected] == 1]) * test.int[selected][diag.status[selected] == 1])  
   
   diag.time[selected][diag.status[selected] == 1] <- 1 - time.since.inf[selected][diag.status[selected] == 1] + time.to.dx[selected][diag.status[selected] == 1]
   
@@ -685,7 +683,7 @@ init_status_msm_whamp <- function(dat) {
   if (dat$param$testing.pattern == "interval") {
       tslt <- ceiling(runif(length(selected),
                             min = 0,
-                            max = exp.test.int))
+                            max = test.int[selected]))
   }
   if (dat$param$testing.pattern == "memoryless") {
       stop("Intertest interval parameter calculated assuming interval method. Revise parameter estimation procedure for memoryless process.")
