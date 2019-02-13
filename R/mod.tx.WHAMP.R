@@ -27,7 +27,7 @@
 #'
 #' @export
 #'
-tx_msm <- function(dat, at) {
+tx_msm_whamp <- function(dat, at) {
 
   ## Variables
 
