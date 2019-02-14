@@ -113,37 +113,21 @@
 #'        negative insertive partner is circumcised.
 #' @param condom.rr Relative risk of infection from anal sex when a condom is
 #'        used.
-#' @param disc.outset.main.B.prob Probability that an HIV-infected black MSM will
+#' @param disc.outset.main.prob Probability that an HIV-infected MSM will
 #'        disclose his status at the start of a main partnership.
-#' @param disc.outset.main.W.prob Probability that an HIV-infected white MSM will
-#'        disclose his status at the start of a main partnership.
-#' @param disc.at.diag.main.B.prob Probability that a black MSM already in a main
+#' @param disc.at.diag.main.prob Probability that an MSM already in a main
 #'        partnership will disclose at the time of diagnosis.
-#' @param disc.at.diag.main.W.prob Probability that a white MSM already in a main
-#'        partnership will disclose at the time of diagnosis.
-#' @param disc.post.diag.main.B.prob Probability that an HIV-infected black MSM
+#' @param disc.post.diag.main.prob Probability that an HIV-infected MSM
 #'        in a main partnership will disclose his status, assuming he didn't
 #'        at the start of the partnership or at diagnosis.
-#' @param disc.post.diag.main.W.prob Probability that an HIV-infected white MSM
-#'        in a main partnership will disclose his status, assuming he didn't
-#'        at the start of the partnership or at diagnosis.
-#' @param disc.outset.pers.B.prob Probability that an HIV-infected black MSM will
+#' @param disc.outset.pers.prob Probability that an HIV-infected MSM will
 #'        disclose his status at the start of a casual partnership.
-#' @param disc.outset.pers.W.prob Probability that an HIV-infected white MSM will
-#'        disclose his status at the start of a casual partnership.
-#' @param disc.at.diag.pers.B.prob Probability that a black MSM already in a
+#' @param disc.at.diag.pers.prob Probability that an MSM already in a
 #'        casual partnership will disclose at the time of diagnosis.
-#' @param disc.at.diag.pers.W.prob Probability that a white MSM already in a
-#'        casual partnership will disclose at the time of diagnosis.
-#' @param disc.post.diag.pers.B.prob Probability that an HIV-infected black MSM
+#' @param disc.post.diag.pers.prob Probability that an HIV-infected MSM
 #'        in a casual partnership will disclose his status, assuming he
 #'        didn't at the start of the partnership or at diagnosis.
-#' @param disc.post.diag.pers.W.prob Probability that an HIV-infected white MSM
-#'        in a casual partnership will disclose his status, assuming he
-#'        didn't at the start of the partnership or at diagnosis.
-#' @param disc.inst.B.prob Probability that an HIV-infected black MSM will
-#'        disclose his status to a one-off partner.
-#' @param disc.inst.W.prob Probability that an HIV-infected white MSM will
+#' @param disc.inst.prob Probability that an HIV-infected black MSM will
 #'        disclose his status to a one-off partner.
 #' @param circ.B.prob Probablity that a black new arrival in the population
 #'        will be circumcised.
@@ -175,7 +159,7 @@
 #' @param cond.pers.always.prob Fraction of men in persistent partnerships who always
 #'        use condoms in those partnerships.
 #' @param cond.pers.prob Of men who are not consistent condom users, per-act
-#'        probability of condom use persistent partnerships.
+#'        probability of condom use in persistent partnerships.
 #' @param cond.inst.always.prob Fraction of men in instant partnerships who always
 #'        use condoms in those partnerships.
 #' @param cond.inst.prob Of men who are not consistent condom users, per-act
@@ -359,21 +343,14 @@ param_msm_whamp <- function(nwstats,
                       circ.rr = 0.4,
                       condom.rr = 0.295,
 
-                      disc.outset.main.B.prob = 0.685,
-                      disc.outset.main.W.prob = 0.889,
-                      disc.at.diag.main.B.prob = 1,
-                      disc.at.diag.main.W.prob = 1,
-                      disc.post.diag.main.B.prob = 0,
-                      disc.post.diag.main.W.prob = 0,
-                      disc.outset.pers.B.prob = 0.527,
-                      disc.outset.pers.W.prob = 0.828,
-                      disc.at.diag.pers.B.prob = 1,
-                      disc.at.diag.pers.W.prob = 1,
-                      disc.post.diag.pers.B.prob = 0,
-                      disc.post.diag.pers.W.prob = 0,
-                      disc.inst.B.prob = 0.445,
-                      disc.inst.W.prob = 0.691,
-                      
+                      disc.outset.main.prob = 1,
+                      disc.at.diag.main.prob = 1,
+                      disc.post.diag.main.prob = 0,
+                      disc.outset.pers.prob = 0.5671,
+                      disc.at.diag.pers.prob = 1,
+                      disc.post.diag.pers.prob = 0,
+                      disc.inst.prob = 0.4918,
+
                       circ.B.prob = 0.6449,
                       circ.H.prob = 0.4897,
                       circ.O.prob = 0.86,
