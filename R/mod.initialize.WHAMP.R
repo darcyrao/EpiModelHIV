@@ -651,9 +651,11 @@ init_status_msm_whamp <- function(dat) {
       (1 / (tx.reinit.full[selected]))
   
   ##' Assume that, upon stopping ART in the AIDS phase, VL rises at the same rate as it would in the chronic phase up to set point and then
-  ##' rises at the slope that VL rises in untreated AIDS to go from set point to the fatal level in 2 years. To implement this, first define 
-  ##' the time it takes for VL to go back to set point
+  ##' rises at the slope that VL rises in untreated AIDS to go from set point to the max level in 2 years. To implement this, first define 
+  ##' the time it takes for VL to go back to set point. Because HIV-related mortality is modeled as a constant increased hazard of death rather
+  ##' than upon progression to the end of AIDS, VL is constrained not to exceed 7 log10. 
   vl.supp <- rep(NA, length(selected))
+  vl.up.slope <- rep(NA, length(selected))
   vl.supp[tt.traj[selected] %in% c(1,3)] <- dat$param$vl.part.supp
   vl.supp[tt.traj[selected] %in% c(2,4)] <- dat$param$vl.full.supp
   vl.up.slope[tt.traj[selected] %in% c(1,3)] <- dat$param$part.supp.up.slope
@@ -670,7 +672,7 @@ init_status_msm_whamp <- function(dat) {
     (cum.time.off.tx[selected] >= dat$param$max.time.off.tx.int) * (cons.time.off.tx < vl.rise.int) * 
       (vl.supp + (cons.time.off.tx * vl.up.slope)) + 
     (cum.time.off.tx[selected] >= dat$param$max.time.off.tx.int) * (cons.time.off.tx >= vl.rise.int) * 
-      (vlsp + (cons.time.off.tx - vl.rise.int) * vlds)
+      pmin((vlsp + (cons.time.off.tx - vl.rise.int) * vlds), vlaidsp)
   ##' We assume that all who are on tx are at their suppressed levels. This doesn't account for the fact that some people may have 
   ##' recently reinitiated and not yet achieved on-treatment levels. But we assume all men in the chronic phase who are off tx are 
   ##' at set point, so it balances out for them.
