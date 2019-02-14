@@ -12,9 +12,6 @@
 #'              defined.
 #'
 #' @param time.unit Time unit relative to 1 for daily.
-#' @param method Method for calculating target statistics by race, with options of
-#'        \code{2} for preserving race-specific statistics and \code{1} for
-#'        averaging over the statistics and dropping the race-specific terms.
 #' @param num.B Population size of black MSM.
 #' @param num.W Population size of white MSM.
 #' @param num.H..wa Population size of Hispanic MSM.
@@ -88,7 +85,6 @@
 #' @export
 #'
 calc_nwstats_msm_whamp <- function(time.unit = 7,
-                             method = 2,
                              num.B,
                              num.W,
                              num.H.KC,
@@ -142,9 +138,6 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   }
   if (sum(inst.region) !=1) {
     stop("deg distribution must sum to 1.")
-  }
-  if (!(method %in% 1:2)) {      #--delete this eventually
-    stop("method must either be 1 for one-race models or 2 for two-race models", call. = FALSE)
   }
   
   if (sum(agestr) !=1) {
@@ -323,8 +316,7 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
 
   # Compile results ---------------------------------------------------------
   out <- list()
-  out$method <- method
-
+  
   out$stats.m <- stats.m
   out$stats.p <- stats.p
   out$stats.i <- stats.i
