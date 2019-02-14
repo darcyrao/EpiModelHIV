@@ -487,7 +487,6 @@ param_msm_whamp <- function(nwstats,
 
   p$riskh.start <- max(1, prep.start - prep.risk.int - 1)
 
-  p$method <- nwstats$method #-- Delete this old code when finish debugging
   p$modes <- 1
 
   p$asmr.B <- nwstats$asmr.B #-- Delete this old code when finish debugging
