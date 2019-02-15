@@ -65,8 +65,10 @@ simnet_msm_whamp <- function(dat, at) {
 
   ## One-off network
   nwparam.i <- EpiModel::get_nwparam(dat, network = 3)
-
-  dat$attr$deg.pers <- get_degree(dat$el[[2]])
+  
+  #' Don't need to update deg.main again becuase it was updated in line 46 *after* re-fitting the main model.
+  #' We need to update deg.pers becuase in line 23 it was assigned before refitting the pers model.
+  dat$attr$deg.pers <- get_degree(dat$el[[2]]) 
  
   dat <- tergmLite::updateModelTermInputs(dat, network = 3)
 
