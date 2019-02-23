@@ -29,7 +29,6 @@ acts_msm_whamp <- function(dat, at) {
 
     # Attributes
     status <- dat$attr$status
-    race <- dat$attr$race #-- Delete this code eventually
 
     # Parameters
     ai.scale <- dat$param$ai.scale
