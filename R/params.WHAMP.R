@@ -189,39 +189,62 @@
 #'        they're having AI.
 #'
 #' @param prep.start Time step at which the PrEP intervention should start.
-#' @param prep.elig.model Modeling approach for determining who is eligible for
-#'        PrEP. Current options are limited to: \code{"all"} for all persons who
-#'        have never been on PrEP and are disease-susceptible.
-#' @param prep.class.prob The probability of adherence class in non-adherent,
-#'        low adherence, medium adherence, or high adherence groups (from Liu).
+#' @param prep.class.prob The probability of adherence class in low adherence,
+#'        medium adherence, or high adherence groups.
 #' @param prep.class.hr The hazard ratio for infection per act associated with each
-#'        level of adherence (from Grant).
-#' @param prep.coverage The proportion of the eligible population who are start
-#'        PrEP once they become eligible.
+#'        level of adherence.
+#' @param prep.coverage.init.KC Vector of length 4 for the proportion of eligible men 
+#'        (eligibility defined by CAI and discordant partnership status in line with 
+#'        WA State guidelines) in each age group (18-24, 25-29, 30-49, 50-59) in
+#'        King County who are to start PrEP once they become eligible in \code{prep.start}.
+#' @param prep.coverage.init.oth Vector of length 4 for the proportion of eligible men 
+#'        (eligibility defined by CAI and discordant partnership status in line with 
+#'        WA State guidelines) in each age group (18-24, 25-29, 30-49, 50-59) in
+#'        other WA counties who are to start PrEP once they become eligible in \code{prep.start}.
 #' @param prep.cov.method The method for calculating PrEP coverage, with options
 #'        of \code{"curr"} to base the numerator on the number of people currently
 #'        on PrEP and \code{"ever"} to base it on the number of people ever on
 #'        PrEP.
-#' @param prep.cov.rate The rate at which persons initiate PrEP conditional on
+#' @param prep.scaleup.KC.rate Vector of length 4 for the rates at which PrEP is  
+#'        scaled up per day from \code{prep.start} for each age group 
+#'        (18-24, 25-29, 30-49, 50-59) in King County.
+#' @param prep.scaleup.oth.rate Vector of length 4 for the rates at which PrEP is  
+#'        scaled up per day from \code{prep.start} for each age group 
+#'        (18-24, 25-29, 30-49, 50-59) in other WA counties.
+#' @param prep.cov.max.KC Vector of length 4 for the maximum attainable PrEP coverage
+#'        for each age group in KC. Upon reaching these values, PrEP uptake will stabilize.
+#' @param prep.cov.max.oth Vector of length 4 for the maximum attainable PrEP coverage
+#'        for each age group in other WA counties. Upon reaching these values, PrEP uptake 
+#'        will stabilize.
+#' @param prep.init.rate The rate at which persons initiate PrEP conditional on
 #'        their eligibility, with 1 equal to instant start.
 #' @param prep.tst.int Testing interval for those who are actively on PrEP. This
 #'        overrides the mean testing interval parameters.
 #' @param prep.risk.int Time window for assessment of risk eligibility for PrEP
 #'        in days.
 #' @param prep.risk.reassess If \code{TRUE}, reassess eligibility for PrEP at
-#'        each testing visit.
+#'        each testing visit. If \code{FALSE}, reassess every year.
+#' @param prep.discont <- Proportion of PrEP users who will discontinue while still at risk.
+#'        This will be used to assign an attribute to indicate men who will discontinue
+#'        while they are still candidates for PrEP. The remainder will discontinue only
+#'        if their risk changes such that they are no longer eligilbe for the intervention.
+#' @param prep.discont.prob Probability per time step that of halting PrEP for men who 
+#'        discontinue.
 #'
 #' @param rcomp.prob Level of risk compensation from 0 to 1, where 0 is no risk
 #'        compensation, 0.5 is a 50% reduction in the probability of condom use
 #'        per act, and 1 is a complete cessation of condom use following PrEP
 #'        initiation.
 #' @param rcomp.adh.groups PrEP adherence groups for whom risk compensation
-#'        occurs, as a vector with values 0, 1, 2, 3 corresponding to non-adherent,
+#'        occurs, as a vector with values 1, 2, 3 corresponding to
 #'        low adherence, medium adherence, and high adherence to PrEP.
 #' @param rcomp.main.only Logical, if risk compensation is limited to main
 #'        partnerships only, versus all partnerships.
 #' @param rcomp.discl.only Logical, if risk compensation is limited known-discordant
 #'        partnerships only, versus all partnerships.
+#' @param rcomp.discont Argument for whether condom use stays at the level
+#'        at which PrEP was discontinued or returns to pre-PrEP levels, with options
+#'        \code{"remain"} and \code{"return"}
 #'
 #' @param rgc.tprob Probability of rectal gonorrhea infection per act.
 #' @param ugc.tprob Probability of urethral gonorrhea infection per act.
@@ -381,21 +404,28 @@ param_msm_whamp <- function(nwstats,
 
                       vv.iev.prob = 0.42,
 
-                      prep.start = Inf,
-                      prep.elig.model = "base",
-                      prep.class.prob = c(0.211, 0.07, 0.1, 0.619),
-                      prep.class.hr = c(1, 0.69, 0.19, 0.05),
-                      prep.coverage = 0,
+                      prep.start = Inf, # Set to Inf for no PrEP
+                      prep.class.prob = c(0.07, 0.451, 0.619),
+                      prep.class.hr = c(0.69, 0.19, 0.05),
+                      prep.coverage.init.KC = c(0.1093,	0.4644,	0.526,	0.4926),
+                      prep.coverage.init.oth = c(0.1566,	0.1962,	0.4143,	0.0742),
                       prep.cov.method = "curr",
-                      prep.cov.rate = 1,
+                      prep.scaleup.KC.rate = c(1, 1, 1, 1),
+                      prep.scaleup.oth.rate = c(1, 1, 1, 1),
+                      prep.cov.max.KC = c(0.7734,	0.741,	0.7754,	0.6125),
+                      prep.cov.max.oth = c(0.6553,	0.7485,	0.6568,	0.3854),
+                      prep.init.rate = 1,
                       prep.tst.int = 90,
-                      prep.risk.int = 182,
+                      prep.risk.int = 365,
                       prep.risk.reassess = TRUE,
+                      prep.discont = 0.3,
+                      prep.discont.prob = 0.017724
 
                       rcomp.prob = 0,
-                      rcomp.adh.groups = 0:3,
+                      rcomp.adh.groups = 1:3,
                       rcomp.main.only = FALSE,
                       rcomp.discl.only = FALSE,
+                      rcomp.discont = "return",
 
                       rgc.tprob = 0.357698,
                       ugc.tprob = 0.248095,
@@ -619,17 +649,17 @@ control_msm_whamp <- function(simno = 1,
                         births.FUN = births_msm_whamp,
                         test.FUN = test_msm_whamp,
                         tx.FUN = tx_msm_whamp,
-                        prep.FUN = prep_msm,
+                        prep.FUN = prep_msm_whamp,
                         progress.FUN = progress_msm_whamp,
                         vl.FUN = vl_msm_whamp,
                         aiclass.FUN = update_aiclass_msm_whamp,
                         roleclass.FUN = NULL,
                         resim_nets.FUN = simnet_msm_whamp,
-                        disclose.FUN = disclose_msm,
+                        disclose.FUN = disclose_msm_whamp,
                         acts.FUN = acts_msm_whamp,
                         condoms.FUN = condoms_msm_whamp,
-                        riskhist.FUN = riskhist_msm,
-                        position.FUN = position_msm,
+                        riskhist.FUN = riskhist_msm_whamp,
+                        position.FUN = position_msm_whamp,
                         trans.FUN = trans_msm_whamp,
                         stitrans.FUN = NULL,
                         stirecov.FUN = NULL,
