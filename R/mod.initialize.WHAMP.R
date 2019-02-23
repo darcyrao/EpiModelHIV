@@ -135,7 +135,8 @@ initialize_msm_whamp <- function(x, param, init, control, s) {
   dat$attr$prepStat <- rep(0, num)
   dat$attr$prepStartTime <- rep(NA, num)
   dat$attr$prepLastRisk <- rep(NA, num)
-  dat$attr$prepLastStiScreen <- rep(NA, num)
+  dat$attr$prepDisc <- rep(NA, num)
+  # dat$attr$prepLastStiScreen <- rep(NA, num)
 
   # Role class
   role.class <- get.vertex.attribute(nw[[1]], "role.class")
