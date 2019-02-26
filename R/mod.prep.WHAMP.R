@@ -12,12 +12,20 @@
 #'
 prep_msm_whamp <- function(dat, at) {
 
+  # Function Selection ------------------------------------------------------
+  
+  if (at >= dat$param$riskh.start) {
+    dat <- riskhist_msm(dat, at)
+  } else {
+    return(dat)
+  }
+  
   if (at < dat$param$prep.start) {
     return(dat)
   }
 
-  ## Variables
-
+  # Set attributes ----------------------------------------------------------
+  
   # Attributes
   uid <- dat$attr$uid
   active <- dat$attr$active
@@ -36,6 +44,7 @@ prep_msm_whamp <- function(dat, at) {
   # prepLastStiScreen <- dat$attr$prepLastStiScreen
 
   # Parameters
+  prep.risk.reassess.method <- dat$param$prep.risk.reassess.method
   prep.start.step <- dat$param$prep.start
   prep.init.rate <- dat$param$prep.init.rate
   prep.coverage.init.KC <- dat$param$prep.coverage.init.KC
@@ -87,31 +96,30 @@ prep_msm_whamp <- function(dat, at) {
 
   prepElig[idsEligStart] <- 1
 
+  
+  # No longer indicated for PrEP
+  idsNoIndic <- which((ind1 < at | is.na(ind1)) & 
+                        (ind2 < twind | is.na(ind2)))
+  
+  prepElig[idsNoIndic] <- 0
 
   ## Discontinuation ------------------------------------------------------------------
 
-  # No longer indicated for PrEP
-  if (dat$param$prep.risk.reassess == TRUE) {  # If TRUE, reassess at every testing visit
-    idsRiskAssess <- which(active == 1 & prepStat == 1 & lnt == at)
-
-    idsEligStop <- intersect(which(ind1 < at & ind2 < twind),
-                             idsRiskAssess)
-  
-    prepElig[idsEligStop] <- 0
-
-  } 
-  if (dat$param$prep.risk.reassess == FALSE) { #  If FALSE, reassess at every year
+  # With changes in risk behavior 
+  if (prep.risk.reassess.method == "none") {
+    idsEligStop <- NULL
+  } else if (prep.risk.reassess.method == "inst") {
+    idsRiskAssess <- which(active == 1 & prepStat == 1)
+    prepLastRisk[idsRiskAssess] <- at
+    idsEligStop <- intersect(idsNoIndic, idsRiskAssess)
+  } else if (prep.risk.reassess.method == "year") {
     idsRiskAssess <- which(active == 1 & prepStat == 1 & lnt == at & (at - prepLastRisk) >= 52)
     prepLastRisk[idsRiskAssess] <- at
-    
-    idsEligStop <- intersect(which(ind1 < at & ind2 < twind),
-                             idsRiskAssess)
-    
-    prepElig[idsEligStop] <- 0
-    
-  } 
+    idsEligStop <- intersect(idsNoIndic, idsRiskAssess)
+  }
   
-  # Spontaneous discontinuation
+  
+  # Spontaneous (memoryless) discontinuation
   discont.elig <- which(active == 1 & prepStat == 1 & prepDiscont == 1 & diag.status != 1)
   idsDiscont <- discont.elig[rbinom(length(discont.elig), 1,
                                     prep.discont.prob) == 1]
@@ -129,6 +137,8 @@ prep_msm_whamp <- function(dat, at) {
   prepStat[idsStp] <- 0
   prepLastRisk[idsStp] <- NA
   prepStartTime[idsStp] <- NA
+  # prepLastStiScreen[idsStp] <- NA
+  
 
   ## Initiation ----------------------------------------------------------------
 
@@ -434,7 +444,7 @@ riskhist_msm_whamp <- function(dat, at) {
   
   dat$attr$prep.ind.discord.ongoing[ai.sd] <- at
   
-  ## Condition 2: UAI outside of a 2-sided "monogamous" partnership,
+  ## Condition 2: UAI outside of a 2-sided "monogamous" partnership
   ##               with a partner tested negative in past 6 months
   mono.neg <- intersect(uai.mono, all.neg)
   part.id1 <- c(el2[el2$p1 %in% mono.neg, 2], el2[el2$p2 %in% mono.neg, 1])
