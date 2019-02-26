@@ -11,7 +11,9 @@
 #' based on the partnership type and, for main partnerships, age combination. Other
 #' modifiers for the probability of condom use in that pair are diagnosis of
 #' disease, disclosure of status, full or partial HIV viral suppression
-#' given HIV anti-retroviral therapy, and PrEP use.
+#' given HIV anti-retroviral therapy, and PrEP use. If \code{rcomp.discont == TRUE},
+#' condom use stays at on-PrEP risk compensation levels after spontaneous 
+#' discontinuation.
 #'
 #' @return
 #' Updates the discordant edgelist with a \code{uai} variable indicating whether
@@ -27,12 +29,14 @@ condoms_msm_whamp <- function(dat, at) {
   diag.status <- dat$attr$diag.status
   prepStat <- dat$attr$prepStat
   prepClass <- dat$attr$prepClass
+  spontDisc <- dat$attr$spontDisc
 
   # Parameters
   rcomp.prob <- dat$param$rcomp.prob
   rcomp.adh.groups <- dat$param$rcomp.adh.groups
   rcomp.main.only <- dat$param$rcomp.main.only
   rcomp.discl.only <- dat$param$rcomp.discl.only
+  rcomp.discont <- dat$param$rcomp.discont
 
   el <- dat$temp$el
 
@@ -145,6 +149,14 @@ condoms_msm_whamp <- function(dat, at) {
         idsRC <- intersect(idsRC, isDisc)
       }
       uai.prob[idsRC] <- 1 - (1 - uai.prob[idsRC]) * (1 - rcomp.prob)
+    }
+    
+    # Continued risk compensation after PrEP discontinuation - only if the partner is not an always condom user
+    if (rcomp.discont == TRUE){
+      ids.spontDisc <- which((prepStat[elt[, 1]] == 0 & prepClass[elt[, 1]] %in% rcomp.adh.groups & spontDisc[elt[, 1]] == 1 & cond.always[elt[, 2]] !=1) |
+                               (prepStat[elt[, 2]] == 0 & prepClass[elt[, 2]] %in% rcomp.adh.groups & spontDisc[elt[, 2]] == 1 & cond.always[elt[, 1]] !=1))
+      uai.prob[ids.spontDisc] <- 1 - (1 - uai.prob[ids.spontDisc]) * (1 - rcomp.prob)
+      
     }
 
     ai.vec <- elt[, "ai"]
