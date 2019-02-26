@@ -136,6 +136,7 @@ initialize_msm_whamp <- function(x, param, init, control, s) {
   dat$attr$prepStartTime <- rep(NA, num)
   dat$attr$prepLastRisk <- rep(NA, num)
   dat$attr$prepDisc <- rep(NA, num)
+  dat$attr$spontDisc <- rep(0, num) # add attribute to track whether people discontinued PrEP spontaneously
   # dat$attr$prepLastStiScreen <- rep(NA, num)
 
   # Role class
