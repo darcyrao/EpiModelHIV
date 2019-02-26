@@ -69,8 +69,6 @@ prevalence_msm_whamp <- function(dat, at) {
     dat$epi$i.num.OW <- rNA
     dat$epi$i.num.EW <- rNA
     dat$epi$i.prev <- rNA
-    dat$epi$i.prev.B <- rNA #-- delete this when finish de-bugging
-    dat$epi$i.prev.W <- rNA #-- delete this when finish de-bugging
     dat$epi$i.prev.H..wa <- rNA
     dat$epi$i.prev.B..wa <- rNA
     dat$epi$i.prev.O..wa <- rNA
@@ -133,8 +131,6 @@ prevalence_msm_whamp <- function(dat, at) {
   }
 
   dat$epi$num[at] <- sum(active == 1, na.rm = TRUE)
-  dat$epi$num.B[at] <- sum(race == "B", na.rm = TRUE) #-- delete this when finish de-bugging
-  dat$epi$num.W[at] <- sum(race == "W", na.rm = TRUE) #-- delete this when finish de-bugging
   dat$epi$num.H..wa[at] <- sum(race..wa == "H", na.rm = TRUE)
   dat$epi$num.B..wa[at] <- sum(race..wa == "B", na.rm = TRUE)
   dat$epi$num.O..wa[at] <- sum(race..wa == "O", na.rm = TRUE)
@@ -143,8 +139,6 @@ prevalence_msm_whamp <- function(dat, at) {
   dat$epi$num.EW[at] <- sum(region == "EW", na.rm = TRUE)
   dat$epi$s.num[at] <- sum(status == 0, na.rm = TRUE)
   dat$epi$i.num[at] <- sum(status == 1, na.rm = TRUE)
-  dat$epi$i.num.B[at] <- sum(status == 1 & race == "B", na.rm = TRUE) #-- delete this when finish de-bugging
-  dat$epi$i.num.W[at] <- sum(status == 1 & race == "W", na.rm = TRUE) #-- delete this when finish de-bugging
   dat$epi$i.num.H..wa[at] <- sum(status == 1 & race..wa == "H", na.rm = TRUE)
   dat$epi$i.num.B..wa[at] <- sum(status == 1 & race..wa == "B", na.rm = TRUE)
   dat$epi$i.num.O..wa[at] <- sum(status == 1 & race..wa == "O", na.rm = TRUE)
@@ -152,8 +146,6 @@ prevalence_msm_whamp <- function(dat, at) {
   dat$epi$i.num.OW[at] <- sum(status == 1 & region == "OW", na.rm = TRUE)
   dat$epi$i.num.EW[at] <- sum(status == 1 & region == "EW", na.rm = TRUE)
   dat$epi$i.prev[at] <- dat$epi$i.num[at] / dat$epi$num[at]
-  dat$epi$i.prev.B[at] <- dat$epi$i.num.B[at] / dat$epi$num.B[at] #-- delete this when finish de-bugging
-  dat$epi$i.prev.W[at] <- dat$epi$i.num.W[at] / dat$epi$num.W[at] #-- delete this when finish de-bugging
   dat$epi$i.prev.H..wa[at] <- dat$epi$i.num.H..wa[at] / dat$epi$num.H..wa[at]
   dat$epi$i.prev.B..wa[at] <- dat$epi$i.num.B..wa[at] / dat$epi$num.B..wa[at]
   dat$epi$i.prev.O..wa[at] <- dat$epi$i.num.O..wa[at] / dat$epi$num.O..wa[at]
