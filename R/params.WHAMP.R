@@ -222,8 +222,10 @@
 #'        overrides the mean testing interval parameters.
 #' @param prep.risk.int Time window for assessment of risk eligibility for PrEP
 #'        in days.
-#' @param prep.risk.reassess If \code{TRUE}, reassess eligibility for PrEP at
-#'        each testing visit. If \code{FALSE}, reassess every year.
+#' @param prep.risk.reassess.method Method for determining risk-based discontinuation
+#'        of PrEP, with \code{"none"} for no risk-based discontinuation, \code{"inst"} 
+#'        for reassessment every time step, and \code{"year"} for reassessment at yearly
+#'        HIV screening visits.
 #' @param prep.discont <- Proportion of PrEP users who will discontinue while still at risk.
 #'        This will be used to assign an attribute to indicate men who will discontinue
 #'        while they are still candidates for PrEP. The remainder will discontinue only
@@ -242,9 +244,8 @@
 #'        partnerships only, versus all partnerships.
 #' @param rcomp.discl.only Logical, if risk compensation is limited known-discordant
 #'        partnerships only, versus all partnerships.
-#' @param rcomp.discont Argument for whether condom use stays at the level
-#'        at which PrEP was discontinued or returns to pre-PrEP levels, with options
-#'        \code{"remain"} and \code{"return"}
+#' @param rcomp.discont Logical, if condom use stays at the level at which PrEP was 
+#'        discontinued versus returning to pre-PrEP levels
 #'
 #' @param rgc.tprob Probability of rectal gonorrhea infection per act.
 #' @param ugc.tprob Probability of urethral gonorrhea infection per act.
@@ -405,7 +406,7 @@ param_msm_whamp <- function(nwstats,
                       vv.iev.prob = 0.42,
 
                       prep.start = Inf, # Set to Inf for no PrEP
-                      prep.class.prob = c(0.07, 0.451, 0.619),
+                      prep.class.prob = c(0.089, 0.127, 0.784),
                       prep.class.hr = c(0.69, 0.19, 0.05),
                       prep.coverage.init.KC = c(0.1093,	0.4644,	0.526,	0.4926),
                       prep.coverage.init.oth = c(0.1566,	0.1962,	0.4143,	0.0742),
@@ -417,15 +418,15 @@ param_msm_whamp <- function(nwstats,
                       prep.init.rate = 1,
                       prep.tst.int = 90,
                       prep.risk.int = 365,
-                      prep.risk.reassess = TRUE,
+                      prep.risk.reassess.method = "inst", #year
                       prep.discont = 0.3,
-                      prep.discont.prob = 0.017724
+                      prep.discont.prob = 0.017724,
 
                       rcomp.prob = 0,
                       rcomp.adh.groups = 1:3,
                       rcomp.main.only = FALSE,
                       rcomp.discl.only = FALSE,
-                      rcomp.discont = "return",
+                      rcomp.discont = FALSE,
 
                       rgc.tprob = 0.357698,
                       ugc.tprob = 0.248095,
