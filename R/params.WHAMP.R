@@ -308,15 +308,15 @@ param_msm_whamp <- function(nwstats,
                       testing.pattern = "interval",
                       test.window.int = 21,
 
-                      tt.traj.KC.B.prob = c(0.081*(1-0.838), 0.081*(0.838), (1-0.081)*(1-0.838), (1-0.081)*(0.838)),
-                      tt.traj.KC.H.prob = c(0.064*(1-0.902), 0.064*(0.902), (1-0.064)*(1-0.902), (1-0.064)*(0.902)),
-                      tt.traj.KC.O.prob = c(0.105*(1-0.92), 0.105*(0.92), (1-0.105)*(1-0.92), (1-0.105)*(0.92)),
-                      tt.traj.OW.B.prob = c(0.121*(1-0.809), 0.121*(0.809), (1-0.121)*(1-0.809), (1-0.121)*(0.809)),
-                      tt.traj.OW.H.prob = c(0.102*(1-0.885), 0.102*(0.885), (1-0.102)*(1-0.885), (1-0.102)*(0.885)),
-                      tt.traj.OW.O.prob = c(0.148*(1-0.905), 0.148*(0.905), (1-0.148)*(1-0.905), (1-0.148)*(0.905)),
-                      tt.traj.EW.B.prob = c(0.162*(1-0.758), 0.162*(0.758), (1-0.162)*(1-0.758), (1-0.162)*(0.758)),
-                      tt.traj.EW.H.prob = c(0.14*(1-0.846), 0.14*(0.846), (1-0.14)*(1-0.846), (1-0.14)*(0.846)),
-                      tt.traj.EW.O.prob = c(0.192*(1-0.874), 0.192*(0.874), (1-0.192)*(1-0.874), (1-0.192)*(0.874)),
+                      tt.traj.KC.B.prob = c(0.081*(1-0.841), 0.081*(0.841), (1-0.081)*(1-0.841), (1-0.081)*(0.841)),
+                      tt.traj.KC.H.prob = c(0.064*(1-0.903), 0.064*(0.903), (1-0.064)*(1-0.903), (1-0.064)*(0.903)),
+                      tt.traj.KC.O.prob = c(0.105*(1-0.921), 0.105*(0.921), (1-0.105)*(1-0.921), (1-0.105)*(0.921)),
+                      tt.traj.OW.B.prob = c(0.121*(1-0.813), 0.121*(0.813), (1-0.121)*(1-0.813), (1-0.121)*(0.813)),
+                      tt.traj.OW.H.prob = c(0.102*(1-0.886), 0.102*(0.886), (1-0.102)*(1-0.886), (1-0.102)*(0.886)),
+                      tt.traj.OW.O.prob = c(0.148*(1-0.906), 0.148*(0.906), (1-0.148)*(1-0.906), (1-0.148)*(0.906)),
+                      tt.traj.EW.B.prob = c(0.162*(1-0.765), 0.162*(0.765), (1-0.162)*(1-0.765), (1-0.162)*(0.765)),
+                      tt.traj.EW.H.prob = c(0.14*(1-0.849), 0.14*(0.849), (1-0.14)*(1-0.849), (1-0.14)*(0.849)),
+                      tt.traj.EW.O.prob = c(0.192*(1-0.876), 0.192*(0.876), (1-0.192)*(1-0.876), (1-0.192)*(0.876)),
                       
                       tx.init.int.KC.B = 46,
                       tx.init.int.KC.H = 43,
@@ -328,17 +328,17 @@ param_msm_whamp <- function(nwstats,
                       tx.init.int.EW.H = 50,
                       tx.init.int.EW.O = 53,
                       
-                      tx.halt.full = 0.0043,
+                      tx.halt.full = 0.001010551,
                       tx.halt.part.rr = 2,
-                      tx.reinit.full.KC.B = 0.0487,
-                      tx.reinit.full.KC.H = 0.0471,
-                      tx.reinit.full.KC.O = 0.0546,
-                      tx.reinit.full.OW.B = 0.0403,
-                      tx.reinit.full.OW.H = 0.0390,
-                      tx.reinit.full.OW.O = 0.0443,
-                      tx.reinit.full.EW.B = 0.0443,
-                      tx.reinit.full.EW.H = 0.0417,
-                      tx.reinit.full.EW.O = 0.0472,
+                      tx.reinit.full.KC.B = 0.0098,
+                      tx.reinit.full.KC.H = 0.0099,
+                      tx.reinit.full.KC.O = 0.0116,
+                      tx.reinit.full.OW.B = 0.0078,
+                      tx.reinit.full.OW.H = 0.0080,
+                      tx.reinit.full.OW.O = 0.0091,
+                      tx.reinit.full.EW.B = 0.0085,
+                      tx.reinit.full.EW.H = 0.0085,
+                      tx.reinit.full.EW.O = 0.0097,
 
                       max.time.off.tx.int = 520 * 7,
                       sympt.onset.int = 2737.5,
@@ -492,9 +492,8 @@ param_msm_whamp <- function(nwstats,
                                   0, 0, 1),
                                 nrow = 3)
 
-
-  p$riskh.start <- max(1, prep.start - prep.risk.int - 1)
-
+  p$riskh.start <- max(1, prep.start - p$prep.risk.int - 1)
+  
   p$modes <- 1
 
   p$asmr.B <- nwstats$asmr.B #-- Delete this old code when finish debugging
