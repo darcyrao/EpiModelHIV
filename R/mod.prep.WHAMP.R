@@ -132,8 +132,14 @@ prep_msm_whamp <- function(dat, at) {
   # Death
   idsStpDth <- which(active == 0 & prepStat == 1)
 
-  # Reset PrEP status
+  # All discontinuation
   idsStp <- c(idsStpDx, idsStpDth, idsEligStop, idsDiscont)
+  
+  # Calculate mean time to discontinuation among those who stopped
+  time.to.disc <- rep(NA, length(idsStp))
+  time.to.disc <- at - prepStartTime[idsStp]
+  
+  # Reset PrEP status
   prepStat[idsStp] <- 0
   prepLastRisk[idsStp] <- NA
   prepStartTime[idsStp] <- NA
@@ -280,7 +286,7 @@ prep_msm_whamp <- function(dat, at) {
     # Discontinuation group
     needgp <- which(is.na(prepDiscont[idsStart]))
     prepDiscont[idsStart[needgp]] <- rbinom(length(needgp, 1, prep.discontinue)) 
-
+    
   }
   
   ## Discontinue if current coverage exceeds threshold due to men aging into groups with lower coverage-------
@@ -334,6 +340,14 @@ prep_msm_whamp <- function(dat, at) {
   prepLastRisk[idsStopQuota] <- NA
   prepStartTime[idsStopQuota] <- NA
   
+  # Calculate elapsed time on PrEP among men discontinued due to coverage quotas by age
+  time.to.disc <- c(time.to.disc, c(at - prepStartTime[idsStopQuota]))
+  
+  ## Calculate time on PrEP among current users -----------------------
+  time.since.prep.start <- rep(NA, sum(prepStat == 1))
+  time.since.prep.start[prepStat == 1] <- (at - prepStartTime[prepStat == 1]) 
+  
+  
   ## Output --------------------------------------------------------------------
 
   # Attributes
@@ -357,6 +371,8 @@ prep_msm_whamp <- function(dat, at) {
   dat$epi$prep.cov.KC[at] <- prep.cov.KC
   dat$epi$prep.cov.oth[at] <- prep.cov.oth
   dat$epi$prepStart[at] <- length(idsStart)
+  dat$epi$time.on.prep <- time.on.prep # Vector with the total time on PrEP among those who discontinued in this time step
+  dat$epi$time.since.prep.start <- time.since.prep.start # Vector with the elapsed time on PrEP among current users
 
   return(dat)
 }
