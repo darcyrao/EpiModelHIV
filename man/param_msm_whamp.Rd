@@ -4,51 +4,67 @@
 \alias{param_msm_whamp}
 \title{Epidemic Model Parameters for the WHAMP model}
 \usage{
-param_msm_whamp(nwstats, race.method = 1, last.neg.test.B.int = 301,
-  last.neg.test.W.int = 315, mean.test.B.int = 301, mean.test.W.int = 315,
-  testing.pattern = "memoryless", test.window.int = 21,
-  tt.traj.B.prob = c(0.077, 0, 0.356, 0.567), tt.traj.W.prob = c(0.052, 0,
-  0.331, 0.617), tx.init.B.prob = 0.092, tx.init.W.prob = 0.127,
-  tx.halt.B.prob = 0.0102, tx.halt.W.prob = 0.0071,
-  tx.reinit.B.prob = 0.00066, tx.reinit.W.prob = 0.00291,
-  max.time.off.tx.full.int = 520 * 7, max.time.on.tx.part.int = 52 * 15 * 7,
-  max.time.off.tx.part.int = 520 * 7, vl.acute.rise.int = 45,
-  vl.acute.peak = 6.886, vl.acute.fall.int = 45, vl.set.point = 4.5,
-  vl.aids.onset.int = 520 * 7, vl.aids.int = 52 * 2 * 7, vl.fatal = 7,
-  vl.full.supp = 1.5, vl.part.supp = 3.5, full.supp.down.slope = 0.25,
-  full.supp.up.slope = 0.25, part.supp.down.slope = 0.25,
-  part.supp.up.slope = 0.25, birth.age = 18, exit.age = 60,
-  b.method = "fixed", URAI.prob = 0.0082 * 1.09, UIAI.prob = 0.0031 *
-  1.09, acute.rr = 6, circ.rr = 0.4, condom.rr = 0.295,
-  disc.outset.main.B.prob = 0.685, disc.outset.main.W.prob = 0.889,
-  disc.at.diag.main.B.prob = 1, disc.at.diag.main.W.prob = 1,
-  disc.post.diag.main.B.prob = 0, disc.post.diag.main.W.prob = 0,
-  disc.outset.pers.B.prob = 0.527, disc.outset.pers.W.prob = 0.828,
-  disc.at.diag.pers.B.prob = 1, disc.at.diag.pers.W.prob = 1,
-  disc.post.diag.pers.B.prob = 0, disc.post.diag.pers.W.prob = 0,
-  disc.inst.B.prob = 0.445, disc.inst.W.prob = 0.691, circ.B.prob = 0.874,
-  circ.W.prob = 0.918, ccr5.B.prob = c(0, 0.034), ccr5.W.prob = c(0.021,
-  0.176), ccr5.heteroz.rr = 0.3, num.inst.ai.classes = 4,
-  base.ai.main.BB.rate = 0.17, base.ai.main.BW.rate = 0.26,
-  base.ai.main.WW.rate = 0.23, base.ai.pers.BB.rate = 0.11,
-  base.ai.pers.BW.rate = 0.16, base.ai.pers.WW.rate = 0.14,
-  ai.scale = 1.15, cond.main.BB.prob = 0.38, cond.main.BW.prob = 0.1,
-  cond.main.WW.prob = 0.15, cond.pers.always.prob = 0.216,
-  cond.pers.BB.prob = 0.26, cond.pers.BW.prob = 0.26,
-  cond.pers.WW.prob = 0.26, cond.inst.always.prob = 0.326,
-  cond.inst.BB.prob = 0.27, cond.inst.BW.prob = 0.27,
-  cond.inst.WW.prob = 0.27, cond.always.prob.corr = 0.5, cond.rr.BB = 1,
-  cond.rr.BW = 1, cond.rr.WW = 1, cond.diag.main.beta = -0.67,
-  cond.discl.main.beta = -0.85, cond.diag.pers.beta = -0.67,
-  cond.discl.pers.beta = -0.85, cond.diag.inst.beta = -0.67,
-  cond.discl.inst.beta = -0.85, vv.iev.BB.prob = 0.42,
-  vv.iev.BW.prob = 0.56, vv.iev.WW.prob = 0.49, prep.start = Inf,
-  prep.elig.model = "base", prep.class.prob = c(0.211, 0.07, 0.1, 0.619),
-  prep.class.hr = c(1, 0.69, 0.19, 0.05), prep.coverage = 0,
-  prep.cov.method = "curr", prep.cov.rate = 1, prep.tst.int = 90,
-  prep.risk.int = 182, prep.risk.reassess = TRUE, rcomp.prob = 0,
-  rcomp.adh.groups = 0:3, rcomp.main.only = FALSE,
-  rcomp.discl.only = FALSE, rgc.tprob = 0.357698, ugc.tprob = 0.248095,
+param_msm_whamp(nwstats, race.method = 1, iti.coefs = c(415.796063738122,
+  5.46732489852761, -0.318623224804563), mean.age.iti = 36.77193,
+  testing.pattern = "interval", test.window.int = 21,
+  tt.traj.KC.B.prob = c(0.081 * (1 - 0.841), 0.081 * (0.841), (1 - 0.081) * (1
+  - 0.841), (1 - 0.081) * (0.841)), tt.traj.KC.H.prob = c(0.064 * (1 - 0.903),
+  0.064 * (0.903), (1 - 0.064) * (1 - 0.903), (1 - 0.064) * (0.903)),
+  tt.traj.KC.O.prob = c(0.105 * (1 - 0.921), 0.105 * (0.921), (1 - 0.105) * (1
+  - 0.921), (1 - 0.105) * (0.921)), tt.traj.OW.B.prob = c(0.121 * (1 - 0.813),
+  0.121 * (0.813), (1 - 0.121) * (1 - 0.813), (1 - 0.121) * (0.813)),
+  tt.traj.OW.H.prob = c(0.102 * (1 - 0.886), 0.102 * (0.886), (1 - 0.102) * (1
+  - 0.886), (1 - 0.102) * (0.886)), tt.traj.OW.O.prob = c(0.148 * (1 - 0.906),
+  0.148 * (0.906), (1 - 0.148) * (1 - 0.906), (1 - 0.148) * (0.906)),
+  tt.traj.EW.B.prob = c(0.162 * (1 - 0.765), 0.162 * (0.765), (1 - 0.162) * (1
+  - 0.765), (1 - 0.162) * (0.765)), tt.traj.EW.H.prob = c(0.14 * (1 - 0.849),
+  0.14 * (0.849), (1 - 0.14) * (1 - 0.849), (1 - 0.14) * (0.849)),
+  tt.traj.EW.O.prob = c(0.192 * (1 - 0.876), 0.192 * (0.876), (1 - 0.192) * (1
+  - 0.876), (1 - 0.192) * (0.876)), tx.init.int.KC.B = 46,
+  tx.init.int.KC.H = 43, tx.init.int.KC.O = 47, tx.init.int.OW.B = 56,
+  tx.init.int.OW.H = 53, tx.init.int.OW.O = 57, tx.init.int.EW.B = 53,
+  tx.init.int.EW.H = 50, tx.init.int.EW.O = 53,
+  tx.halt.full = 0.001010551, tx.halt.part.rr = 2,
+  tx.reinit.full.KC.B = 0.0098, tx.reinit.full.KC.H = 0.0099,
+  tx.reinit.full.KC.O = 0.0116, tx.reinit.full.OW.B = 0.0078,
+  tx.reinit.full.OW.H = 0.008, tx.reinit.full.OW.O = 0.0091,
+  tx.reinit.full.EW.B = 0.0085, tx.reinit.full.EW.H = 0.0085,
+  tx.reinit.full.EW.O = 0.0097, max.time.off.tx.int = 520 * 7,
+  sympt.onset.int = 2737.5, vl.acute.rise.int = 45, vl.acute.peak = 6.886,
+  vl.acute.fall.int = 45, vl.set.point = 4.5, vl.aids.onset.int = 520 * 7,
+  vl.aids.int = 52 * 2 * 7, vl.aids.peak = 7, vl.full.supp = 1.5,
+  vl.part.supp = 3.5, full.supp.down.slope = 0.75,
+  full.supp.up.slope = 0.75, part.supp.down.slope = 0.25,
+  part.supp.up.slope = 0.75, growth.rate = 1.0001441/7, birth.age = 18,
+  exit.age = 60, asmr.rr.pos = c(3.791, 2.974, 1.984), URAI.prob = 0.0082
+  * 1.09, UIAI.prob = 0.0031 * 1.09, acute.rr = 6, circ.rr = 0.4,
+  condom.rr = 0.295, disc.outset.main.prob = 1,
+  disc.at.diag.main.prob = 1, disc.post.diag.main.prob = 0,
+  disc.outset.pers.prob = 0.5671, disc.at.diag.pers.prob = 1,
+  disc.post.diag.pers.prob = 0, disc.inst.prob = 0.4918,
+  circ.B.prob = 0.6449, circ.H.prob = 0.4897, circ.O.prob = 0.86,
+  ccr5.B.prob = c(0, 0.034), ccr5.H.prob = c(0.003, 0.05),
+  ccr5.O.prob = c(0.017, 0.164), ccr5.heteroz.rr = 0.3,
+  base.ai.main.rate = 0.1864, base.ai.pers.rate = 0.118, ai.scale = 1,
+  cond.main.YY.prob = 0.3391, cond.main.other.prob = 0.1399,
+  cond.pers.always.prob = 0.0924, cond.pers.prob = 0.3925,
+  cond.inst.always.prob = 0.1982, cond.inst.prob = 0.4138,
+  cond.always.prob.corr = 0.6009, cond.rr = 1,
+  cond.diag.main.beta = -0.67, cond.discl.main.beta = -0.85,
+  cond.diag.pers.beta = -0.67, cond.discl.pers.beta = -0.85,
+  cond.diag.inst.beta = -0.67, cond.discl.inst.beta = -0.85,
+  vv.iev.prob = 0.42, prep.start = Inf, prep.class.prob = c(0.089, 0.127,
+  0.784), prep.class.hr = c(0.69, 0.19, 0.05),
+  prep.coverage.init.KC = c(0.1093, 0.4644, 0.526, 0.4926),
+  prep.coverage.init.oth = c(0.1566, 0.1962, 0.4143, 0.0742),
+  prep.cov.method = "curr", prep.scaleup.KC.rate = c(1, 1, 1, 1),
+  prep.scaleup.oth.rate = c(1, 1, 1, 1), prep.cov.max.KC = c(0.7734, 0.741,
+  0.7754, 0.6125), prep.cov.max.oth = c(0.6553, 0.7485, 0.6568, 0.3854),
+  prep.init.rate = 1, prep.tst.int = 90, prep.risk.int = 365,
+  prep.risk.reassess.method = "inst", prep.discont = 0.3,
+  prep.discont.prob = 0.017724, rcomp.prob = 0, rcomp.adh.groups = 1:3,
+  rcomp.main.only = FALSE, rcomp.discl.only = FALSE,
+  rcomp.discont = FALSE, rgc.tprob = 0.357698, ugc.tprob = 0.248095,
   rct.tprob = 0.321597, uct.tprob = 0.212965, rgc.sympt.prob = 0.076975,
   ugc.sympt.prob = 0.824368, rct.sympt.prob = 0.103517,
   uct.sympt.prob = 0.885045, rgc.asympt.int = 35.11851 * 7,
@@ -68,15 +84,11 @@ param_msm_whamp(nwstats, race.method = 1, last.neg.test.B.int = 301,
 \item{race.method}{Number of races in the model, with options of 1 or 2. If    #-- Delete this when finish debugging
 1, then race-specific parameters will be averaged.}
 
-\item{last.neg.test.B.int}{Time range in days for last negative test for
-black men.}
+\item{iti.coefs}{GLM coefficients for median intertest interval among men who test
+(intercept, centered age, centered age squared)}
 
-\item{last.neg.test.W.int}{Time range in days for last negative test for
-white men.}
-
-\item{mean.test.B.int}{Mean intertest interval in days for black MSM who test.}
-
-\item{mean.test.W.int}{Mean intertest interval in days for white MSM who test.}
+\item{mean.age.iti}{Mean age from the sample used to fit the GLM tor median ITI, 
+for use in calculating centered age.}
 
 \item{testing.pattern}{Method for HIV testing, with options \code{"memoryless"}
 for constant hazard without regard to time since previous test, or
@@ -84,49 +96,94 @@ for constant hazard without regard to time since previous test, or
 
 \item{test.window.int}{Length of the HIV test window period in days.}
 
-\item{tt.traj.B.prob}{Proportion of black MSM who enter one of four
-testing/treatment trajectories: never test or treat, test and never
-initiate treatment, test and treated with partial viral suppression,
-and test and treated with full suppression.}
+\item{tt.traj.KC.B.prob}{Proportion of black MSM in King County who enter one of four
+testing/treatment trajectories: non-screener treated with partial viral suppression,
+non-screener treated with full viral suppression, regular screener treated with partial
+suppression, and regular screener treated with full suppression}
 
-\item{tt.traj.W.prob}{Proportion of white MSM who enter into the four
+\item{tt.traj.KC.H.prob}{Proportion of Hispanic MSM in King County who enter into the four
 testing/treatment trajectories, as defined above.}
 
-\item{tx.init.B.prob}{Probability per time step that a black MSM who has
-tested positive will initiate treatment.}
+\item{tt.traj.KC.O.prob}{Proportion of other MSM in King County who enter into the four
+testing/treatment trajectories, as defined above.}
 
-\item{tx.init.W.prob}{Probability per time step that a white MSM who has
-tested positive will initiate treatment.}
+\item{tt.traj.OW.B.prob}{Proportion of black MSM in Western WA who enter one of four
+testing/treatment trajectories, as defined above}
 
-\item{tx.halt.B.prob}{Probability per time step that a black MSM who is
+\item{tt.traj.OW.H.prob}{Proportion of Hispanic MSM in Western WA who enter into the four
+testing/treatment trajectories, as defined above.}
+
+\item{tt.traj.OW.O.prob}{Proportion of other MSM in Western WA who enter into the four
+testing/treatment trajectories, as defined above.}
+
+\item{tt.traj.EW.B.prob}{Proportion of black MSM in Eastern WA who enter one of four
+testing/treatment trajectories, as defined above}
+
+\item{tt.traj.EW.H.prob}{Proportion of Hispanic MSM in Eastern WA who enter into the four
+testing/treatment trajectories, as defined above.}
+
+\item{tt.traj.EW.O.prob}{Proportion of other MSM in Eastern WA who enter into the four
+testing/treatment trajectories, as defined above.}
+
+\item{tx.init.int.KC.B}{Days from diagnosis to treatment initiation for Black MSM in King County}
+
+\item{tx.init.int.KC.H}{Days from diagnosis to treatment initiation for Hispanic MSM in King County}
+
+\item{tx.init.int.KC.O}{Days from diagnosis to treatment initiation for Other MSM in King County}
+
+\item{tx.init.int.OW.B}{Days from diagnosis to treatment initiation for Black MSM in other western WA}
+
+\item{tx.init.int.OW.H}{Days from diagnosis to treatment initiation for Hispanic MSM in other western WA}
+
+\item{tx.init.int.OW.O}{Days from diagnosis to treatment initiation for Other MSM in other western WA}
+
+\item{tx.init.int.EW.B}{Days from diagnosis to treatment initiation for Black MSM in eastern WA}
+
+\item{tx.init.int.EW.H}{Days from diagnosis to treatment initiation for Hispanic MSM in eastern WA}
+
+\item{tx.init.int.EW.O}{Days from diagnosis to treatment initiation for Other MSM in eastern WA}
+
+\item{tx.halt.full}{Probability per time step that a full suppressor who is
 currently on treatment will halt treatment.}
 
-\item{tx.halt.W.prob}{Probability per time step that a white MSM who is
-currently on treatment will halt treatment.}
+\item{tx.halt.part.rr}{Relative risk of halting treatment per time step for a partial suppressor
+currently on treatment, as compared to a full suppressor}
 
-\item{tx.reinit.B.prob}{Probability per time step that a black MSM who is
-not currently on treatment but who has been in the past will
-re-initiate treatment.}
+\item{tx.reinit.full.KC.B}{Probability per time step that black MSM in KC who are full suppressors and
+not currently on treatment but who have been in the past will re-initiate}
 
-\item{tx.reinit.W.prob}{Probability per time step that a white MSM who is
-not currently on treatment but who has been in the past will
-re-initiate treatment.}
+\item{tx.reinit.full.KC.H}{Probability per time step that Hispanic MSM in KC who are full suppressors and
+not currently on treatment but who have been in the past will re-initiate}
 
-\item{max.time.off.tx.full.int}{Number of days off treatment for a full
-suppressor before onset of AIDS, including time before diagnosis.}
+\item{tx.reinit.full.KC.O}{Probability per time step that other MSM in KC who are full suppressors and
+not currently on treatment but who have been in the past will re-initiate}
 
-\item{max.time.on.tx.part.int}{Number of days on treatment for a
-partial suppressor beofre onset of AIDS.}
+\item{tx.reinit.full.OW.B}{Probability per time step that black MSM in OW who are full suppressors and
+not currently on treatment but who have been in the past will re-initiate}
 
-\item{max.time.off.tx.part.int}{Nnumber of days off treatment for a
-partial suppressor before onset of AIDS, including time before
-diagnosis.}
+\item{tx.reinit.full.OW.H}{Probability per time step that Hispanic MSM in OW who are full suppressors and
+not currently on treatment but who have been in the past will re-initiate}
 
-\item{vl.acute.rise.int}{Number of days to peak viremia during acute
-infection.}
+\item{tx.reinit.full.OW.O}{Probability per time step that other MSM in OW who are full suppressors and
+not currently on treatment but who have been in the past will re-initiate}
 
-\item{vl.acute.peak}{Peak viral load (in log10 units) at the height of acute
-infection.}
+\item{tx.reinit.full.EW.B}{Probability per time step that black MSM in EW who are full suppressors and
+not currently on treatment but who have been in the past will re-initiate}
+
+\item{tx.reinit.full.EW.H}{Probability per time step that Hispanic MSM in EW who are full suppressors and
+not currently on treatment but who have been in the past will re-initiate}
+
+\item{tx.reinit.full.EW.O}{Probability per time step that other MSM in EW who are full suppressors and
+not currently on treatment but who have been in the past will re-initiate}
+
+\item{max.time.off.tx.int}{Number of days off treatment for a before onset of AIDS, 
+including time before diagnosis.}
+
+\item{sympt.onset.int}{Number of days from infection to symptom onset in the absence of ART}
+
+\item{vl.acute.rise.int}{Number of days to peak viremia during acute infection.}
+
+\item{vl.acute.peak}{Peak viral load (in log10 units) at the height of acute infection.}
 
 \item{vl.acute.fall.int}{Number of days from peak viremia to set-point
 viral load during the acute infection period.}
@@ -136,9 +193,9 @@ viral load during the acute infection period.}
 \item{vl.aids.onset.int}{Number of days to AIDS for a treatment-naive
 patient.}
 
-\item{vl.aids.int}{Duration of AIDS stage infection in days.}
+\item{vl.aids.int}{Time from AIDS onset to peak AIDS VL in untreated infection in days.}
 
-\item{vl.fatal}{Viral load in AIDS at which death occurs.}
+\item{vl.aids.peak}{Peak VL in AIDS.}
 
 \item{vl.full.supp}{Log10 viral load at full suppression on ART.}
 
@@ -159,13 +216,14 @@ re-initiation until the level in \code{vl.part.supp}.}
 \item{part.supp.up.slope}{For partial suppressors, number of log10 units that
 viral load rises per time step from treatment halting until expected value.}
 
+\item{growth.rate}{Rate of population growth per day.}
+
 \item{birth.age}{Age (in years) of new arrivals.}
 
 \item{exit.age}{Age (in years) at which individuals age out of the network}
 
-\item{b.method}{Method for calculating the number of expected births at each
-time step, with \code{"fixed"} based on the number of persons at the
-initial time step and \code{"varying"} based on the current time step.}
+\item{asmr.rr.pos}{Relative increase in age-specific mortality for HIV-positive men
+(for age groups 18-44, 45-54, 55-59)}
 
 \item{URAI.prob}{Probability of transmission for a man having unprotected
 receptive anal intercourse with an infected man at set point viral
@@ -184,137 +242,84 @@ negative insertive partner is circumcised.}
 \item{condom.rr}{Relative risk of infection from anal sex when a condom is
 used.}
 
-\item{disc.outset.main.B.prob}{Probability that an HIV-infected black MSM will
+\item{disc.outset.main.prob}{Probability that an HIV-infected MSM will
 disclose his status at the start of a main partnership.}
 
-\item{disc.outset.main.W.prob}{Probability that an HIV-infected white MSM will
-disclose his status at the start of a main partnership.}
-
-\item{disc.at.diag.main.B.prob}{Probability that a black MSM already in a main
+\item{disc.at.diag.main.prob}{Probability that an MSM already in a main
 partnership will disclose at the time of diagnosis.}
 
-\item{disc.at.diag.main.W.prob}{Probability that a white MSM already in a main
-partnership will disclose at the time of diagnosis.}
-
-\item{disc.post.diag.main.B.prob}{Probability that an HIV-infected black MSM
+\item{disc.post.diag.main.prob}{Probability that an HIV-infected MSM
 in a main partnership will disclose his status, assuming he didn't
 at the start of the partnership or at diagnosis.}
 
-\item{disc.post.diag.main.W.prob}{Probability that an HIV-infected white MSM
-in a main partnership will disclose his status, assuming he didn't
-at the start of the partnership or at diagnosis.}
-
-\item{disc.outset.pers.B.prob}{Probability that an HIV-infected black MSM will
+\item{disc.outset.pers.prob}{Probability that an HIV-infected MSM will
 disclose his status at the start of a casual partnership.}
 
-\item{disc.outset.pers.W.prob}{Probability that an HIV-infected white MSM will
-disclose his status at the start of a casual partnership.}
-
-\item{disc.at.diag.pers.B.prob}{Probability that a black MSM already in a
+\item{disc.at.diag.pers.prob}{Probability that an MSM already in a
 casual partnership will disclose at the time of diagnosis.}
 
-\item{disc.at.diag.pers.W.prob}{Probability that a white MSM already in a
-casual partnership will disclose at the time of diagnosis.}
-
-\item{disc.post.diag.pers.B.prob}{Probability that an HIV-infected black MSM
+\item{disc.post.diag.pers.prob}{Probability that an HIV-infected MSM
 in a casual partnership will disclose his status, assuming he
 didn't at the start of the partnership or at diagnosis.}
 
-\item{disc.post.diag.pers.W.prob}{Probability that an HIV-infected white MSM
-in a casual partnership will disclose his status, assuming he
-didn't at the start of the partnership or at diagnosis.}
-
-\item{disc.inst.B.prob}{Probability that an HIV-infected black MSM will
-disclose his status to a one-off partner.}
-
-\item{disc.inst.W.prob}{Probability that an HIV-infected white MSM will
+\item{disc.inst.prob}{Probability that an HIV-infected black MSM will
 disclose his status to a one-off partner.}
 
 \item{circ.B.prob}{Probablity that a black new arrival in the population
 will be circumcised.}
 
-\item{circ.W.prob}{Probablity that a white new arrival in the population
+\item{circ.H.prob}{Probablity that a Hispanic new arrival in the population
 will be circumcised.}
+
+\item{circ.O.prob}{Probablity that an other race/ethnicity new arrival in 
+the population will be circumcised.}
 
 \item{ccr5.B.prob}{Vector of length two of frequencies of the Delta 32
 mutation (homozygous and heterozygous, respectively) in the CCR5 gene
 among black MSM.}
 
-\item{ccr5.W.prob}{Vector of length two of frequencies of the Delta 32
+\item{ccr5.H.prob}{Vector of length two of frequencies of the Delta 32
 mutation (homozygous and heterozygous, respectively) in the CCR5 gene
-among white MSM.}
+among hispanic MSM.}
+
+\item{ccr5.O.prob}{Vector of length two of frequencies of the Delta 32
+mutation (homozygous and heterozygous, respectively) in the CCR5 gene
+among other race/ethnicity MSM.}
 
 \item{ccr5.heteroz.rr}{Relative risk of infection for men who are heterozygous
 in the CCR5 mutation.}
 
-\item{num.inst.ai.classes}{Number of quantiles into which men should be
-divided in determining their levels of one-off anal intercourse.}
+\item{base.ai.main.rate}{Expected coital frequency in main partnerships
+(acts per day).}
 
-\item{base.ai.main.BB.rate}{Expected coital frequency in black-black main
-partnerships (acts per day).}
-
-\item{base.ai.main.BW.rate}{Expected coital frequency in black-white main
-partnerships (acts per day).}
-
-\item{base.ai.main.WW.rate}{Expected coital frequency in white-white main
-partnerships (acts per day).}
-
-\item{base.ai.pers.BB.rate}{Expected coital frequency in black-black casual
-partnerships (acts per day).}
-
-\item{base.ai.pers.BW.rate}{Expected coital frequency in black-white casual
-partnerships (acts per day).}
-
-\item{base.ai.pers.WW.rate}{Expected coital frequency in white-white casual
-partnerships (acts per day).}
+\item{base.ai.pers.rate}{Expected coital frequency in persistent partnerships
+(acts per day).}
 
 \item{ai.scale}{General relative scaler for all act rates for model
 calibration.}
 
-\item{cond.main.BB.prob}{Probability of condom use in a black-black main
+\item{cond.main.YY.prob}{Probability of condom use in a Young-Young (18-34) main
 partnership.}
 
-\item{cond.main.BW.prob}{Probability of condom use in a black-white main
-partnership.}
+\item{cond.main.other.prob}{Probability of condom use in main partnerships with
+other age combinations.}
 
-\item{cond.main.WW.prob}{Probability of condom use in a white-white main
-partnership.}
-
-\item{cond.pers.always.prob}{Fraction of men in casual partnerships who always
+\item{cond.pers.always.prob}{Fraction of men in persistent partnerships who always
 use condoms in those partnerships.}
 
-\item{cond.pers.BB.prob}{Of men who are not consistent condom users, per-act
-probability of condom use in a black-black casual partnerships.}
-
-\item{cond.pers.BW.prob}{Of men who are not consistent condom users, per-act
-probability of condom use in a black-white casual partnerships.}
-
-\item{cond.pers.WW.prob}{Of men who are not consistent condom users, per-act
-probability of condom use in a white-white casual partnerships.}
+\item{cond.pers.prob}{Of men who are not consistent condom users, per-act
+probability of condom use in persistent partnerships.}
 
 \item{cond.inst.always.prob}{Fraction of men in instant partnerships who always
 use condoms in those partnerships.}
 
-\item{cond.inst.BB.prob}{Of men who are not consistent condom users, per-act
-probability of condom use in a black-black one-off partnerships.}
-
-\item{cond.inst.BW.prob}{Of men who are not consistent condom users, per-act
-probability of condom use in a black-white one-off partnerships.}
-
-\item{cond.inst.WW.prob}{Of men who are not consistent condom users, per-act
-probability of condom use in a white-white one-off partnerships.}
+\item{cond.inst.prob}{Of men who are not consistent condom users, per-act
+probability of condom use in a instantaneous partnerships.}
 
 \item{cond.always.prob.corr}{Correlation coefficient for probability of always
-using condoms in both casual and one-off}
+using condoms in both persistent and instantaneous partnerships}
 
-\item{cond.rr.BB}{Condom probability scaler for black-black partnerships for
-model calibration purposes.}
-
-\item{cond.rr.BW}{Condom probability scaler for black-white partnerships for
-model calibration purposes.}
-
-\item{cond.rr.WW}{Condom probability scaler for white-white partnerships for
-model calibration purposes.}
+\item{cond.rr}{Condom probability scaler for model calibration purposes.}
 
 \item{cond.diag.main.beta}{Beta multiplier for the log odds of using a
 condom in a main partnership if the HIV-infected man has been
@@ -324,54 +329,64 @@ diagnosed.}
 condom in a main partnership if the HIV-infected man has disclosed.}
 
 \item{cond.diag.pers.beta}{Beta multiplier for the log odds of using a
-condom in a casual partnership if the HIV-infected man has been
+condom in a persistent partnership if the HIV-infected man has been
 diagnosed.}
 
 \item{cond.discl.pers.beta}{Beta multiplier for the log odds of using a
-condom in a casual partnership if the HIV-infected man has disclosed
+condom in a persistent partnership if the HIV-infected man has disclosed
 his status.}
 
 \item{cond.diag.inst.beta}{Beta multiplier for the log odds of using a
-condom in a one-off partnership if the HIV-infected man has been
+condom in an instantaneous partnership if the HIV-infected man has been
 diagnosed.}
 
 \item{cond.discl.inst.beta}{Beta multiplier for the log odds of using a
-condom in a one-off partnership if the HIV-infected man has disclosed
+condom in an instantaneous partnership if the HIV-infected man has disclosed
 his status.}
 
-\item{vv.iev.BB.prob}{Probability that in a black-black partnership of
-two versatile men, they will engage in intra-event versatility
-("flipping") given that they're having AI.}
-
-\item{vv.iev.BW.prob}{Probability that in a black-white partnership of
-two versatile men, they will engage in intra-event versatility
-("flipping") given that they're having AI.}
-
-\item{vv.iev.WW.prob}{Probability that in a white-white partnership of
-two versatile men, they will engage in intra-event versatility
-("flipping") given that they're having AI.}
+\item{vv.iev.prob}{Probability that in a partnership of two versatile men,
+they will engage in intra-event versatility ("flipping") given that 
+they're having AI.}
 
 \item{prep.start}{Time step at which the PrEP intervention should start.}
 
-\item{prep.elig.model}{Modeling approach for determining who is eligible for
-PrEP. Current options are limited to: \code{"all"} for all persons who
-have never been on PrEP and are disease-susceptible.}
-
-\item{prep.class.prob}{The probability of adherence class in non-adherent,
-low adherence, medium adherence, or high adherence groups (from Liu).}
+\item{prep.class.prob}{The probability of adherence class in low adherence,
+medium adherence, or high adherence groups.}
 
 \item{prep.class.hr}{The hazard ratio for infection per act associated with each
-level of adherence (from Grant).}
+level of adherence.}
 
-\item{prep.coverage}{The proportion of the eligible population who are start
-PrEP once they become eligible.}
+\item{prep.coverage.init.KC}{Vector of length 4 for the proportion of eligible men 
+(eligibility defined by CAI and discordant partnership status in line with 
+WA State guidelines) in each age group (18-24, 25-29, 30-49, 50-59) in
+King County who are to start PrEP once they become eligible in \code{prep.start}.}
+
+\item{prep.coverage.init.oth}{Vector of length 4 for the proportion of eligible men 
+(eligibility defined by CAI and discordant partnership status in line with 
+WA State guidelines) in each age group (18-24, 25-29, 30-49, 50-59) in
+other WA counties who are to start PrEP once they become eligible in \code{prep.start}.}
 
 \item{prep.cov.method}{The method for calculating PrEP coverage, with options
 of \code{"curr"} to base the numerator on the number of people currently
 on PrEP and \code{"ever"} to base it on the number of people ever on
 PrEP.}
 
-\item{prep.cov.rate}{The rate at which persons initiate PrEP conditional on
+\item{prep.scaleup.KC.rate}{Vector of length 4 for the rates at which PrEP is
+scaled up per day from \code{prep.start} for each age group 
+(18-24, 25-29, 30-49, 50-59) in King County.}
+
+\item{prep.scaleup.oth.rate}{Vector of length 4 for the rates at which PrEP is
+scaled up per day from \code{prep.start} for each age group 
+(18-24, 25-29, 30-49, 50-59) in other WA counties.}
+
+\item{prep.cov.max.KC}{Vector of length 4 for the maximum attainable PrEP coverage
+for each age group in KC. Upon reaching these values, PrEP uptake will stabilize.}
+
+\item{prep.cov.max.oth}{Vector of length 4 for the maximum attainable PrEP coverage
+for each age group in other WA counties. Upon reaching these values, PrEP uptake 
+will stabilize.}
+
+\item{prep.init.rate}{The rate at which persons initiate PrEP conditional on
 their eligibility, with 1 equal to instant start.}
 
 \item{prep.tst.int}{Testing interval for those who are actively on PrEP. This
@@ -380,8 +395,18 @@ overrides the mean testing interval parameters.}
 \item{prep.risk.int}{Time window for assessment of risk eligibility for PrEP
 in days.}
 
-\item{prep.risk.reassess}{If \code{TRUE}, reassess eligibility for PrEP at
-each testing visit.}
+\item{prep.risk.reassess.method}{Method for determining risk-based discontinuation
+of PrEP, with \code{"none"} for no risk-based discontinuation, \code{"inst"} 
+for reassessment every time step, and \code{"year"} for reassessment at yearly
+HIV screening visits.}
+
+\item{prep.discont}{<- Proportion of PrEP users who will discontinue while still at risk.
+This will be used to assign an attribute to indicate men who will discontinue
+while they are still candidates for PrEP. The remainder will discontinue only
+if their risk changes such that they are no longer eligilbe for the intervention.}
+
+\item{prep.discont.prob}{Probability per time step that of halting PrEP for men who 
+discontinue.}
 
 \item{rcomp.prob}{Level of risk compensation from 0 to 1, where 0 is no risk
 compensation, 0.5 is a 50% reduction in the probability of condom use
@@ -389,7 +414,7 @@ per act, and 1 is a complete cessation of condom use following PrEP
 initiation.}
 
 \item{rcomp.adh.groups}{PrEP adherence groups for whom risk compensation
-occurs, as a vector with values 0, 1, 2, 3 corresponding to non-adherent,
+occurs, as a vector with values 1, 2, 3 corresponding to
 low adherence, medium adherence, and high adherence to PrEP.}
 
 \item{rcomp.main.only}{Logical, if risk compensation is limited to main
@@ -397,6 +422,9 @@ partnerships only, versus all partnerships.}
 
 \item{rcomp.discl.only}{Logical, if risk compensation is limited known-discordant
 partnerships only, versus all partnerships.}
+
+\item{rcomp.discont}{Logical, if condom use stays at the level at which PrEP was 
+discontinued versus returning to pre-PrEP levels}
 
 \item{rgc.tprob}{Probability of rectal gonorrhea infection per act.}
 
@@ -473,6 +501,9 @@ a condom used by the insertive partner.}
 given dual infection with both gonorrhea and chlamydia.}
 
 \item{...}{Additional arguments passed to the function.}
+
+\item{tx.reinit.part.rr}{Relative risk of reinitiating treatment per time step for a partial suppressor
+currently on treatment, as compared to a full suppressor}
 }
 \value{
 A list object of class \code{param_msm}, which can be passed to
