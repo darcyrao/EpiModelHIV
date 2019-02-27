@@ -4,21 +4,16 @@
 \alias{calc_nwstats_msm_whamp}
 \title{Calculate Target Statistics for Network Model Estimation for the WHAMP model}
 \usage{
-calc_nwstats_msm_whamp(time.unit = 7, method = 2, num.B, num.W, num.H.KC,
-  num.B.KC, num.O.KC, num.H.OW, num.B.OW, num.O.OW, num.H.EW, num.B.EW,
-  num.O.EW, agestr, deg.mp, deg.mp.H, deg.mp.B, deg.mp.O, deg.m.region,
-  prop.deg.p.EW, prop.deg.p.KC, prop.deg.p.OW, mdeg.inst, qnts.18to49,
-  qnts.50to59, inst.bho, inst.region, prop.hom.mpi.H, prop.hom.mpi.B,
-  prop.hom.mpi.O, sqrt.adiff.mpi, prop.hom.region.mpi, diss.main, diss.pers,
-  durs.main, durs.pers, ages, asmr.B, asmr.W, asmr.H..wa, asmr.B..wa,
-  asmr.O..wa, role.prob)
+calc_nwstats_msm_whamp(time.unit = 7, num.B, num.W, num.H.KC, num.B.KC,
+  num.O.KC, num.H.OW, num.B.OW, num.O.OW, num.H.EW, num.B.EW, num.O.EW, agestr,
+  deg.mp, deg.mp.H, deg.mp.B, deg.mp.O, deg.m.region, prop.deg.p.EW,
+  prop.deg.p.KC, prop.deg.p.OW, mdeg.inst, qnts.18to49, qnts.50to59, inst.bho,
+  inst.region, prop.hom.mpi.H, prop.hom.mpi.B, prop.hom.mpi.O, sqrt.adiff.mpi,
+  prop.hom.region.mpi, diss.main, diss.pers, durs.main, durs.pers, ages, asmr.B,
+  asmr.W, asmr.H..wa, asmr.B..wa, asmr.O..wa, role.prob)
 }
 \arguments{
 \item{time.unit}{Time unit relative to 1 for daily.}
-
-\item{method}{Method for calculating target statistics by race, with options of
-\code{2} for preserving race-specific statistics and \code{1} for
-averaging over the statistics and dropping the race-specific terms.}
 
 \item{num.B}{Population size of black MSM.}
 
