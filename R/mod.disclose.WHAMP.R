@@ -21,7 +21,7 @@
 #' @keywords module msm
 #' @export
 #'
-disclose_msm <- function(dat, at){
+disclose_msm_whamp <- function(dat, at){
 
   for (type in c("main", "pers", "inst")) {
 
