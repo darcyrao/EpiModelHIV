@@ -13,12 +13,12 @@ individual-level attributes, and summary statistics.}
 \item{at}{Current time step.}
 }
 \value{
-This function updates the individual-level attribute \code{inst.ai.class} on
+This function updates the individual-level attribute \code{riskg} on
 \code{dat$attr}.
 }
 \description{
-Module function for updating act class in one-off partnerships
-             based on probabilities of transition.
+Module function for updating act class in instantaneous partnerships
+             at age 50 for the WHAMP model.
 }
 \keyword{module}
 \keyword{msm}
