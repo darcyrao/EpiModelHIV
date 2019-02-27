@@ -22,7 +22,11 @@ Module function for births or entries into the sexually active
 }
 \details{
 New population members are added based on expected numbers of entries,
-stochastically determined with draws from Poisson distributions.
+stochastically determined with draws from Poisson distributions. The 
+expected number of entries is set to balance exits due to aging out and  
+background mortality, defined as the number of deaths among HIV-negative men plus
+the expected number of deaths among HIV+ if they were subject to general pop
+age-specific mortality (i.e. subtracting excess mortality due to disease).
 For each new entry, a set of attributes is added for that node,
 and the nodes are added onto the network objects. Only attributes that are
 a part of the network model formulae are updated as vertex attributes on the
