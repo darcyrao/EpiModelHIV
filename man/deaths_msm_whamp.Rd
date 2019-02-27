@@ -14,7 +14,7 @@ individual-level attributes, and summary statistics.}
 }
 \value{
 This function returns the updated \code{dat} object accounting for deaths.
-The deaths are deactivated from the main and casual networks, as those are in
+The deaths are deactivated from the main and persistent networks, as those are in
 \code{networkDynamic} class objects; dead nodes are not deleted from the
 instant network until the \code{\link{simnet_msm}} module for bookkeeping
 purposes.
@@ -26,12 +26,12 @@ Module function for simulting both general and disease-related
 }
 \details{
 Deaths are divided into two categories: general deaths, for which demographic
-data on age-specific mortality rates applies; and disease-related diseases,
-for which the rate of death is a function of progression to end-stage AIDS.
-Which nodes have died is determined stochastically for general deaths using
-draws from a binomial distribution, and deterministically for disease-related
-deaths after nodes have reach a maximum viral load value set in the
-\code{vl.fatal} parameter. This module also tracks nodes that age out of the network.
+data on age-specific mortality rates applies; and disease-related deaths,
+which are calculated by multiplying general age-specific mortality rates by a 
+scalar for persons living with HIV.
+Which nodes have died is determined stochastically using draws from binomial 
+distributions for both general and HIV-related deaths. This module also tracks 
+nodes that age out of the network.
 }
 \keyword{module}
 \keyword{msm}
