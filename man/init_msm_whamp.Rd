@@ -4,17 +4,13 @@
 \alias{init_msm_whamp}
 \title{Epidemic Model Initial Conditions for the WHAMP model}
 \usage{
-init_msm_whamp(nwstats, prev.B = 0.253, prev.W = 0.253, prev.H..wa = 0.08,
-  prev.B..wa = 0.12, prev.O..wa = 0.05, prev.ugc = 0, prev.rgc = 0,
-  prev.uct = 0, prev.rct = 0, ...)
+init_msm_whamp(nwstats, prev.H..wa = 0.08, prev.B..wa = 0.12,
+  prev.O..wa = 0.05, prev.ugc = 0, prev.rgc = 0, prev.uct = 0,
+  prev.rct = 0, ...)
 }
 \arguments{
 \item{nwstats}{Target statistics for the network model. An object of class
 \code{nwstats} output from \code{\link{calc_nwstats_msm}}.}
-
-\item{prev.B}{Initial disease prevalence among black MSM.}
-
-\item{prev.W}{Initial disease prevalence among white MSM.}
 
 \item{prev.H..wa}{Initial disease prevalence among Hispanic MSM.}
 

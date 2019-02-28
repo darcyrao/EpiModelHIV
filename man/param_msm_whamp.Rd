@@ -4,8 +4,8 @@
 \alias{param_msm_whamp}
 \title{Epidemic Model Parameters for the WHAMP model}
 \usage{
-param_msm_whamp(nwstats, race.method = 1, iti.coefs = c(415.796063738122,
-  5.46732489852761, -0.318623224804563), mean.age.iti = 36.77193,
+param_msm_whamp(nwstats, iti.coefs = c(415.796063738122, 5.46732489852761,
+  -0.318623224804563), mean.age.iti = 36.77193,
   testing.pattern = "interval", test.window.int = 21,
   tt.traj.KC.B.prob = c(0.081 * (1 - 0.841), 0.081 * (0.841), (1 - 0.081) * (1
   - 0.841), (1 - 0.081) * (0.841)), tt.traj.KC.H.prob = c(0.064 * (1 - 0.903),
@@ -80,9 +80,6 @@ param_msm_whamp(nwstats, race.method = 1, iti.coefs = c(415.796063738122,
 \arguments{
 \item{nwstats}{Target statistics for the network model. An object of class
 \code{nwstats} output from \code{\link{calc_nwstats_msm}}.}
-
-\item{race.method}{Number of races in the model, with options of 1 or 2. If    #-- Delete this when finish debugging
-1, then race-specific parameters will be averaged.}
 
 \item{iti.coefs}{GLM coefficients for median intertest interval among men who test
 (intercept, centered age, centered age squared)}

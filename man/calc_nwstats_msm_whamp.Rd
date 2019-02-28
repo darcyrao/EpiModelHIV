@@ -4,20 +4,16 @@
 \alias{calc_nwstats_msm_whamp}
 \title{Calculate Target Statistics for Network Model Estimation for the WHAMP model}
 \usage{
-calc_nwstats_msm_whamp(time.unit = 7, num.B, num.W, num.H.KC, num.B.KC,
-  num.O.KC, num.H.OW, num.B.OW, num.O.OW, num.H.EW, num.B.EW, num.O.EW, agestr,
-  deg.mp, deg.mp.H, deg.mp.B, deg.mp.O, deg.m.region, prop.deg.p.EW,
-  prop.deg.p.KC, prop.deg.p.OW, mdeg.inst, qnts.18to49, qnts.50to59, inst.bho,
-  inst.region, prop.hom.mpi.H, prop.hom.mpi.B, prop.hom.mpi.O, sqrt.adiff.mpi,
-  prop.hom.region.mpi, diss.main, diss.pers, durs.main, durs.pers, ages, asmr.B,
-  asmr.W, asmr.H..wa, asmr.B..wa, asmr.O..wa, role.prob)
+calc_nwstats_msm_whamp(time.unit = 7, num.H.KC, num.B.KC, num.O.KC, num.H.OW,
+  num.B.OW, num.O.OW, num.H.EW, num.B.EW, num.O.EW, agestr, deg.mp, deg.mp.H,
+  deg.mp.B, deg.mp.O, deg.m.region, prop.deg.p.EW, prop.deg.p.KC, prop.deg.p.OW,
+  mdeg.inst, qnts.18to49, qnts.50to59, inst.bho, inst.region, prop.hom.mpi.H,
+  prop.hom.mpi.B, prop.hom.mpi.O, sqrt.adiff.mpi, prop.hom.region.mpi,
+  diss.main, diss.pers, durs.main, durs.pers, ages, asmr.H..wa, asmr.B..wa,
+  asmr.O..wa, role.prob)
 }
 \arguments{
 \item{time.unit}{Time unit relative to 1 for daily.}
-
-\item{num.B}{Population size of black MSM.}
-
-\item{num.W}{Population size of white MSM.}
 
 \item{agestr}{Vector with the proportion of MSM in each age group 18-24, 25-29...50-59}
 
@@ -78,12 +74,6 @@ and instantaneous partnerships that are within-region.}
 
 \item{ages}{Integer vector of ages in years that defines range of possible
 initial ages in the population.}
-
-\item{asmr.B}{Vector of length 40 defining the age-specific
-mortality rate for persons within that age slot, for black MSM.}
-
-\item{asmr.W}{Vector of length 40 defining the age-specific
-mortality rate for persons within that age slot, for white MSM.}
 
 \item{asmr.H..wa}{Vector of length 60 defining the age-specific
 mortality rates for for Hispanic MSM.}
