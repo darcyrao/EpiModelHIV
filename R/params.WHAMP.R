@@ -610,8 +610,6 @@ init_msm_whamp <- function(nwstats,
 #' @param acts.FUN Module function to simulate the number of sexual acts within
 #'        partnerships.
 #' @param condoms.FUN Module function to simulate condom use within acts.
-#' @param riskhist.FUN Module function to calculate risk history for uninfected
-#'        persons in the population.
 #' @param position.FUN Module function to simulate sexual position within acts.
 #' @param trans.FUN Module function to stochastically simulate HIV transmission
 #'        over acts given individual and dyadic attributes.
@@ -658,7 +656,6 @@ control_msm_whamp <- function(simno = 1,
                         disclose.FUN = disclose_msm_whamp,
                         acts.FUN = acts_msm_whamp,
                         condoms.FUN = condoms_msm_whamp,
-                        riskhist.FUN = riskhist_msm_whamp,
                         position.FUN = position_msm_whamp,
                         trans.FUN = trans_msm_whamp,
                         stitrans.FUN = NULL,
