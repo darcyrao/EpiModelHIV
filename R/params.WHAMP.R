@@ -8,8 +8,6 @@
 #'
 #' @param nwstats Target statistics for the network model. An object of class
 #'        \code{nwstats} output from \code{\link{calc_nwstats_msm}}.
-#' @param race.method Number of races in the model, with options of 1 or 2. If    #-- Delete this when finish debugging
-#'        1, then race-specific parameters will be averaged.
 #' @param iti.coefs GLM coefficients for median intertest interval among men who test  
 #'        (intercept, centered age, centered age squared)
 #' @param mean.age.iti Mean age from the sample used to fit the GLM tor median ITI, 
@@ -302,7 +300,6 @@
 #' @export
 #'
 param_msm_whamp <- function(nwstats,
-                      race.method = 1, #-- Delete this when finish debugging
                       iti.coefs = c(415.796063738122, 5.46732489852761, -0.318623224804563),
                       mean.age.iti = 36.77193,
                       testing.pattern = "interval",
@@ -496,9 +493,6 @@ param_msm_whamp <- function(nwstats,
   
   p$modes <- 1
 
-  p$asmr.B <- nwstats$asmr.B #-- Delete this old code when finish debugging
-  p$asmr.W <- nwstats$asmr.W #-- Delete this old code when finish debugging
-
   p$asmr.H..wa <- nwstats$asmr.H..wa
   p$asmr.B..wa <- nwstats$asmr.B..wa
   p$asmr.O..wa <- nwstats$asmr.O..wa
@@ -518,8 +512,6 @@ param_msm_whamp <- function(nwstats,
 #'
 #' @param nwstats Target statistics for the network model. An object of class
 #'        \code{nwstats} output from \code{\link{calc_nwstats_msm}}.
-#' @param prev.B Initial disease prevalence among black MSM.
-#' @param prev.W Initial disease prevalence among white MSM.
 #' @param prev.H..wa Initial disease prevalence among Hispanic MSM.
 #' @param prev.B..wa Initial disease prevalence among non-Hispanic black MSM.
 #' @param prev.O..wa Initial disease prevalence among non-Hispanic other MSM.
@@ -537,8 +529,6 @@ param_msm_whamp <- function(nwstats,
 #'
 #' @export
 init_msm_whamp <- function(nwstats,
-                     prev.B = 0.253, #-- Delete this old code eventually
-                     prev.W = 0.253, #-- Delete this old code eventually
                      prev.H..wa = 0.08, #-- Surveillance data on prevalent diagnoses suggest 7.7% prevalence for Other, 17.3% for Black, 12.0% for Hispanic. Note this underestimates true prevalence bc it only counts diagnosed cases. We set starting prevalence to 70% of this for each group to reach equilibrium faster
                      prev.B..wa = 0.12,
                      prev.O..wa = 0.05,
@@ -551,8 +541,6 @@ init_msm_whamp <- function(nwstats,
   p <- get_args(formal.args = formals(sys.function()),
                 dot.args = list(...))
 
-  p$num.B <- nwstats$num.B   #-- Delete this old code eventually
-  p$num.W <- nwstats$num.W   #-- Delete this old code eventually
   p$num.H..wa <- nwstats$num.H.KC + nwstats$num.H.OW + nwstats$num.H.EW
   p$num.B..wa <- nwstats$num.B.KC + nwstats$num.B.OW + nwstats$num.B.EW
   p$num.O..wa <- nwstats$num.O.KC + nwstats$num.O.OW + nwstats$num.O.EW
@@ -562,9 +550,6 @@ init_msm_whamp <- function(nwstats,
   p$num.EW <- nwstats$num.H.EW + nwstats$num.B.EW + nwstats$num.O.EW
   
   p$ages <- nwstats$ages
-
-  p$init.prev.age.slope.B <- prev.B / ((max(p$ages) - min(p$ages) + 1)/2) #-- Delete this old code eventually
-  p$init.prev.age.slope.W <- prev.W / ((max(p$ages) - min(p$ages) + 1)/2) #-- Delete this old code eventually
 
   p$init.prev.age.slope.H..wa <- prev.H..wa / ((max(p$ages) - min(p$ages) + 1)/2) # Divide by half the age range to set the slope for prevalence by age
   p$init.prev.age.slope.B..wa <- prev.B..wa / ((max(p$ages) - min(p$ages) + 1)/2)
