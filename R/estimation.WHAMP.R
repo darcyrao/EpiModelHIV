@@ -12,8 +12,6 @@
 #'              defined.
 #'
 #' @param time.unit Time unit relative to 1 for daily.
-#' @param num.B Population size of black MSM.
-#' @param num.W Population size of white MSM.
 #' @param num.H..wa Population size of Hispanic MSM.
 #' @param num.B..wa Population size of non-Hispanic black MSM.
 #' @param num.O..wa Population size of non-Hispanic other MSM.
@@ -56,10 +54,6 @@
 #' @param durs.pers Duration of persistent partnerships in days. 
 #' @param ages Integer vector of ages in years that defines range of possible
 #'        initial ages in the population.
-#' @param asmr.B Vector of length 40 defining the age-specific
-#'        mortality rate for persons within that age slot, for black MSM.
-#' @param asmr.W Vector of length 40 defining the age-specific
-#'        mortality rate for persons within that age slot, for white MSM.
 #' @param asmr.H..wa Vector of length 60 defining the age-specific
 #'        mortality rates for for Hispanic MSM.
 #' @param asmr.B..wa Vector of length 60 defining the age-specific
@@ -85,8 +79,6 @@
 #' @export
 #'
 calc_nwstats_msm_whamp <- function(time.unit = 7,
-                             num.B,
-                             num.W,
                              num.H.KC,
                              num.B.KC,
                              num.O.KC,
@@ -120,8 +112,6 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
                              durs.main,
                              durs.pers,
                              ages,
-                             asmr.B,
-                             asmr.W,
                              asmr.H..wa,
                              asmr.B..wa,
                              asmr.O..wa,
@@ -192,7 +182,6 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   sqrt.adiff.m <- edges.m * sqrt.adiff.mpi[1]
 
   # Compile target stats: edges, nodefactor("deg.pers"), nodefactor("race"), nodefactor("region"), nodematch("race"), absdiff("sqrt.age")
-          ##-- confirm which level to omit for nodefactor terms, confirm how specify target stats for offset terms
   stats.m <- c(edges.m, totdeg.m.by.dp[2:3], totdeg.m.by.race[1:2], totdeg.m.by.region[c(1,3)], edges.hom.m.hbo, sqrt.adiff.m)
 
   # Dissolution model
@@ -252,7 +241,6 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   sqrt.adiff.p <- edges.p * sqrt.adiff.mpi[2]
 
   # Compile target statistics: edges, nodefactor("deg.main"), concurrent, nodematch("race"), nodematch("region"), absdiff(sqrt.age)
-    ##-- confirm which level to omit for nodefactor terms, confirm how specify target stats for offset terms
   stats.p <- c(edges.p, totdeg.p.by.dm[2], totdeg.p.by.race[1:2], totdeg.p.by.region[c(1,3)], conc.p, edges.hom.p.hbo, edges.hom.p.region, sqrt.adiff.p)
     
 
@@ -304,7 +292,6 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
   sqrt.adiff.i <- edges.i * sqrt.adiff.mpi[3]
 
   # Compile target stats: edges, nodefactor(c("deg.main", "deg.pers")), nodefactor("riskg") nodematch("race"), nodematch("region"), absdiff(sqrt.age)
-    ##-- confirm which level to omit for nodefactor terms, confirm how specify target stats for offset terms
   if (!is.na(qnts.18to49[1]) & !is.na(qnts.50to59[1])) {
     stats.i <- c(edges.i, num.inst[-1], num.riskg[-8], totdeg.i.bho[1:2], totdeg.i.region[c(1,3)], edges.hom.i.bho, edges.hom.i.region, sqrt.adiff.i)
   } else {
@@ -326,16 +313,12 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
 
   out$ages <- ages
   out$agestr <- agestr
-  out$asmr.B <- asmr.B
-  out$asmr.W <- asmr.W
   out$asmr.H..wa <- asmr.H..wa
   out$asmr.B..wa <- asmr.B..wa
   out$asmr.O..wa <- asmr.O..wa
 
   out$time.unit <- time.unit
   
-  out$num.B <- num.B
-  out$num.W <- num.W
   out$num.H.KC <- num.H.KC
   out$num.B.KC <- num.B.KC
   out$num.O.KC <- num.O.KC
@@ -388,8 +371,6 @@ calc_nwstats_msm_whamp <- function(time.unit = 7,
 #'
 base_nw_msm_whamp <- function(nwstats) {
 
-  num.B <- nwstats$num.B #-- delete when finish debugging
-  num.W <- nwstats$num.W #-- delete when finish debugging
   num.H.KC <- nwstats$num.H.KC
   num.B.KC <- nwstats$num.B.KC
   num.O.KC <- nwstats$num.O.KC
@@ -406,9 +387,6 @@ base_nw_msm_whamp <- function(nwstats) {
   nw <- network::network.initialize(n, directed = FALSE)
 
   # Calculate attributes
-  race <- c(rep("B", num.B), rep("W", num.W)) #-- delete when finish debugging
-  race <- sample(race) #-- delete when finish debugging
-  
   race.region <- c(rep("H.KC", num.H.KC), rep("B.KC", num.B.KC), rep("O.KC", num.O.KC),  
                    rep("H.OW", num.H.OW), rep("B.OW", num.B.OW), rep("O.OW", num.O.OW), 
                    rep("H.EW", num.H.EW), rep("B.EW", num.B.EW), rep("O.EW", num.O.EW))
