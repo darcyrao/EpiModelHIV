@@ -119,8 +119,8 @@ initialize_msm_whamp <- function(x, param, init, control, s) {
   # Circumcision
   circ <- rep(NA, num)
   circ[ids.H..wa] <- sample(apportion_lr(num.H..wa, 0:1, 1 - param$circ.H.prob))
-  circ[ids.B..wa] <- sample(apportion_lr(ids.B..wa, 0:1, 1 - param$circ.B.prob))
-  circ[ids.O..wa] <- sample(apportion_lr(ids.O..wa, 0:1, 1 - param$circ.O.prob))
+  circ[ids.B..wa] <- sample(apportion_lr(num.B..wa, 0:1, 1 - param$circ.B.prob))
+  circ[ids.O..wa] <- sample(apportion_lr(num.O..wa, 0:1, 1 - param$circ.O.prob))
   dat$attr$circ <- circ
 
   # PrEP Attributes
