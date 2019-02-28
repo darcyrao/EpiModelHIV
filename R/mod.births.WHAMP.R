@@ -130,23 +130,23 @@ setBirthAttr_msm_whamp <- function(dat, at, nBirths) {
   dat$attr$status[newIds] <- rep(0, nBirths)
 
   dat$attr$tt.traj[newIds[new.KC.B]] <- sample(apportion_lr(nBirths.KC.B, c(1, 2, 3, 4),
-                                           prob = dat$param$tt.traj.KC.B.prob))
+                                          proportions = dat$param$tt.traj.KC.B.prob))
   dat$attr$tt.traj[newIds[new.KC.H]] <- sample(apportion_lr(nBirths.KC.H, c(1, 2, 3, 4),
-                                                            prob = dat$param$tt.traj.KC.H.prob))
+                                          proportions = dat$param$tt.traj.KC.H.prob))
   dat$attr$tt.traj[newIds[new.KC.O]] <- sample(apportion_lr(nBirths.KC.O, c(1, 2, 3, 4),
-                                                            prob = dat$param$tt.traj.KC.O.prob))
+                                          proportions = dat$param$tt.traj.KC.O.prob))
   dat$attr$tt.traj[newIds[new.OW.B]] <- sample(apportion_lr(nBirths.OW.B, c(1, 2, 3, 4),
-                                                            prob = dat$param$tt.traj.OW.B.prob))
+                                          proportions = dat$param$tt.traj.OW.B.prob))
   dat$attr$tt.traj[newIds[new.OW.H]] <- sample(apportion_lr(nBirths.OW.H, c(1, 2, 3, 4),
-                                                            prob = dat$param$tt.traj.OW.H.prob))
+                                          proportions = dat$param$tt.traj.OW.H.prob))
   dat$attr$tt.traj[newIds[new.OW.O]] <- sample(apportion_lr(nBirths.OW.O, c(1, 2, 3, 4),
-                                                            prob = dat$param$tt.traj.OW.O.prob))
+                                          proportions = dat$param$tt.traj.OW.O.prob))
   dat$attr$tt.traj[newIds[new.EW.B]] <- sample(apportion_lr(nBirths.EW.B, c(1, 2, 3, 4),
-                                                            prob = dat$param$tt.traj.EW.B.prob))
+                                          proportions = dat$param$tt.traj.EW.B.prob))
   dat$attr$tt.traj[newIds[new.EW.H]] <- sample(apportion_lr(nBirths.EW.H, c(1, 2, 3, 4),
-                                                            prob = dat$param$tt.traj.EW.H.prob))
+                                          proportions = dat$param$tt.traj.EW.H.prob))
   dat$attr$tt.traj[newIds[new.EW.O]] <- sample(apportion_lr(nBirths.EW.O, c(1, 2, 3, 4),
-                                                            prob = dat$param$tt.traj.EW.O.prob))
+                                          proportions = dat$param$tt.traj.EW.O.prob))
   
   # Circumcision
   dat$attr$circ[newIds[newB..wa]] <- rbinom(nBirths.B..wa, 1, dat$param$circ.B.prob)
