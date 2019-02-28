@@ -12,11 +12,11 @@ control_msm_whamp(simno = 1, nsims = 1, ncores = 1, nsteps = 100,
   vl.FUN = vl_msm_whamp, aiclass.FUN = update_aiclass_msm_whamp,
   roleclass.FUN = NULL, resim_nets.FUN = simnet_msm_whamp,
   disclose.FUN = disclose_msm_whamp, acts.FUN = acts_msm_whamp,
-  condoms.FUN = condoms_msm_whamp, riskhist.FUN = riskhist_msm_whamp,
-  position.FUN = position_msm_whamp, trans.FUN = trans_msm_whamp,
-  stitrans.FUN = NULL, stirecov.FUN = NULL, stitx.FUN = NULL,
-  prev.FUN = prevalence_msm_whamp, verbose.FUN = verbose_msm,
-  save.nwstats = FALSE, verbose = TRUE, verbose.int = 1, ...)
+  condoms.FUN = condoms_msm_whamp, position.FUN = position_msm_whamp,
+  trans.FUN = trans_msm_whamp, stitrans.FUN = NULL, stirecov.FUN = NULL,
+  stitx.FUN = NULL, prev.FUN = prevalence_msm_whamp,
+  verbose.FUN = verbose_msm, save.nwstats = FALSE, verbose = TRUE,
+  verbose.int = 1, ...)
 }
 \arguments{
 \item{simno}{Unique ID for the simulation run, used for file naming purposes
@@ -66,9 +66,6 @@ step.}
 partnerships.}
 
 \item{condoms.FUN}{Module function to simulate condom use within acts.}
-
-\item{riskhist.FUN}{Module function to calculate risk history for uninfected
-persons in the population.}
 
 \item{position.FUN}{Module function to simulate sexual position within acts.}
 
