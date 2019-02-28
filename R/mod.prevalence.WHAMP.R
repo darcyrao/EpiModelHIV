@@ -29,7 +29,6 @@ prevalence_msm_whamp <- function(dat, at) {
   # Attributes
 
   active <- dat$attr$active
-  race <- dat$attr$race #-- delete this when finish de-bugging
   race..wa <- dat$attr$race..wa
   region <- dat$attr$region
   status <- dat$attr$status
@@ -50,8 +49,6 @@ prevalence_msm_whamp <- function(dat, at) {
 
   if (at == 1) {
     dat$epi$num <- rNA
-    dat$epi$num.B <- rNA #-- delete this when finish de-bugging
-    dat$epi$num.W <- rNA #-- delete this when finish de-bugging
     dat$epi$num.H..wa <- rNA
     dat$epi$num.B..wa <- rNA
     dat$epi$num.O..wa <- rNA
@@ -60,8 +57,6 @@ prevalence_msm_whamp <- function(dat, at) {
     dat$epi$num.EW <- rNA
     dat$epi$s.num <- rNA
     dat$epi$i.num <- rNA
-    dat$epi$i.num.B <- rNA  #-- delete this when finish de-bugging
-    dat$epi$i.num.W <- rNA #-- delete this when finish de-bugging
     dat$epi$i.num.H..wa <- rNA
     dat$epi$i.num.B..wa <- rNA
     dat$epi$i.num.O..wa <- rNA

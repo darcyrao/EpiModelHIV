@@ -25,7 +25,6 @@ test_msm_whamp <- function(dat, at) {
   age <- dat$attr$age
   diag.status <- dat$attr$diag.status
   diag.time <- dat$attr$diag.time
-  race <- dat$attr$race #-- Delete when finish debugging
   race..wa <- dat$attr$race..wa
   tt.traj <- dat$attr$tt.traj
   status <- dat$attr$status

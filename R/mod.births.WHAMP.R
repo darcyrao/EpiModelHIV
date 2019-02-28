@@ -77,14 +77,6 @@ setBirthAttr_msm_whamp <- function(dat, at, nBirths) {
   
   # Distribute new births by race/ethnicity and region according to proportion of the population in each group
     
-    #-- Delete when finish debugging
-    race <- sample(apportion_lr(nBirths, c("B", "W"), c(0.5, 0.5))) #-- Assign old race attribute until finish revising code
-    newB <- which(race == "B") #-- Delete when finish de-bugging
-    newW <- which(race == "W") #-- Delete when finish de-bugging
-    nBirths.B <- length(newB) #-- Delete when finish de-bugging
-    nBirths.W <- length(newW) #-- Delete when finish de-bugging
-    dat$attr$race[newIds] <- race #-- Delete when finish de-bugging
-  
   ## Vector with the proportion of Hispanic, black, and other race/ethnicity men in King County, other western WA, and eastern WA
   prop.race.region <- sumto1(c(0.0549, 0.0421, 0.4739, 0.0309, 0.0166, 0.2807, 0.0222, 0.0021, 0.0767))
   

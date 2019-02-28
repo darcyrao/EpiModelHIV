@@ -84,13 +84,7 @@ initialize_msm_whamp <- function(x, param, init, control, s) {
   ids.B..wa <- which(dat$attr$race..wa == "B")
   ids.O..wa <- which(dat$attr$race..wa == "O")
 
-    ##--ORIGINAL - DELETE AFTER FINISH DEBUGGING
-    dat$attr$race <- get.vertex.attribute(nw[[1]], "race")
-    num.B <- dat$init$num.B
-    num.W <- dat$init$num.W
-    ids.B <- which(dat$attr$race == "B")
-    ids.W <- which(dat$attr$race == "W")
-    
+   
   # Region
   dat$attr$region <- get.vertex.attribute(nw[[1]], "region")
   num.KC <- dat$init$num.KC
@@ -291,12 +285,9 @@ remove_bad_roles_msm <- function(nw) {
 init_status_msm_whamp <- function(dat) {
 
   age <- dat$attr$age
-  race <- dat$attr$race #-- Delete this old code when finish debugging
   race..wa <- dat$attr$race..wa
   region <- dat$attr$region
   
-  ids.B <- which(dat$attr$race == "B")
-  ids.W <- which(dat$attr$race == "W")
   ids.B..wa <- which(dat$attr$race..wa == "B")
   ids.H..wa <- which(dat$attr$race..wa == "H")
   ids.O..wa <- which(dat$attr$race..wa == "O")
@@ -310,8 +301,6 @@ init_status_msm_whamp <- function(dat) {
   ids.EW.H <- which(dat$attr$race..wa == "H" & dat$attr$region == "EW")
   ids.EW.O <- which(dat$attr$race..wa == "O" & dat$attr$region == "EW")
   
-  num.B <- dat$init$num.B #-- Delete this old code eventually 
-  num.W <- dat$init$num.W #-- Delete this old code eventually 
   num.B..wa <- dat$init$num.B..wa
   num.H..wa <- dat$init$num.H..wa
   num.O..wa <- dat$init$num.O..wa
@@ -328,25 +317,11 @@ init_status_msm_whamp <- function(dat) {
   num <- num.H..wa + num.B..wa + num.O..wa
 
   # Number initially infected by race/ethnicity
-    nInfB <- round(dat$init$prev.B * num.B) #-- Delete this old code when finish debugging
-    nInfW <- round(dat$init$prev.W * num.W) #-- Delete this old code when finish debugging
-  
   nInfH..wa <- round(dat$init$prev.H..wa * num.H..wa)
   nInfB..wa <- round(dat$init$prev.B..wa * num.B..wa)
   nInfO..wa <- round(dat$init$prev.O..wa * num.O..wa)
 
   # Age-based infection probability
-    probInfCrB <- age[ids.B] * dat$init$init.prev.age.slope.B #-- Delete this old code when finish debugging
-    probInfB <- probInfCrB + (nInfB - sum(probInfCrB)) / num.B #-- Delete this old code when finish debugging
-
-    probInfCrW <- age[ids.W] * dat$init$init.prev.age.slope.W #-- Delete this old code when finish debugging
-    probInfW <- probInfCrW + (nInfW - sum(probInfCrW)) / num.W #-- Delete this old code when finish debugging
-
-    if (any(probInfB <= 0) | any(probInfW <= 0)) {  #-- Delete this old code when finish debugging
-      stop("Slope of initial prevalence by age must be sufficiently low to ",
-           "avoid non-positive probabilities.", call. = FALSE)
-    }
-
   probInfCrH..wa <- age[ids.H..wa] * dat$init$init.prev.age.slope.H..wa 
   probInfH..wa <- probInfCrH..wa + (nInfH..wa - sum(probInfCrH..wa)) / num.H..wa
   
@@ -732,20 +707,15 @@ init_status_msm_whamp <- function(dat) {
 #'
 init_ccr5_msm_whamp <- function(dat) {
 
-  num.B <- dat$init$num.B
-  num.W <- dat$init$num.W
   num.H..wa <- dat$init$num.H..wa
   num.B..wa <- dat$init$num.B..wa
   num.O..wa <- dat$init$num.O..wa
   num <- num.H..wa + num.B..wa + num.O..wa
-  
-  ids.B <- which(dat$attr$race == "B")
-  ids.W <- which(dat$attr$race == "W")
+
   ids.H..wa <- which(dat$attr$race..wa == "H")
   ids.B..wa <- which(dat$attr$race..wa == "B")
   ids.O..wa <- which(dat$attr$race..wa == "O")
   
-  race <- dat$attr$race #-- Delete this code eventually
   race..wa <- dat$attr$race..wa
   status <- dat$attr$status
 
