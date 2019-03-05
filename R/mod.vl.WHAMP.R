@@ -59,7 +59,7 @@ vl_msm_whamp <- function(dat, at) {
   part.supp.up.slope <- dat$param$part.supp.up.slope
   
   # Calculations
-  vlds <- (vlaidsp - vlsp) / vl.aids.int
+  vlds <- (vlaidsp - vlsp) / vldd
 
   ## Process
 
