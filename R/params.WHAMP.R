@@ -327,6 +327,7 @@ param_msm_whamp <- function(nwstats,
                       tx.reinit.full.EW.B = 0.0219,
                       tx.reinit.full.EW.H = 0.0209,
                       tx.reinit.full.EW.O = 0.0237,
+                      tx.reinit.part.rr = 0.5,
 
                       max.time.off.tx.int = 520 * 7,
                       sympt.onset.int = 2737.5,
