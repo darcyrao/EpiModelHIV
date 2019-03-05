@@ -4,8 +4,9 @@
 \alias{param_msm_whamp}
 \title{Epidemic Model Parameters for the WHAMP model}
 \usage{
-param_msm_whamp(nwstats, iti.coefs = c(415.796063738122, 5.46732489852761,
-  -0.318623224804563), mean.age.iti = 36.77193,
+param_msm_whamp(nwstats, racedist = sumto1(c(0.0549, 0.0421, 0.4739, 0.0309,
+  0.0166, 0.2807, 0.0222, 0.0021, 0.0767)), iti.coefs = c(415.796063738122,
+  5.46732489852761, -0.318623224804563), mean.age.iti = 36.77193,
   testing.pattern = "interval", test.window.int = 21,
   tt.traj.KC.B.prob = c(0.081 * (1 - 0.839), 0.081 * (0.839), (1 - 0.081) * (1
   - 0.839), (1 - 0.081) * (0.839)), tt.traj.KC.H.prob = c(0.064 * (1 - 0.902),
@@ -57,7 +58,7 @@ param_msm_whamp(nwstats, iti.coefs = c(415.796063738122, 5.46732489852761,
   vv.iev.prob = 0.42, prep.start = Inf, prep.class.prob = c(0.089, 0.127,
   0.784), prep.class.hr = c(0.69, 0.19, 0.05),
   prep.coverage.init.region = c(0.4392, 0.2655), prep.cov.method = "curr",
-  prep.scaleup.rate = c(1, 1), prep.cov.max.region = c(0.7497, 0.6232),
+  prep.scaleup.rate = c(0, 0), prep.cov.max.region = c(0.7497, 0.6232),
   prep.init.rate = 1, prep.tst.int = 90, prep.risk.int = 365,
   prep.risk.reassess.method = "inst", prep.discont = 0.3,
   prep.discont.prob = 0.017724, rcomp.prob = 0, rcomp.adh.groups = 1:3,
@@ -78,6 +79,10 @@ param_msm_whamp(nwstats, iti.coefs = c(415.796063738122, 5.46732489852761,
 \arguments{
 \item{nwstats}{Target statistics for the network model. An object of class
 \code{nwstats} output from \code{\link{calc_nwstats_msm}}.}
+
+\item{racedist}{Population distribution by race/ethnicity and region (King County Hispanic,
+black, other; other western WA Hispanic, black, and other, eastern WA Hispanic,
+black, and other)}
 
 \item{iti.coefs}{GLM coefficients for median intertest interval among men who test
 (intercept, centered age, centered age squared)}
