@@ -8,6 +8,9 @@
 #'
 #' @param nwstats Target statistics for the network model. An object of class
 #'        \code{nwstats} output from \code{\link{calc_nwstats_msm}}.
+#' @param racedist Population distribution by race/ethnicity and region (King County Hispanic,
+#'        black, other; other western WA Hispanic, black, and other, eastern WA Hispanic,
+#'        black, and other)
 #' @param iti.coefs GLM coefficients for median intertest interval among men who test  
 #'        (intercept, centered age, centered age squared)
 #' @param mean.age.iti Mean age from the sample used to fit the GLM tor median ITI, 
@@ -291,6 +294,9 @@
 #' @export
 #'
 param_msm_whamp <- function(nwstats,
+                            
+                      racedist = sumto1(c(0.0549, 0.0421, 0.4739, 0.0309, 0.0166, 0.2807, 0.0222, 0.0021, 0.0767)),
+                      
                       iti.coefs = c(415.796063738122, 5.46732489852761, -0.318623224804563),
                       mean.age.iti = 36.77193,
                       testing.pattern = "interval",
