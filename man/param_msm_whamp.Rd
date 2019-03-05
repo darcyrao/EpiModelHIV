@@ -29,15 +29,16 @@ param_msm_whamp(nwstats, iti.coefs = c(415.796063738122, 5.46732489852761,
   tx.reinit.full.KC.O = 0.0275, tx.reinit.full.OW.B = 0.02,
   tx.reinit.full.OW.H = 0.0195, tx.reinit.full.OW.O = 0.0223,
   tx.reinit.full.EW.B = 0.0219, tx.reinit.full.EW.H = 0.0209,
-  tx.reinit.full.EW.O = 0.0237, max.time.off.tx.int = 520 * 7,
-  sympt.onset.int = 2737.5, vl.acute.rise.int = 45, vl.acute.peak = 6.886,
-  vl.acute.fall.int = 45, vl.set.point = 4.5, vl.aids.onset.int = 520 * 7,
-  vl.aids.int = 52 * 2 * 7, vl.aids.peak = 7, vl.full.supp = 1.5,
-  vl.part.supp = 3.5, full.supp.down.slope = 0.75,
-  full.supp.up.slope = 0.75, part.supp.down.slope = 0.25,
-  part.supp.up.slope = 0.75, growth.rate = 1.0001441/7, birth.age = 18,
-  exit.age = 60, asmr.rr.pos = c(3.791, 2.974, 1.984), URAI.prob = 0.0082
-  * 1.09, UIAI.prob = 0.0031 * 1.09, acute.rr = 6, circ.rr = 0.4,
+  tx.reinit.full.EW.O = 0.0237, tx.reinit.part.rr = 0.5,
+  max.time.off.tx.int = 520 * 7, sympt.onset.int = 2737.5,
+  vl.acute.rise.int = 45, vl.acute.peak = 6.886, vl.acute.fall.int = 45,
+  vl.set.point = 4.5, vl.aids.onset.int = 520 * 7, vl.aids.int = 52 * 2 *
+  7, vl.aids.peak = 7, vl.full.supp = 1.5, vl.part.supp = 3.5,
+  full.supp.down.slope = 0.75, full.supp.up.slope = 0.75,
+  part.supp.down.slope = 0.25, part.supp.up.slope = 0.75,
+  growth.rate = 1.0001441/7, birth.age = 18, exit.age = 60,
+  asmr.rr.pos = c(3.791, 2.974, 1.984), URAI.prob = 0.0082 * 1.09,
+  UIAI.prob = 0.0031 * 1.09, acute.rr = 6, circ.rr = 0.4,
   condom.rr = 0.295, disc.outset.main.prob = 1,
   disc.at.diag.main.prob = 1, disc.post.diag.main.prob = 0,
   disc.outset.pers.prob = 0.5671, disc.at.diag.pers.prob = 1,
@@ -169,6 +170,9 @@ not currently on treatment but who have been in the past will re-initiate}
 
 \item{tx.reinit.full.EW.O}{Probability per time step that other MSM in EW who are full suppressors and
 not currently on treatment but who have been in the past will re-initiate}
+
+\item{tx.reinit.part.rr}{Relative risk of reinitiating treatment per time step for a partial suppressor
+currently on treatment, as compared to a full suppressor}
 
 \item{max.time.off.tx.int}{Number of days off treatment for a before onset of AIDS, 
 including time before diagnosis.}
@@ -483,9 +487,6 @@ a condom used by the insertive partner.}
 given dual infection with both gonorrhea and chlamydia.}
 
 \item{...}{Additional arguments passed to the function.}
-
-\item{tx.reinit.part.rr}{Relative risk of reinitiating treatment per time step for a partial suppressor
-currently on treatment, as compared to a full suppressor}
 }
 \value{
 A list object of class \code{param_msm}, which can be passed to
