@@ -7,29 +7,29 @@
 param_msm_whamp(nwstats, iti.coefs = c(415.796063738122, 5.46732489852761,
   -0.318623224804563), mean.age.iti = 36.77193,
   testing.pattern = "interval", test.window.int = 21,
-  tt.traj.KC.B.prob = c(0.081 * (1 - 0.841), 0.081 * (0.841), (1 - 0.081) * (1
-  - 0.841), (1 - 0.081) * (0.841)), tt.traj.KC.H.prob = c(0.064 * (1 - 0.903),
-  0.064 * (0.903), (1 - 0.064) * (1 - 0.903), (1 - 0.064) * (0.903)),
-  tt.traj.KC.O.prob = c(0.105 * (1 - 0.921), 0.105 * (0.921), (1 - 0.105) * (1
-  - 0.921), (1 - 0.105) * (0.921)), tt.traj.OW.B.prob = c(0.121 * (1 - 0.813),
-  0.121 * (0.813), (1 - 0.121) * (1 - 0.813), (1 - 0.121) * (0.813)),
-  tt.traj.OW.H.prob = c(0.102 * (1 - 0.886), 0.102 * (0.886), (1 - 0.102) * (1
-  - 0.886), (1 - 0.102) * (0.886)), tt.traj.OW.O.prob = c(0.148 * (1 - 0.906),
-  0.148 * (0.906), (1 - 0.148) * (1 - 0.906), (1 - 0.148) * (0.906)),
-  tt.traj.EW.B.prob = c(0.162 * (1 - 0.765), 0.162 * (0.765), (1 - 0.162) * (1
-  - 0.765), (1 - 0.162) * (0.765)), tt.traj.EW.H.prob = c(0.14 * (1 - 0.849),
-  0.14 * (0.849), (1 - 0.14) * (1 - 0.849), (1 - 0.14) * (0.849)),
-  tt.traj.EW.O.prob = c(0.192 * (1 - 0.876), 0.192 * (0.876), (1 - 0.192) * (1
-  - 0.876), (1 - 0.192) * (0.876)), tx.init.int.KC.B = 46,
+  tt.traj.KC.B.prob = c(0.081 * (1 - 0.839), 0.081 * (0.839), (1 - 0.081) * (1
+  - 0.839), (1 - 0.081) * (0.839)), tt.traj.KC.H.prob = c(0.064 * (1 - 0.902),
+  0.064 * (0.902), (1 - 0.064) * (1 - 0.902), (1 - 0.064) * (0.902)),
+  tt.traj.KC.O.prob = c(0.105 * (1 - 0.92), 0.105 * (0.92), (1 - 0.105) * (1 -
+  0.92), (1 - 0.105) * (0.92)), tt.traj.OW.B.prob = c(0.121 * (1 - 0.811),
+  0.121 * (0.811), (1 - 0.121) * (1 - 0.811), (1 - 0.121) * (0.811)),
+  tt.traj.OW.H.prob = c(0.102 * (1 - 0.885), 0.102 * (0.885), (1 - 0.102) * (1
+  - 0.885), (1 - 0.102) * (0.885)), tt.traj.OW.O.prob = c(0.148 * (1 - 0.905),
+  0.148 * (0.905), (1 - 0.148) * (1 - 0.905), (1 - 0.148) * (0.905)),
+  tt.traj.EW.B.prob = c(0.162 * (1 - 0.759), 0.162 * (0.759), (1 - 0.162) * (1
+  - 0.759), (1 - 0.162) * (0.759)), tt.traj.EW.H.prob = c(0.14 * (1 - 0.847),
+  0.14 * (0.847), (1 - 0.14) * (1 - 0.847), (1 - 0.14) * (0.847)),
+  tt.traj.EW.O.prob = c(0.192 * (1 - 0.874), 0.192 * (0.874), (1 - 0.192) * (1
+  - 0.874), (1 - 0.192) * (0.874)), tx.init.int.KC.B = 46,
   tx.init.int.KC.H = 43, tx.init.int.KC.O = 47, tx.init.int.OW.B = 56,
   tx.init.int.OW.H = 53, tx.init.int.OW.O = 57, tx.init.int.EW.B = 53,
   tx.init.int.EW.H = 50, tx.init.int.EW.O = 53,
-  tx.halt.full = 0.001010551, tx.halt.part.rr = 2,
-  tx.reinit.full.KC.B = 0.0098, tx.reinit.full.KC.H = 0.0099,
-  tx.reinit.full.KC.O = 0.0116, tx.reinit.full.OW.B = 0.0078,
-  tx.reinit.full.OW.H = 0.008, tx.reinit.full.OW.O = 0.0091,
-  tx.reinit.full.EW.B = 0.0085, tx.reinit.full.EW.H = 0.0085,
-  tx.reinit.full.EW.O = 0.0097, max.time.off.tx.int = 520 * 7,
+  tx.halt.full = 0.002226782, tx.halt.part.rr = 2,
+  tx.reinit.full.KC.B = 0.0244, tx.reinit.full.KC.H = 0.0239,
+  tx.reinit.full.KC.O = 0.0275, tx.reinit.full.OW.B = 0.02,
+  tx.reinit.full.OW.H = 0.0195, tx.reinit.full.OW.O = 0.0223,
+  tx.reinit.full.EW.B = 0.0219, tx.reinit.full.EW.H = 0.0209,
+  tx.reinit.full.EW.O = 0.0237, max.time.off.tx.int = 520 * 7,
   sympt.onset.int = 2737.5, vl.acute.rise.int = 45, vl.acute.peak = 6.886,
   vl.acute.fall.int = 45, vl.set.point = 4.5, vl.aids.onset.int = 520 * 7,
   vl.aids.int = 52 * 2 * 7, vl.aids.peak = 7, vl.full.supp = 1.5,
@@ -55,11 +55,8 @@ param_msm_whamp(nwstats, iti.coefs = c(415.796063738122, 5.46732489852761,
   cond.diag.inst.beta = -0.67, cond.discl.inst.beta = -0.85,
   vv.iev.prob = 0.42, prep.start = Inf, prep.class.prob = c(0.089, 0.127,
   0.784), prep.class.hr = c(0.69, 0.19, 0.05),
-  prep.coverage.init.KC = c(0.1093, 0.4644, 0.526, 0.4926),
-  prep.coverage.init.oth = c(0.1566, 0.1962, 0.4143, 0.0742),
-  prep.cov.method = "curr", prep.scaleup.KC.rate = c(1, 1, 1, 1),
-  prep.scaleup.oth.rate = c(1, 1, 1, 1), prep.cov.max.KC = c(0.7734, 0.741,
-  0.7754, 0.6125), prep.cov.max.oth = c(0.6553, 0.7485, 0.6568, 0.3854),
+  prep.coverage.init.region = c(0.4392, 0.2655), prep.cov.method = "curr",
+  prep.scaleup.rate = c(1, 1), prep.cov.max.region = c(0.7497, 0.6232),
   prep.init.rate = 1, prep.tst.int = 90, prep.risk.int = 365,
   prep.risk.reassess.method = "inst", prep.discont = 0.3,
   prep.discont.prob = 0.017724, rcomp.prob = 0, rcomp.adh.groups = 1:3,
@@ -353,35 +350,23 @@ medium adherence, or high adherence groups.}
 \item{prep.class.hr}{The hazard ratio for infection per act associated with each
 level of adherence.}
 
-\item{prep.coverage.init.KC}{Vector of length 4 for the proportion of eligible men 
+\item{prep.coverage.init.region}{Vector of length 2 for the proportion of eligible men 
 (eligibility defined by CAI and discordant partnership status in line with 
-WA State guidelines) in each age group (18-24, 25-29, 30-49, 50-59) in
-King County who are to start PrEP once they become eligible in \code{prep.start}.}
-
-\item{prep.coverage.init.oth}{Vector of length 4 for the proportion of eligible men 
-(eligibility defined by CAI and discordant partnership status in line with 
-WA State guidelines) in each age group (18-24, 25-29, 30-49, 50-59) in
-other WA counties who are to start PrEP once they become eligible in \code{prep.start}.}
+WA State guidelines) in King County and other counties in WA who are allowed 
+to start PrEP once they become eligible at the time step in which PrEP is initiated
+(as specified in \code{prep.start}).}
 
 \item{prep.cov.method}{The method for calculating PrEP coverage, with options
 of \code{"curr"} to base the numerator on the number of people currently
 on PrEP and \code{"ever"} to base it on the number of people ever on
 PrEP.}
 
-\item{prep.scaleup.KC.rate}{Vector of length 4 for the rates at which PrEP is
-scaled up per day from \code{prep.start} for each age group 
-(18-24, 25-29, 30-49, 50-59) in King County.}
+\item{prep.scaleup.rate}{Vector of length 2 for the rate at which PrEP is
+scaled up per day from \code{prep.start} for each region (KC vs. other)}
 
-\item{prep.scaleup.oth.rate}{Vector of length 4 for the rates at which PrEP is
-scaled up per day from \code{prep.start} for each age group 
-(18-24, 25-29, 30-49, 50-59) in other WA counties.}
-
-\item{prep.cov.max.KC}{Vector of length 4 for the maximum attainable PrEP coverage
-for each age group in KC. Upon reaching these values, PrEP uptake will stabilize.}
-
-\item{prep.cov.max.oth}{Vector of length 4 for the maximum attainable PrEP coverage
-for each age group in other WA counties. Upon reaching these values, PrEP uptake 
-will stabilize.}
+\item{prep.cov.max.region}{Vector of length 2 for the maximum attainable PrEP coverage
+for each region (King County vs. other counties). Upon reaching these values, 
+PrEP uptake will stabilize.}
 
 \item{prep.init.rate}{The rate at which persons initiate PrEP conditional on
 their eligibility, with 1 equal to instant start.}
