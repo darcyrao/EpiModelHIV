@@ -33,11 +33,7 @@ births_msm_whamp <- function(dat, at){
   nBirths.age <- dat$epi$dth.age[at] # Births to replace those who aged out
   
   ## Determine the number of additional births to add to achieve the specified population growth
-  if (at == 1) {
-    nBirths.growth <- round(sum(dat$epi$num.H..wa[at], dat$epi$num.B..wa[at], dat$epi$num.O..wa[at])*(dat$param$growth.rate - 1))
-  } else {
-    nBirths.growth <- round(sum(dat$epi$num.H..wa[at - 1], dat$epi$num.B..wa[at - 1], dat$epi$num.O..wa[at - 1])*(dat$param$growth.rate - 1))
-  }
+  nBirths.growth <- round(sum(dat$epi$num.H..wa[at - 1], dat$epi$num.B..wa[at - 1], dat$epi$num.O..wa[at - 1])*(dat$param$growth.rate - 1))
   
   nBirths <- nBirths.gen + nBirths.age + nBirths.growth
   
