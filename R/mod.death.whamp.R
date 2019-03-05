@@ -27,7 +27,7 @@
 #' @export
 #'
 deaths_msm_whamp <- function(dat, at) {
-
+  
   ## General deaths among HIV-neg (includes deaths from aging out of the population b/c asmr = 1 at age 60)
   age <- floor(dat$attr$age)
   race..wa <- dat$attr$race..wa
@@ -49,8 +49,8 @@ deaths_msm_whamp <- function(dat, at) {
   deaths.O..wa.neg <- alive.O..wa.neg[rbinom(length(death.O.prob..wa.neg), 1, death.O.prob..wa.neg) == 1]
   
   dth.neg..wa <- c(deaths.H..wa.neg, deaths.B..wa.neg, deaths.O..wa.neg)
-
-
+  
+  
   ## Disease deaths among HIV-pos
   asmr.H..wa.pos <-  c(dat$param$asmr.H..wa[1:17], 
                        dat$param$asmr.H..wa[18:44]*dat$param$asmr.rr.pos[1], 
@@ -91,20 +91,20 @@ deaths_msm_whamp <- function(dat, at) {
   ### Calculate the excepted number of deaths among HIV-pos if they experienced the background general pop ASMRs 
   ### (for use in determining the number of births to balance out background mortality
   death.H.prob..wa.pos.bkg <-  dat$param$asmr.H..wa[age.H..wa.pos]
-  deaths.H..wa.pos.bkg <- length(rbinom(length(death.H.prob..wa.pos.bkg), 1, death.H.prob..wa.pos.bkg) == 1)
+  deaths.H..wa.pos.bkg <- sum(rbinom(length(death.H.prob..wa.pos.bkg), 1, death.H.prob..wa.pos.bkg) == 1)
   
   death.B.prob..wa.pos.bkg <-  dat$param$asmr.B..wa[age.B..wa.pos]
-  deaths.B..wa.pos.bkg <- length(rbinom(length(death.B.prob..wa.pos.bkg), 1, death.B.prob..wa.pos.bkg) == 1)
+  deaths.B..wa.pos.bkg <- sum(rbinom(length(death.B.prob..wa.pos.bkg), 1, death.B.prob..wa.pos.bkg) == 1)
   
   death.O.prob..wa.pos.bkg <-  dat$param$asmr.O..wa[age.O..wa.pos]
-  deaths.O..wa.pos.bkg <- length(rbinom(length(death.O.prob..wa.pos.bkg), 1, death.O.prob..wa.pos.bkg) == 1)
+  deaths.O..wa.pos.bkg <- sum(rbinom(length(death.O.prob..wa.pos.bkg), 1, death.O.prob..wa.pos.bkg) == 1)
   
   dth.pos.bkg <- sum(deaths.H..wa.pos.bkg, deaths.B..wa.pos.bkg, deaths.O..wa.pos.bkg)
   
   ## Combine
   dth.all..wa <- NULL
   dth.all..wa <- unique(c(dth.neg..wa, dth.pos..wa))
-
+  
   if (length(dth.all..wa) > 0) {
     dat$attr$active[dth.all..wa] <- 0
     for (i in 1:3) {
@@ -115,7 +115,7 @@ deaths_msm_whamp <- function(dat, at) {
       stop("mismatch between el and attr length in death mod")
     }
   }
-
+  
   ## Aging out of the network
   dth.age <- which(age >= dat$param$exit.age)
   dth.age.neg <- which(age >= dat$param$exit.age & status == 0) # define these separately so can subract them below
@@ -126,7 +126,7 @@ deaths_msm_whamp <- function(dat, at) {
   dat$epi$dth.pos..wa[at] <- max(0, length(dth.pos..wa) - length(dth.age.pos))
   dat$epi$dth.age[at] <- max(0, length(dth.age))
   dat$epi$dth.pos.bkg[at] <- max(0, dth.pos.bkg - length(dth.age.pos))
-
+  
   return(dat)
 }
 
