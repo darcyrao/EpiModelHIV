@@ -54,18 +54,18 @@ tx_msm_whamp <- function(dat, at) {
   tx.init.int[race..wa == "H" & region == "EW"] <- dat$param$tx.init.int.EW.H
   tx.init.int[race..wa == "O" & region == "EW"] <- dat$param$tx.init.int.EW.O
   
-  tx.halt.full <- dat$param$tx.halt.full
+  tx.halt.full.prob <- dat$param$tx.halt.full
   tx.halt.part.rr <- dat$param$tx.halt.part.rr
   
-  tx.reinit.full.KC.B <- dat$param$tx.reinit.full.KC.B
-  tx.reinit.full.KC.H <- dat$param$tx.reinit.full.KC.H
-  tx.reinit.full.KC.O <- dat$param$tx.reinit.full.KC.O
-  tx.reinit.full.OW.B <- dat$param$tx.reinit.full.OW.B
-  tx.reinit.full.OW.H <- dat$param$tx.reinit.full.OW.H
-  tx.reinit.full.OW.O <- dat$param$tx.reinit.full.OW.O
-  tx.reinit.full.EW.B <- dat$param$tx.reinit.full.EW.B
-  tx.reinit.full.EW.H <- dat$param$tx.reinit.full.EW.H
-  tx.reinit.full.EW.O <- dat$param$tx.reinit.full.EW.O
+  tx.reinit.full.KC.B.prob <- dat$param$tx.reinit.full.KC.B
+  tx.reinit.full.KC.H.prob <- dat$param$tx.reinit.full.KC.H
+  tx.reinit.full.KC.O.prob <- dat$param$tx.reinit.full.KC.O
+  tx.reinit.full.OW.B.prob <- dat$param$tx.reinit.full.OW.B
+  tx.reinit.full.OW.H.prob <- dat$param$tx.reinit.full.OW.H
+  tx.reinit.full.OW.O.prob <- dat$param$tx.reinit.full.OW.O
+  tx.reinit.full.EW.B.prob <- dat$param$tx.reinit.full.EW.B
+  tx.reinit.full.EW.H.prob <- dat$param$tx.reinit.full.EW.H
+  tx.reinit.full.EW.O.prob <- dat$param$tx.reinit.full.EW.O
   
   tx.reinit.part.rr <- dat$param$tx.reinit.part.rr
   
@@ -83,111 +83,59 @@ tx_msm_whamp <- function(dat, at) {
   ## Halting
   tx.halt.elig.full <- which(tx.status == 1 & tt.traj %in% c(2,4))
   tx.halt.full <- tx.halt.elig.full[rbinom(length(tx.halt.elig.full), 1,
-                                     tx.halt.full) == 1]
+                                     tx.halt.full.prob) == 1]
   
   tx.halt.elig.part <- which(tx.status == 1 & tt.traj %in% c(1,3))
   tx.halt.part <- tx.halt.elig.part[rbinom(length(tx.halt.elig.part), 1,
-                                           (tx.halt.full * tx.halt.part.rr)) == 1]
+                                           (tx.halt.full.prob * tx.halt.part.rr)) == 1]
 
   tx.halt <- c(tx.halt.full, tx.halt.part)
   dat$attr$tx.status[tx.halt] <- 0
 
 
   ## Reinitating
-  tx.reinit.elig.KC.B.full <- which(race..wa == "B" & region == "KC" & tt.traj %in% c(2, 4) &
-                                    tx.status == 0 & cum.time.on.tx > 0)
-  tx.reinit.KC.B.full <- tx.reinit.elig.KC.B.full[rbinom(length(tx.reinit.elig.KC.B.full),
-                                         1, tx.reinit.full.KC.B) == 1]
   
-  tx.reinit.elig.KC.B.part <- which(race..wa == "B" & region == "KC" & tt.traj %in% c(1, 3) &
-                                      tx.status == 0 & cum.time.on.tx > 0)
-  tx.reinit.KC.B.part <- tx.reinit.elig.KC.B.part[rbinom(length(tx.reinit.elig.KC.B.part),
-                                                         1, (tx.reinit.full.KC.B * tx.reinit.part.rr)) == 1]
+  tx_reinit_fun <- function(reg, race.eth, tx.group) {
+    tx.reinit.prob <- get(paste0("tx.reinit.full.", reg, ".", race.eth, ".prob"))
+    if (tx.group == "full") {
+      tx.reinit.elig <- which(race..wa == race.eth & region == reg & tt.traj %in% c(2, 4) &
+                                tx.status ==0 & cum.time.on.tx > 0)
+      tx.reinit <- tx.reinit.elig[rbinom(length(tx.reinit.elig), 1, tx.reinit.prob) == 1]
+    }
+    if (tx.group == "part") {
+      tx.reinit.elig <- which(race..wa == race.eth & region == reg & tt.traj %in% c(1, 3) &
+                                tx.status ==0 & cum.time.on.tx > 0)
+      tx.reinit <- tx.reinit.elig[rbinom(length(tx.reinit.elig), 1, tx.reinit.prob * tx.reinit.part.rr) == 1]
+    }
+    
+    return(tx.reinit)
+  }
   
-  tx.reinit.elig.KC.H.full <- which(race..wa == "H" & region == "KC" & tt.traj %in% c(2, 4) &
-                                      tx.status == 0 & cum.time.on.tx > 0)
-  tx.reinit.KC.H.full <- tx.reinit.elig.KC.H.full[rbinom(length(tx.reinit.elig.KC.H.full),
-                                                         1, tx.reinit.full.KC.H) == 1]
+  tx.reinit.KC.B.full <- tx_reinit_fun("KC", "B", "full")
+  tx.reinit.KC.B.part <- tx_reinit_fun("KC", "B", "part")
+  tx.reinit.KC.H.full <- tx_reinit_fun("KC", "H", "full")
+  tx.reinit.KC.H.part <- tx_reinit_fun("KC", "H", "part")
+  tx.reinit.KC.O.full <- tx_reinit_fun("KC", "O", "full")
+  tx.reinit.KC.O.part <- tx_reinit_fun("KC", "O", "part")
   
-  tx.reinit.elig.KC.H.part <- which(race..wa == "H" & region == "KC" & tt.traj %in% c(1, 3) &
-                                      tx.status == 0 & cum.time.on.tx > 0)
-  tx.reinit.KC.H.part <- tx.reinit.elig.KC.H.part[rbinom(length(tx.reinit.elig.KC.H.part),
-                                                         1, (tx.reinit.full.KC.H * tx.reinit.part.rr)) == 1]
+  tx.reinit.OW.B.full <- tx_reinit_fun("OW", "B", "full")
+  tx.reinit.OW.B.part <- tx_reinit_fun("OW", "B", "part")
+  tx.reinit.OW.H.full <- tx_reinit_fun("OW", "H", "full")
+  tx.reinit.OW.H.part <- tx_reinit_fun("OW", "H", "part")
+  tx.reinit.OW.O.full <- tx_reinit_fun("OW", "O", "full")
+  tx.reinit.OW.O.part <- tx_reinit_fun("OW", "O", "part")
   
-  tx.reinit.elig.KC.O.full <- which(race..wa == "O" & region == "KC" & tt.traj %in% c(2, 4) &
-                                      tx.status == 0 & cum.time.on.tx > 0)
-  tx.reinit.KC.O.full <- tx.reinit.elig.KC.O.full[rbinom(length(tx.reinit.elig.KC.O.full),
-                                                         1, tx.reinit.full.KC.O) == 1]
-  
-  tx.reinit.elig.KC.O.part <- which(race..wa == "O" & region == "KC" & tt.traj %in% c(1, 3) &
-                                      tx.status == 0 & cum.time.on.tx > 0)
-  tx.reinit.KC.O.part <- tx.reinit.elig.KC.O.part[rbinom(length(tx.reinit.elig.KC.O.part),
-                                                         1, (tx.reinit.full.KC.O * tx.reinit.part.rr)) == 1]
-
-  tx.reinit.elig.OW.B.full <- which(race..wa == "B" & region == "OW" & tt.traj %in% c(2, 4) &
-                                      tx.status == 0 & cum.time.on.tx > 0)
-  tx.reinit.OW.B.full <- tx.reinit.elig.OW.B.full[rbinom(length(tx.reinit.elig.OW.B.full),
-                                                         1, tx.reinit.full.OW.B) == 1]
-  
-  tx.reinit.elig.OW.B.part <- which(race..wa == "B" & region == "OW" & tt.traj %in% c(1, 3) &
-                                      tx.status == 0 & cum.time.on.tx > 0)
-  tx.reinit.OW.B.part <- tx.reinit.elig.OW.B.part[rbinom(length(tx.reinit.elig.OW.B.part),
-                                                         1, (tx.reinit.full.OW.B * tx.reinit.part.rr)) == 1]
-  
-  tx.reinit.elig.OW.H.full <- which(race..wa == "H" & region == "OW" & tt.traj %in% c(2, 4) &
-                                      tx.status == 0 & cum.time.on.tx > 0)
-  tx.reinit.OW.H.full <- tx.reinit.elig.OW.H.full[rbinom(length(tx.reinit.elig.OW.H.full),
-                                                         1, tx.reinit.full.OW.H) == 1]
-  
-  tx.reinit.elig.OW.H.part <- which(race..wa == "H" & region == "OW" & tt.traj %in% c(1, 3) &
-                                      tx.status == 0 & cum.time.on.tx > 0)
-  tx.reinit.OW.H.part <- tx.reinit.elig.OW.H.part[rbinom(length(tx.reinit.elig.OW.H.part),
-                                                         1, (tx.reinit.full.OW.H * tx.reinit.part.rr)) == 1]
-  
-  tx.reinit.elig.OW.O.full <- which(race..wa == "O" & region == "OW" & tt.traj %in% c(2, 4) &
-                                      tx.status == 0 & cum.time.on.tx > 0)
-  tx.reinit.OW.O.full <- tx.reinit.elig.OW.O.full[rbinom(length(tx.reinit.elig.OW.O.full),
-                                                         1, tx.reinit.full.OW.O) == 1]
-  
-  tx.reinit.elig.OW.O.part <- which(race..wa == "O" & region == "OW" & tt.traj %in% c(1, 3) &
-                                      tx.status == 0 & cum.time.on.tx > 0)
-  tx.reinit.OW.O.part <- tx.reinit.elig.OW.O.part[rbinom(length(tx.reinit.elig.OW.O.part),
-                                                         1, (tx.reinit.full.OW.O * tx.reinit.part.rr)) == 1]
-  
-  tx.reinit.elig.EW.B.full <- which(race..wa == "B" & region == "EW" & tt.traj %in% c(2, 4) &
-                                      tx.status == 0 & cum.time.on.tx > 0)
-  tx.reinit.EW.B.full <- tx.reinit.elig.EW.B.full[rbinom(length(tx.reinit.elig.EW.B.full),
-                                                         1, tx.reinit.full.EW.B) == 1]
-  
-  tx.reinit.elig.EW.B.part <- which(race..wa == "B" & region == "EW" & tt.traj %in% c(1, 3) &
-                                      tx.status == 0 & cum.time.on.tx > 0)
-  tx.reinit.EW.B.part <- tx.reinit.elig.EW.B.part[rbinom(length(tx.reinit.elig.EW.B.part),
-                                                         1, (tx.reinit.full.EW.B * tx.reinit.part.rr)) == 1]
-  
-  tx.reinit.elig.EW.H.full <- which(race..wa == "H" & region == "EW" & tt.traj %in% c(2, 4) &
-                                      tx.status == 0 & cum.time.on.tx > 0)
-  tx.reinit.EW.H.full <- tx.reinit.elig.EW.H.full[rbinom(length(tx.reinit.elig.EW.H.full),
-                                                         1, tx.reinit.full.EW.H) == 1]
-  
-  tx.reinit.elig.EW.H.part <- which(race..wa == "H" & region == "EW" & tt.traj %in% c(1, 3) &
-                                      tx.status == 0 & cum.time.on.tx > 0)
-  tx.reinit.EW.H.part <- tx.reinit.elig.EW.H.part[rbinom(length(tx.reinit.elig.EW.H.part),
-                                                         1, (tx.reinit.full.EW.H * tx.reinit.part.rr)) == 1]
-  
-  tx.reinit.elig.EW.O.full <- which(race..wa == "O" & region == "EW" & tt.traj %in% c(2, 4) &
-                                      tx.status == 0 & cum.time.on.tx > 0)
-  tx.reinit.EW.O.full <- tx.reinit.elig.EW.O.full[rbinom(length(tx.reinit.elig.EW.O.full),
-                                                         1, tx.reinit.full.EW.O) == 1]
-  
-  tx.reinit.elig.EW.O.part <- which(race..wa == "O" & region == "EW" & tt.traj %in% c(1, 3) &
-                                      tx.status == 0 & cum.time.on.tx > 0)
-  tx.reinit.EW.O.part <- tx.reinit.elig.EW.O.part[rbinom(length(tx.reinit.elig.EW.O.part),
-                                                         1, (tx.reinit.full.EW.O * tx.reinit.part.rr)) == 1]
-  
+  tx.reinit.EW.B.full <- tx_reinit_fun("EW", "B", "full")
+  tx.reinit.EW.B.part <- tx_reinit_fun("EW", "B", "part")
+  tx.reinit.EW.H.full <- tx_reinit_fun("EW", "H", "full")
+  tx.reinit.EW.H.part <- tx_reinit_fun("EW", "H", "part")
+  tx.reinit.EW.O.full <- tx_reinit_fun("EW", "O", "full")
+  tx.reinit.EW.O.part <- tx_reinit_fun("EW", "O", "part")
   
   tx.reinit <- c(tx.reinit.KC.B.full, tx.reinit.KC.B.part, tx.reinit.KC.H.full, tx.reinit.KC.H.part, tx.reinit.KC.O.full, tx.reinit.KC.O.part,
                  tx.reinit.OW.B.full, tx.reinit.OW.B.part, tx.reinit.OW.H.full, tx.reinit.OW.H.part, tx.reinit.OW.O.full, tx.reinit.OW.O.part,
                  tx.reinit.EW.B.full, tx.reinit.EW.B.part, tx.reinit.EW.H.full, tx.reinit.EW.H.part, tx.reinit.EW.O.full, tx.reinit.EW.O.part)
+  
   dat$attr$tx.status[tx.reinit] <- 1
 
 
