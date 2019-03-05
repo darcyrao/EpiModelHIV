@@ -33,8 +33,12 @@ births_msm_whamp <- function(dat, at){
   nBirths.age <- dat$epi$dth.age[at] # Births to replace those who aged out
   
   ## Determine the number of additional births to add to achieve the specified population growth
-  nBirths.growth <- sum(dat$epi$num.H..wa[at - 1], dat$epi$num.B..wa[at - 1], dat$epi$num.O..wa[at - 1])*(dat$param$growth.rate - 1)
-
+  if (at == 1) {
+    nBirths.growth <- round(sum(dat$epi$num.H..wa[at], dat$epi$num.B..wa[at], dat$epi$num.O..wa[at])*(dat$param$growth.rate - 1))
+  } else {
+    nBirths.growth <- round(sum(dat$epi$num.H..wa[at - 1], dat$epi$num.B..wa[at - 1], dat$epi$num.O..wa[at - 1])*(dat$param$growth.rate - 1))
+  }
+  
   nBirths <- nBirths.gen + nBirths.age + nBirths.growth
   
   ## Update Attr
@@ -76,38 +80,19 @@ setBirthAttr_msm_whamp <- function(dat, at, nBirths) {
   dat$attr$arrival.time[newIds] <- rep(at, nBirths)
   
   # Distribute new births by race/ethnicity and region according to proportion of the population in each group
-    
-  ## Vector with the proportion of Hispanic, black, and other race/ethnicity men in King County, other western WA, and eastern WA
-  prop.race.region <- sumto1(c(0.0549, 0.0421, 0.4739, 0.0309, 0.0166, 0.2807, 0.0222, 0.0021, 0.0767))
-  
-  race.region <- sample(apportion_lr(nBirths, c("H.KC", "B.KC", "O.KC", "H.OW", "B.OW", "O.OW", "H.EW", "B.EW", "O.EW"), 
+  prop.race.region <- dat$param$racedist
+  race.region <- sample(apportion_lr(nBirths, c("KC.H", "KC.B", "KC.O", "OW.H", "OW.B", "OW.O", "EW.H", "EW.B", "EW.O"), 
                                     prop.race.region))
   
-  race..wa <- rep(NA, nBirths)
-  race..wa[race.region %in% c("H.KC", "H.OW", "H.EW")] <- "H"
-  race..wa[race.region %in% c("B.KC", "B.OW", "B.EW")] <- "B"
-  race..wa[race.region %in% c("O.KC", "O.OW", "O.EW")] <- "O"
-  newB..wa <- which(race..wa == "B")
-  newH..wa <- which(race..wa == "H")
-  newO..wa <- which(race..wa == "O")
-  nBirths.B..wa <- length(newB..wa)
-  nBirths.H..wa <- length(newH..wa)
-  nBirths.O..wa <- length(newO..wa)
-  
-  region <- rep(NA, nBirths)
-  region[race.region %in% c("H.KC", "B.KC", "O.KC")] <- "KC"
-  region[race.region %in% c("H.OW", "B.OW", "O.OW")] <- "OW"
-  region[race.region %in% c("H.EW", "B.EW", "O.EW")] <- "EW"
-  
-  new.KC.B <- which(region == "KC" & race..wa == "B") 
-  new.KC.H <- which(region == "KC" & race..wa == "H") 
-  new.KC.O <- which(region == "KC" & race..wa == "O") 
-  new.OW.B <- which(region == "OW" & race..wa == "B") 
-  new.OW.H <- which(region == "OW" & race..wa == "H") 
-  new.OW.O <- which(region == "OW" & race..wa == "O") 
-  new.EW.B <- which(region == "EW" & race..wa == "B") 
-  new.EW.H <- which(region == "EW" & race..wa == "H") 
-  new.EW.O <- which(region == "EW" & race..wa == "O") 
+  new.KC.B <- which(race.region %in% "KC.B") 
+  new.KC.H <- which(race.region %in% "KC.H") 
+  new.KC.O <- which(race.region %in% "KC.O") 
+  new.OW.B <- which(race.region %in% "OW.B") 
+  new.OW.H <- which(race.region %in% "OW.H") 
+  new.OW.O <- which(race.region %in% "OW.O") 
+  new.EW.B <- which(race.region %in% "EW.B") 
+  new.EW.H <- which(race.region %in% "EW.H") 
+  new.EW.O <- which(race.region %in% "EW.O") 
   nBirths.KC.B <- length(new.KC.B)
   nBirths.KC.H <- length(new.KC.H)
   nBirths.KC.O <- length(new.KC.O)
@@ -117,6 +102,22 @@ setBirthAttr_msm_whamp <- function(dat, at, nBirths) {
   nBirths.EW.B <- length(new.EW.B)
   nBirths.EW.H <- length(new.EW.H)
   nBirths.EW.O <- length(new.EW.O)
+  
+  race..wa <- rep(NA, nBirths)
+  race..wa[race.region %in% c("KC.H", "OW.H", "EW.H")] <- "H"
+  race..wa[race.region %in% c("KC.B", "OW.B", "EW.B")] <- "B"
+  race..wa[race.region %in% c("KC.O", "OW.O", "EW.O")] <- "O"
+  newB..wa <- which(race..wa == "B")
+  newH..wa <- which(race..wa == "H")
+  newO..wa <- which(race..wa == "O")
+  nBirths.B..wa <- length(newB..wa)
+  nBirths.H..wa <- length(newH..wa)
+  nBirths.O..wa <- length(newO..wa)
+  
+  region <- rep(NA, nBirths)
+  region[race.region %in% c("KC.H", "KC.B", "KC.O")] <- "KC"
+  region[race.region %in% c("OW.H", "OW.B", "OW.O")] <- "OW"
+  region[race.region %in% c("EW.H", "EW.B", "EW.O")] <- "EW"
   
   dat$attr$race..wa[newIds] <- race..wa
   dat$attr$region[newIds] <- region
@@ -129,24 +130,33 @@ setBirthAttr_msm_whamp <- function(dat, at, nBirths) {
   # Disease status and related
   dat$attr$status[newIds] <- rep(0, nBirths)
 
-  dat$attr$tt.traj[newIds[new.KC.B]] <- sample(apportion_lr(nBirths.KC.B, c(1, 2, 3, 4),
-                                          proportions = dat$param$tt.traj.KC.B.prob))
-  dat$attr$tt.traj[newIds[new.KC.H]] <- sample(apportion_lr(nBirths.KC.H, c(1, 2, 3, 4),
-                                          proportions = dat$param$tt.traj.KC.H.prob))
-  dat$attr$tt.traj[newIds[new.KC.O]] <- sample(apportion_lr(nBirths.KC.O, c(1, 2, 3, 4),
-                                          proportions = dat$param$tt.traj.KC.O.prob))
-  dat$attr$tt.traj[newIds[new.OW.B]] <- sample(apportion_lr(nBirths.OW.B, c(1, 2, 3, 4),
-                                          proportions = dat$param$tt.traj.OW.B.prob))
-  dat$attr$tt.traj[newIds[new.OW.H]] <- sample(apportion_lr(nBirths.OW.H, c(1, 2, 3, 4),
-                                          proportions = dat$param$tt.traj.OW.H.prob))
-  dat$attr$tt.traj[newIds[new.OW.O]] <- sample(apportion_lr(nBirths.OW.O, c(1, 2, 3, 4),
-                                          proportions = dat$param$tt.traj.OW.O.prob))
-  dat$attr$tt.traj[newIds[new.EW.B]] <- sample(apportion_lr(nBirths.EW.B, c(1, 2, 3, 4),
-                                          proportions = dat$param$tt.traj.EW.B.prob))
-  dat$attr$tt.traj[newIds[new.EW.H]] <- sample(apportion_lr(nBirths.EW.H, c(1, 2, 3, 4),
-                                          proportions = dat$param$tt.traj.EW.H.prob))
-  dat$attr$tt.traj[newIds[new.EW.O]] <- sample(apportion_lr(nBirths.EW.O, c(1, 2, 3, 4),
-                                          proportions = dat$param$tt.traj.EW.O.prob))
+  dat$attr$tt.traj[newIds[new.KC.B]] <- sample(c(1, 2, 3, 4), 
+                                               nBirths.KC.B, replace = TRUE,
+                                               prob = dat$param$tt.traj.KC.B.prob)
+  dat$attr$tt.traj[newIds[new.KC.H]] <- sample(c(1, 2, 3, 4), 
+                                               nBirths.KC.H, replace = TRUE,
+                                               prob = dat$param$tt.traj.KC.H.prob)
+  dat$attr$tt.traj[newIds[new.KC.O]] <- sample(c(1, 2, 3, 4), 
+                                               nBirths.KC.O, replace = TRUE,
+                                               prob = dat$param$tt.traj.KC.O.prob)
+  dat$attr$tt.traj[newIds[new.OW.B]] <- sample(c(1, 2, 3, 4), 
+                                               nBirths.OW.B, replace = TRUE,
+                                               prob = dat$param$tt.traj.OW.B.prob)
+  dat$attr$tt.traj[newIds[new.OW.H]] <- sample(c(1, 2, 3, 4), 
+                                               nBirths.OW.H, replace = TRUE,
+                                               prob = dat$param$tt.traj.OW.H.prob)
+  dat$attr$tt.traj[newIds[new.OW.O]] <- sample(c(1, 2, 3, 4), 
+                                               nBirths.OW.O, replace = TRUE,
+                                               prob = dat$param$tt.traj.OW.O.prob)
+  dat$attr$tt.traj[newIds[new.EW.B]] <- sample(c(1, 2, 3, 4), 
+                                               nBirths.EW.B, replace = TRUE,
+                                               prob = dat$param$tt.traj.EW.B.prob)
+  dat$attr$tt.traj[newIds[new.EW.H]] <- sample(c(1, 2, 3, 4), 
+                                               nBirths.EW.H, replace = TRUE,
+                                               prob = dat$param$tt.traj.EW.H.prob)
+  dat$attr$tt.traj[newIds[new.EW.O]] <- sample(c(1, 2, 3, 4), 
+                                               nBirths.EW.O, replace = TRUE,
+                                               prob = dat$param$tt.traj.EW.O.prob)
   
   # Circumcision
   dat$attr$circ[newIds[newB..wa]] <- rbinom(nBirths.B..wa, 1, dat$param$circ.B.prob)
@@ -187,7 +197,7 @@ setBirthAttr_msm_whamp <- function(dat, at, nBirths) {
   dat$attr$deg.pers[newIds] <- 0
 
   # One-off risk group (all enter at age 18 so are in the "young" group)
-  dat$attr$riskg[newIds] <- sample(c("Y1", "Y2", "Y3", "Y4"), nBirths, TRUE)
+  dat$attr$riskg[newIds] <- sample(c("Y1", "Y2", "Y3", "Y4"), nBirths, replace = TRUE)
 
   # UAI group
   p1 <- dat$param$cond.pers.always.prob
