@@ -584,8 +584,6 @@ init_status_msm_whamp <- function(dat) {
   ### All tt.traj groups: Calculate cumulative time on and off tx to determine progression to AIDS
   selected <- which(status == 1)
   
-  exp.aids.time <- rep(NA, length(selected))
-  
   # If not yet diagnosed or initiated treatment, cum.time.off = time since infection and cum.time.on = 0
   cum.time.off.tx[selected][diag.status[selected] == 0] <- time.since.inf[selected][diag.status[selected] == 0]
   cum.time.off.tx[selected][time.since.inf[selected] < time.to.tx[selected] & !is.na(time.to.tx[selected])] <- 
@@ -723,99 +721,40 @@ init_status_msm_whamp <- function(dat) {
   cum.time.on.tx[selected.on.tx.EW.O.full] <- round(offon.EW.O.full[(-tx.init.time[selected.on.tx.EW.O.full] + 1), 2])
   
   #' For each group, calculate the expected time step from infection at which AIDS will occur based on the offon matrix and time from infection to tx initiation
-  exp.aids.time[selected.on.tx.KC.B.part] <- NA
-  for (i in 1:length(selected.on.tx.KC.B.part)) {
-    exp.aids.time[selected.on.tx.KC.B.part][i] <- time.to.tx[selected.on.tx.KC.B.part][i] + 
-      min(which(offon.KC.B.part[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.KC.B.part][i])))
-  }
-  exp.aids.time[selected.on.tx.KC.B.full] <- NA
-  for (i in 1:length(selected.on.tx.KC.B.full)) {
-    exp.aids.time[selected.on.tx.KC.B.full][i] <- time.to.tx[selected.on.tx.KC.B.full][i] + 
-      min(which(offon.KC.B.full[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.KC.B.full][i])))
-  }
-  exp.aids.time[selected.on.tx.KC.H.part] <- NA
-  for (i in 1:length(selected.on.tx.KC.H.part)) {
-    exp.aids.time[selected.on.tx.KC.H.part][i] <- time.to.tx[selected.on.tx.KC.H.part][i] + 
-      min(which(offon.KC.H.part[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.KC.H.part][i])))
-  }
-  exp.aids.time[selected.on.tx.KC.H.full] <- NA
-  for (i in 1:length(selected.on.tx.KC.H.full)) {
-    exp.aids.time[selected.on.tx.KC.H.full][i] <- time.to.tx[selected.on.tx.KC.H.full][i] + 
-      min(which(offon.KC.H.full[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.KC.H.full][i])))
-  }
-  exp.aids.time[selected.on.tx.KC.O.part] <- NA
-  for (i in 1:length(selected.on.tx.KC.O.part)) {
-    exp.aids.time[selected.on.tx.KC.O.part][i] <- time.to.tx[selected.on.tx.KC.O.part][i] + 
-      min(which(offon.KC.O.part[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.KC.O.part][i])))
-  }
-  exp.aids.time[selected.on.tx.KC.O.full] <- NA
-  for (i in 1:length(selected.on.tx.KC.O.full)) {
-    exp.aids.time[selected.on.tx.KC.O.full][i] <- time.to.tx[selected.on.tx.KC.O.full][i] + 
-      min(which(offon.KC.O.full[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.KC.O.full][i])))
+  exp.aids.time <- rep(NA, length(selected))
+  
+  calc_aids_timestep <- function(group) {
+    selected <- get(paste0("selected.on.tx.", group))
+    offon <- get(paste0("offon.", group))
+    if (length(selected) > 0) {
+      for (i in 1:length(selected)) {
+        exp.aids.time[selected][i] <- time.to.tx[selected][i] + 
+          min(which(offon[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected][i])))
+      }
+    }
+    return(exp.aids.time)
   }
   
-  exp.aids.time[selected.on.tx.OW.B.part] <- NA
-  for (i in 1:length(selected.on.tx.OW.B.part)) {
-    exp.aids.time[selected.on.tx.OW.B.part][i] <- time.to.tx[selected.on.tx.OW.B.part][i] + 
-      min(which(offon.OW.B.part[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.OW.B.part][i])))
-  }
-  exp.aids.time[selected.on.tx.OW.B.full] <- NA
-  for (i in 1:length(selected.on.tx.OW.B.full)) {
-    exp.aids.time[selected.on.tx.OW.B.full][i] <- time.to.tx[selected.on.tx.OW.B.full][i] + 
-      min(which(offon.OW.B.full[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.OW.B.full][i])))
-  }
-  exp.aids.time[selected.on.tx.OW.H.part] <- NA
-  for (i in 1:length(selected.on.tx.OW.H.part)) {
-    exp.aids.time[selected.on.tx.OW.H.part][i] <- time.to.tx[selected.on.tx.OW.H.part][i] + 
-      min(which(offon.OW.H.part[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.OW.H.part][i])))
-  }
-  exp.aids.time[selected.on.tx.OW.H.full] <- NA
-  for (i in 1:length(selected.on.tx.OW.H.full)) {
-    exp.aids.time[selected.on.tx.OW.H.full][i] <- time.to.tx[selected.on.tx.OW.H.full][i] + 
-      min(which(offon.OW.H.full[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.OW.H.full][i])))
-  }
-  exp.aids.time[selected.on.tx.OW.O.part] <- NA
-  for (i in 1:length(selected.on.tx.OW.O.part)) {
-    exp.aids.time[selected.on.tx.OW.O.part][i] <- time.to.tx[selected.on.tx.OW.O.part][i] + 
-      min(which(offon.OW.O.part[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.OW.O.part][i])))
-  }
-  exp.aids.time[selected.on.tx.OW.O.full] <- NA
-  for (i in 1:length(selected.on.tx.OW.O.full)) {
-    exp.aids.time[selected.on.tx.OW.O.full][i] <- time.to.tx[selected.on.tx.OW.O.full][i] + 
-      min(which(offon.OW.O.full[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.OW.O.full][i])))
-  }
+  exp.aids.time <- calc_aids_timestep("KC.B.part")
+  exp.aids.time <- calc_aids_timestep("KC.B.full")
+  exp.aids.time <- calc_aids_timestep("KC.H.part")
+  exp.aids.time <- calc_aids_timestep("KC.H.full")
+  exp.aids.time <- calc_aids_timestep("KC.O.part")
+  exp.aids.time <- calc_aids_timestep("KC.O.full")
   
-  exp.aids.time[selected.on.tx.EW.B.part] <- NA
-  for (i in 1:length(selected.on.tx.EW.B.part)) {
-    exp.aids.time[selected.on.tx.EW.B.part][i] <- time.to.tx[selected.on.tx.EW.B.part][i] + 
-      min(which(offon.EW.B.part[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.EW.B.part][i])))
-  }
-  exp.aids.time[selected.on.tx.EW.B.full] <- NA
-  for (i in 1:length(selected.on.tx.EW.B.full)) {
-    exp.aids.time[selected.on.tx.EW.B.full][i] <- time.to.tx[selected.on.tx.EW.B.full][i] + 
-      min(which(offon.EW.B.full[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.EW.B.full][i])))
-  }
-  exp.aids.time[selected.on.tx.EW.H.part] <- NA
-  for (i in 1:length(selected.on.tx.EW.H.part)) {
-    exp.aids.time[selected.on.tx.EW.H.part][i] <- time.to.tx[selected.on.tx.EW.H.part][i] + 
-      min(which(offon.EW.H.part[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.EW.H.part][i])))
-  }
-  exp.aids.time[selected.on.tx.EW.H.full] <- NA
-  for (i in 1:length(selected.on.tx.EW.H.full)) {
-    exp.aids.time[selected.on.tx.EW.H.full][i] <- time.to.tx[selected.on.tx.EW.H.full][i] + 
-      min(which(offon.EW.H.full[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.EW.H.full][i])))
-  }
-  exp.aids.time[selected.on.tx.EW.O.part] <- NA
-  for (i in 1:length(selected.on.tx.EW.O.part)) {
-    exp.aids.time[selected.on.tx.EW.O.part][i] <- time.to.tx[selected.on.tx.EW.O.part][i] + 
-      min(which(offon.EW.O.part[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.EW.O.part][i])))
-  }
-  exp.aids.time[selected.on.tx.EW.O.full] <- NA
-  for (i in 1:length(selected.on.tx.EW.O.full)) {
-    exp.aids.time[selected.on.tx.EW.O.full][i] <- time.to.tx[selected.on.tx.EW.O.full][i] + 
-      min(which(offon.EW.O.full[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.EW.O.full][i])))
-  }
+  exp.aids.time <- calc_aids_timestep("OW.B.part")
+  exp.aids.time <- calc_aids_timestep("OW.B.full")
+  exp.aids.time <- calc_aids_timestep("OW.H.part")
+  exp.aids.time <- calc_aids_timestep("OW.H.full")
+  exp.aids.time <- calc_aids_timestep("OW.O.part")
+  exp.aids.time <- calc_aids_timestep("OW.O.full")
   
+  exp.aids.time <- calc_aids_timestep("EW.B.part")
+  exp.aids.time <- calc_aids_timestep("EW.B.full")
+  exp.aids.time <- calc_aids_timestep("EW.H.part")
+  exp.aids.time <- calc_aids_timestep("EW.H.full")
+  exp.aids.time <- calc_aids_timestep("EW.O.part")
+  exp.aids.time <- calc_aids_timestep("EW.O.full")
   
   ### All tt.traj groups: Assign stage of infection 
   stage[selected] <- (time.since.inf[selected] <= vlar.int) * 1 +
