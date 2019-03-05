@@ -405,7 +405,7 @@ param_msm_whamp <- function(nwstats,
                       prep.class.hr = c(0.69, 0.19, 0.05),
                       prep.coverage.init.region = c(0.4392,	0.2655),
                       prep.cov.method = "curr",
-                      prep.scaleup.rate = c(1, 1),
+                      prep.scaleup.rate = c(0, 0), # Set to 0 for stable PrEP use
                       prep.cov.max.region = c(0.7497,	0.6232),
                       prep.init.rate = 1,
                       prep.tst.int = 90,
