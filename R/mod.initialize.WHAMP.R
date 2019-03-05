@@ -457,15 +457,16 @@ init_status_msm_whamp <- function(dat) {
   diag.time[selected][diag.status[selected] == 1] <- 1 - time.since.inf[selected][diag.status[selected] == 1] + sympt.int
   
   ## Assign treatment status
-  time.to.tx[selected][diag.status[selected] == 1] <- sympt.int + tx.init.int[selected]
+  time.to.tx[selected] <- sympt.int + tx.init.int[selected]
   prop.time.on.tx[selected] <- (tx.reinit.full[selected] * tx.reinit.part.rr) /
-      ((tx.halt.full * tx.halt.part.rr) + (tx.reinit.full[selected] * tx.reinit.part.rr))
+    ((tx.halt.full * tx.halt.part.rr) + (tx.reinit.full[selected] * tx.reinit.part.rr))
   tx.status[selected] <- 0
-  tx.status[selected][time.since.inf[selected] >= time.to.tx[selected]] <-
-      rbinom(sum(time.since.inf[selected] >= time.to.tx[selected]),
-             1, prop.time.on.tx[selected][time.since.inf[selected] >= time.to.tx[selected]])
-  tx.init.time[selected][time.since.inf[selected] >= time.to.tx[selected]] <- 
-      1 - time.since.inf[selected][time.since.inf[selected] >= time.to.tx[selected]] + time.to.tx[selected][time.since.inf[selected] >= time.to.tx[selected]]
+  tx.status[selected][time.since.inf[selected] >= time.to.tx[selected] & !is.na(time.to.tx[selected])] <-
+    rbinom(sum(time.since.inf[selected] >= time.to.tx[selected] & !is.na(time.to.tx[selected])),
+           1, prop.time.on.tx[selected][time.since.inf[selected] >= time.to.tx[selected] & !is.na(time.to.tx[selected])])
+  tx.init.time[selected][time.since.inf[selected] >= time.to.tx[selected] & !is.na(time.to.tx[selected])] <- 
+    1 - time.since.inf[selected][time.since.inf[selected] >= time.to.tx[selected] & !is.na(time.to.tx[selected])] + 
+    time.to.tx[selected][time.since.inf[selected] >= time.to.tx[selected] & !is.na(time.to.tx[selected])]
 
   ### 2. Non-screener type - full suppressors
   selected <- which(status == 1 & tt.traj == 2)
@@ -481,15 +482,16 @@ init_status_msm_whamp <- function(dat) {
   diag.time[selected][diag.status[selected] == 1] <- 1 - time.since.inf[selected][diag.status[selected] == 1] + sympt.int
   
   ## Assign treatment status
-  time.to.tx[selected][diag.status[selected] == 1] <- sympt.int + tx.init.int[selected]
+  time.to.tx[selected] <- sympt.int + tx.init.int[selected]
   prop.time.on.tx[selected] <- (tx.reinit.full[selected]) /
-      ((tx.halt.full) + (tx.reinit.full[selected]))
+    ((tx.halt.full) + (tx.reinit.full[selected]))
   tx.status[selected] <- 0
-  tx.status[selected][time.since.inf[selected] >= time.to.tx[selected]] <-
-      rbinom(sum(time.since.inf[selected] >= time.to.tx[selected]),
-             1, prop.time.on.tx[selected][time.since.inf[selected] >= time.to.tx[selected]])
-  tx.init.time[selected][time.since.inf[selected] >= time.to.tx[selected]] <- 
-      1 - time.since.inf[selected][time.since.inf[selected] >= time.to.tx[selected]] + time.to.tx[selected][time.since.inf[selected] >= time.to.tx[selected]]
+  tx.status[selected][time.since.inf[selected] >= time.to.tx[selected] & !is.na(time.to.tx[selected])] <-
+    rbinom(sum(time.since.inf[selected] >= time.to.tx[selected] & !is.na(time.to.tx[selected])),
+           1, prop.time.on.tx[selected][time.since.inf[selected] >= time.to.tx[selected] & !is.na(time.to.tx[selected])])
+  tx.init.time[selected][time.since.inf[selected] >= time.to.tx[selected] & !is.na(time.to.tx[selected])] <- 
+    1 - time.since.inf[selected][time.since.inf[selected] >= time.to.tx[selected] & !is.na(time.to.tx[selected])] + 
+    time.to.tx[selected][time.since.inf[selected] >= time.to.tx[selected] & !is.na(time.to.tx[selected])]
   
   ### 3. Regular screeners - partial suppressors
   selected <- which(status == 1 & tt.traj == 3)
@@ -508,7 +510,7 @@ init_status_msm_whamp <- function(dat) {
       stop("Intertest interval parameter calculated assuming interval method. Revise parameter estimation procedure for memoryless process.")
   }
   
-  diag.status[selected][tslt > time.since.inf[selected]] <- 0 # Last test before infection
+  diag.status[selected][tslt > time.since.inf[selected]] <- 0 # Last test was before infection
   diag.status[selected][time.since.inf[selected] < dat$param$test.window.int] <- 0 # Infection < test window period
   diag.status[selected][tslt <= time.since.inf[selected] & tslt > (time.since.inf[selected] - dat$param$test.window.int)] <- 0 # Last test < test window period
   diag.status[selected][tslt <= (time.since.inf[selected] - dat$param$test.window.int)] <- 1 # Last test occurred since infection but after the window period
@@ -516,7 +518,7 @@ init_status_msm_whamp <- function(dat) {
   ##' Time to dx - calculate time to first test based on test interval (assigned last test used for determining if diagnosis would have occurred may not have been first pos test 
   ##' if infection occurred long ago. So calculate time to first post test as: time since infection - (time since last test + floor((time since infection - time since last test - test.window) / test.int) * test.int)
   time.to.dx[selected][diag.status[selected] == 1] <- time.since.inf[selected][diag.status[selected] == 1] - 
-      (tslt[diag.status[selected] == 1] + floor((time.since.inf[selected][diag.status[selected] == 1] - tslt[diag.status[selected] == 1] - dat$param$test.window.int)/test.int[selected][diag.status[selected] == 1]) * test.int[selected][diag.status[selected] == 1])  
+    (tslt[diag.status[selected] == 1] + floor((time.since.inf[selected][diag.status[selected] == 1] - tslt[diag.status[selected] == 1] - dat$param$test.window.int)/test.int[selected][diag.status[selected] == 1]) * test.int[selected][diag.status[selected] == 1])  
   
   diag.time[selected][diag.status[selected] == 1] <- 1 - time.since.inf[selected][diag.status[selected] == 1] + time.to.dx[selected][diag.status[selected] == 1]
   
@@ -526,17 +528,17 @@ init_status_msm_whamp <- function(dat) {
   # Assign treatment status
   time.to.tx[selected][diag.status[selected] == 1] <- time.to.dx[selected][diag.status[selected] == 1] + tx.init.int[selected][diag.status[selected] == 1]
   prop.time.on.tx[selected] <- (tx.reinit.full[selected] * tx.reinit.part.rr) /
-      ((tx.halt.full * tx.halt.part.rr) + (tx.reinit.full[selected] * tx.reinit.part.rr))
+    ((tx.halt.full * tx.halt.part.rr) + (tx.reinit.full[selected] * tx.reinit.part.rr))
   tx.status[selected] <- 0
-  tx.status[selected][time.since.inf[selected] >= time.to.tx[selected]] <-
-      rbinom(sum(time.since.inf[selected] >= time.to.tx[selected]),
-             1, prop.time.on.tx[selected][time.since.inf[selected] >= time.to.tx[selected]])
-  tx.init.time[selected][time.since.inf[selected] >= time.to.tx[selected]] <- 
-      1 - time.since.inf[selected][time.since.inf[selected] >= time.to.tx[selected]] + 
-      time.to.tx[selected][time.since.inf[selected] >= time.to.tx[selected]]
+  tx.status[selected][time.since.inf[selected] >= time.to.tx[selected] & !is.na(time.to.tx[selected])] <-
+    rbinom(sum(time.since.inf[selected] >= time.to.tx[selected] & !is.na(time.to.tx[selected])),
+           1, prop.time.on.tx[selected][time.since.inf[selected] >= time.to.tx[selected] & !is.na(time.to.tx[selected])])
+  tx.init.time[selected][time.since.inf[selected] >= time.to.tx[selected] & !is.na(time.to.tx[selected])] <- 
+    1 - time.since.inf[selected][time.since.inf[selected] >= time.to.tx[selected] & !is.na(time.to.tx[selected])] + 
+    time.to.tx[selected][time.since.inf[selected] >= time.to.tx[selected] & !is.na(time.to.tx[selected])]
   
   ### 4. Regular screeners - full suppressors
-  selected <- which(status == 1 & tt.traj == 3)
+  selected <- which(status == 1 & tt.traj == 4)
   
   ## Assign infection time
   time.since.inf[selected] <- ceiling(runif(length(selected), max = time.sex.active[selected])) # set max time since infection to time since sexual debut (assumed to be age 18)
@@ -572,60 +574,277 @@ init_status_msm_whamp <- function(dat) {
   prop.time.on.tx[selected] <- (tx.reinit.full[selected]) /
       ((tx.halt.full) + (tx.reinit.full[selected]))
   tx.status[selected] <- 0
-  tx.status[selected][time.since.inf[selected] >= time.to.tx[selected]] <-
-      rbinom(sum(time.since.inf[selected] >= time.to.tx[selected]),
-             1, prop.time.on.tx[selected][time.since.inf[selected] >= time.to.tx[selected]])
-  tx.init.time[selected][time.since.inf[selected] >= time.to.tx[selected]] <- 
-      1 - time.since.inf[selected][time.since.inf[selected] >= time.to.tx[selected]] + 
-      time.to.tx[selected][time.since.inf[selected] >= time.to.tx[selected]]
+  tx.status[selected][time.since.inf[selected] >= time.to.tx[selected] & !is.na(time.to.tx[selected])] <-
+    rbinom(sum(time.since.inf[selected] >= time.to.tx[selected] & !is.na(time.to.tx[selected])),
+           1, prop.time.on.tx[selected][time.since.inf[selected] >= time.to.tx[selected] & !is.na(time.to.tx[selected])])
+  tx.init.time[selected][time.since.inf[selected] >= time.to.tx[selected] & !is.na(time.to.tx[selected])] <- 
+    1 - time.since.inf[selected][time.since.inf[selected] >= time.to.tx[selected] & !is.na(time.to.tx[selected])] + 
+    time.to.tx[selected][time.since.inf[selected] >= time.to.tx[selected] & !is.na(time.to.tx[selected])]
   
   ### All tt.traj groups: Calculate cumulative time on and off tx to determine progression to AIDS
   selected <- which(status == 1)
   
   exp.aids.time <- rep(NA, length(selected))
   
-  # If not yet initiated treatment, cum.time.off = time since infection and cum time on = 0
-  cum.time.off.tx[selected][time.since.inf[selected] < time.to.tx[selected]] <- time.since.inf[selected]
-  cum.time.on.tx[selected][time.since.inf[selected] < time.to.tx[selected]] <- 0
-
-  # If intitated tx, cum.time.off = time to tx initiation + expected cuml time off since starting tx (as estimated with offon)
-  max.steps <- (dat$param$max.time.off.tx.int - tx.init.int[selected]) / (1 - min(prop.time.on.tx[selected])) # determine the max number of steps to extend out the vector to make sure it covers everyone's possible time from tx to AIDS
-  offon <- cbind((1 - prop.time.on.tx[selected]) * 1:max.steps, 
-               prop.time.on.tx[selected] * 1:max.steps)
-  cum.time.off.tx[selected][time.since.inf[selected] >= time.to.tx[selected]] <- 
-    round(time.to.tx[selected][time.since.inf[selected] >= time.to.tx[selected]] + offon[abs(tx.init.time[selected][time.since.inf[selected] >= time.to.tx[selected]]), 1])
-  cum.time.on.tx[selected][time.since.inf[selected] >= time.to.tx[selected]] <-
-    round(offon[abs(tx.init.time[selected][time.since.inf[selected] >= time.to.tx[selected]]), 2])
-  exp.aids.time[time.since.inf[selected] >= time.to.tx[selected]] <- time.to.tx[selected][time.since.inf[selected] >= time.to.tx[selected]] +
-    min(which(offon[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected][time.since.inf[selected] >= time.to.tx[selected]])))
-
+  # If not yet diagnosed or initiated treatment, cum.time.off = time since infection and cum.time.on = 0
+  cum.time.off.tx[selected][diag.status[selected] == 0] <- time.since.inf[selected][diag.status[selected] == 0]
+  cum.time.off.tx[selected][time.since.inf[selected] < time.to.tx[selected] & !is.na(time.to.tx[selected])] <- 
+    time.since.inf[selected][time.since.inf[selected] < time.to.tx[selected] & !is.na(time.to.tx[selected])]
+  cum.time.on.tx[selected][diag.status[selected] == 0] <- 0
+  cum.time.on.tx[selected][time.since.inf[selected] < time.to.tx[selected] & !is.na(time.to.tx[selected])] <- 0
+  
+  # If initiate treatment in the current time step, cum.time.off = 0 time since infection and cum.time.on = 0
+  cum.time.off.tx[selected][time.since.inf[selected] == time.to.tx[selected] & !is.na(time.to.tx[selected])] <- 
+    time.since.inf[selected][time.since.inf[selected] == time.to.tx[selected] & !is.na(time.to.tx[selected])]
+  cum.time.on.tx[selected][time.since.inf[selected] == time.to.tx[selected] & !is.na(time.to.tx[selected])] <- 0
+  
+  # If intitated tx, cum.time.off = time to tx initiation + expected cuml time off since starting tx, and cum.time.on = expected cuml time on since starting tx
+  #' Expected cumulative time off since starting is estimated with offon: column 1 indicates the expected cumulative time off treatment and column 2 indicates the
+  #' expected cumulative time on treatment at each time point since treatment was initiated. We calculate each of these vectors assuming a Markov process based on 
+  #' the calculated proportion of time on treatment, and we define the "offon" matrix separately for each group defined by race, region, and full vs. partial 
+  #' suppressoin status, since the proportion of time on treatment varies for each of these groups.
+  
+  # First define "offon" matrices
+  max.steps <- max((dat$param$max.time.off.tx.int - tx.init.int[selected]) / (1 - max(prop.time.on.tx[selected]))) # determine the max number of steps to extend out the vector to make sure it covers everyone's possible time from tx to AIDS
+  offon.KC.B.part <- cbind((1 - prop.time.on.tx[selected][race..wa[selected] == "B" & region[selected] == "KC" & tt.traj[selected] %in% c(1,3)][1]) * 1:max.steps, 
+                           prop.time.on.tx[selected][race..wa[selected] == "B" & region[selected] == "KC" & tt.traj[selected] %in% c(1,3)][1] * 1:max.steps)
+  offon.KC.B.full <- cbind((1 - prop.time.on.tx[selected][race..wa[selected] == "B" & region[selected] == "KC" & tt.traj[selected] %in% c(2,4)][1]) * 1:max.steps, 
+                           prop.time.on.tx[selected][race..wa[selected] == "B" & region[selected] == "KC" & tt.traj[selected] %in% c(2,4)][1] * 1:max.steps)
+  offon.KC.H.part <- cbind((1 - prop.time.on.tx[selected][race..wa[selected] == "H" & region[selected] == "KC" & tt.traj[selected] %in% c(1,3)][1]) * 1:max.steps, 
+                           prop.time.on.tx[selected][race..wa[selected] == "H" & region[selected] == "KC" & tt.traj[selected] %in% c(1,3)][1] * 1:max.steps)
+  offon.KC.H.full <- cbind((1 - prop.time.on.tx[selected][race..wa[selected] == "H" & region[selected] == "KC" & tt.traj[selected] %in% c(2,4)][1]) * 1:max.steps, 
+                           prop.time.on.tx[selected][race..wa[selected] == "H" & region[selected] == "KC" & tt.traj[selected] %in% c(2,4)][1] * 1:max.steps)
+  offon.KC.O.part <- cbind((1 - prop.time.on.tx[selected][race..wa[selected] == "O" & region[selected] == "KC" & tt.traj[selected] %in% c(1,3)][1]) * 1:max.steps, 
+                           prop.time.on.tx[selected][race..wa[selected] == "O" & region[selected] == "KC" & tt.traj[selected] %in% c(1,3)][1] * 1:max.steps)
+  offon.KC.O.full <- cbind((1 - prop.time.on.tx[selected][race..wa[selected] == "O" & region[selected] == "KC" & tt.traj[selected] %in% c(2,4)][1]) * 1:max.steps, 
+                           prop.time.on.tx[selected][race..wa[selected] == "O" & region[selected] == "KC" & tt.traj[selected] %in% c(2,4)][1] * 1:max.steps)
+  offon.OW.B.part <- cbind((1 - prop.time.on.tx[selected][race..wa[selected] == "B" & region[selected] == "OW" & tt.traj[selected] %in% c(1,3)][1]) * 1:max.steps, 
+                           prop.time.on.tx[selected][race..wa[selected] == "B" & region[selected] == "OW" & tt.traj[selected] %in% c(1,3)][1] * 1:max.steps)
+  offon.OW.B.full <- cbind((1 - prop.time.on.tx[selected][race..wa[selected] == "B" & region[selected] == "OW" & tt.traj[selected] %in% c(2,4)][1]) * 1:max.steps, 
+                           prop.time.on.tx[selected][race..wa[selected] == "B" & region[selected] == "OW" & tt.traj[selected] %in% c(2,4)][1] * 1:max.steps)
+  offon.OW.H.part <- cbind((1 - prop.time.on.tx[selected][race..wa[selected] == "H" & region[selected] == "OW" & tt.traj[selected] %in% c(1,3)][1]) * 1:max.steps, 
+                           prop.time.on.tx[selected][race..wa[selected] == "H" & region[selected] == "OW" & tt.traj[selected] %in% c(1,3)][1] * 1:max.steps)
+  offon.OW.H.full <- cbind((1 - prop.time.on.tx[selected][race..wa[selected] == "H" & region[selected] == "OW" & tt.traj[selected] %in% c(2,4)][1]) * 1:max.steps, 
+                           prop.time.on.tx[selected][race..wa[selected] == "H" & region[selected] == "OW" & tt.traj[selected] %in% c(2,4)][1] * 1:max.steps)
+  offon.OW.O.part <- cbind((1 - prop.time.on.tx[selected][race..wa[selected] == "O" & region[selected] == "OW" & tt.traj[selected] %in% c(1,3)][1]) * 1:max.steps, 
+                           prop.time.on.tx[selected][race..wa[selected] == "O" & region[selected] == "OW" & tt.traj[selected] %in% c(1,3)][1] * 1:max.steps)
+  offon.OW.O.full <- cbind((1 - prop.time.on.tx[selected][race..wa[selected] == "O" & region[selected] == "OW" & tt.traj[selected] %in% c(2,4)][1]) * 1:max.steps, 
+                           prop.time.on.tx[selected][race..wa[selected] == "O" & region[selected] == "OW" & tt.traj[selected] %in% c(2,4)][1] * 1:max.steps)
+  offon.EW.B.part <- cbind((1 - prop.time.on.tx[selected][race..wa[selected] == "B" & region[selected] == "EW" & tt.traj[selected] %in% c(1,3)][1]) * 1:max.steps, 
+                           prop.time.on.tx[selected][race..wa[selected] == "B" & region[selected] == "EW" & tt.traj[selected] %in% c(1,3)][1] * 1:max.steps)
+  offon.EW.B.full <- cbind((1 - prop.time.on.tx[selected][race..wa[selected] == "B" & region[selected] == "EW" & tt.traj[selected] %in% c(2,4)][1]) * 1:max.steps, 
+                           prop.time.on.tx[selected][race..wa[selected] == "B" & region[selected] == "EW" & tt.traj[selected] %in% c(2,4)][1] * 1:max.steps)
+  offon.EW.H.part <- cbind((1 - prop.time.on.tx[selected][race..wa[selected] == "H" & region[selected] == "EW" & tt.traj[selected] %in% c(1,3)][1]) * 1:max.steps, 
+                           prop.time.on.tx[selected][race..wa[selected] == "H" & region[selected] == "EW" & tt.traj[selected] %in% c(1,3)][1] * 1:max.steps)
+  offon.EW.H.full <- cbind((1 - prop.time.on.tx[selected][race..wa[selected] == "H" & region[selected] == "EW" & tt.traj[selected] %in% c(2,4)][1]) * 1:max.steps, 
+                           prop.time.on.tx[selected][race..wa[selected] == "H" & region[selected] == "EW" & tt.traj[selected] %in% c(2,4)][1] * 1:max.steps)
+  offon.EW.O.part <- cbind((1 - prop.time.on.tx[selected][race..wa[selected] == "O" & region[selected] == "EW" & tt.traj[selected] %in% c(1,3)][1]) * 1:max.steps, 
+                           prop.time.on.tx[selected][race..wa[selected] == "O" & region[selected] == "EW" & tt.traj[selected] %in% c(1,3)][1] * 1:max.steps)
+  offon.EW.O.full <- cbind((1 - prop.time.on.tx[selected][race..wa[selected] == "O" & region[selected] == "EW" & tt.traj[selected] %in% c(2,4)][1]) * 1:max.steps, 
+                           prop.time.on.tx[selected][race..wa[selected] == "O" & region[selected] == "EW" & tt.traj[selected] %in% c(2,4)][1] * 1:max.steps)
+  
+  # Define new indices to subset based on having started treatment 1+ time steps ago, being in the specified group defined by race/ethnicity, region, and partial vs. full adherence
+  selected.on.tx.KC.B.part <- selected[time.since.inf[selected] > time.to.tx[selected] & !is.na(time.to.tx[selected]) & race..wa[selected] == "B" & 
+                                         region[selected] == "KC" & tt.traj[selected] %in% c(1,3)]
+  selected.on.tx.KC.B.full <- selected[time.since.inf[selected] > time.to.tx[selected] & !is.na(time.to.tx[selected]) & race..wa[selected] == "B" & 
+                                         region[selected] == "KC" & tt.traj[selected] %in% c(2,4)]
+  selected.on.tx.KC.H.part <- selected[time.since.inf[selected] > time.to.tx[selected] & !is.na(time.to.tx[selected]) & race..wa[selected] == "H" & 
+                                         region[selected] == "KC" & tt.traj[selected] %in% c(1,3)]
+  selected.on.tx.KC.H.full <- selected[time.since.inf[selected] > time.to.tx[selected] & !is.na(time.to.tx[selected]) & race..wa[selected] == "H" & 
+                                         region[selected] == "KC" & tt.traj[selected] %in% c(2,4)]
+  selected.on.tx.KC.O.part <- selected[time.since.inf[selected] > time.to.tx[selected] & !is.na(time.to.tx[selected]) & race..wa[selected] == "O" & 
+                                         region[selected] == "KC" & tt.traj[selected] %in% c(1,3)]
+  selected.on.tx.KC.O.full <- selected[time.since.inf[selected] > time.to.tx[selected] & !is.na(time.to.tx[selected]) & race..wa[selected] == "O" & 
+                                         region[selected] == "KC" & tt.traj[selected] %in% c(2,4)]
+  selected.on.tx.OW.B.part <- selected[time.since.inf[selected] > time.to.tx[selected] & !is.na(time.to.tx[selected]) & race..wa[selected] == "B" & 
+                                         region[selected] == "OW" & tt.traj[selected] %in% c(1,3)]
+  selected.on.tx.OW.B.full <- selected[time.since.inf[selected] > time.to.tx[selected] & !is.na(time.to.tx[selected]) & race..wa[selected] == "B" & 
+                                         region[selected] == "OW" & tt.traj[selected] %in% c(2,4)]
+  selected.on.tx.OW.H.part <- selected[time.since.inf[selected] > time.to.tx[selected] & !is.na(time.to.tx[selected]) & race..wa[selected] == "H" & 
+                                         region[selected] == "OW" & tt.traj[selected] %in% c(1,3)]
+  selected.on.tx.OW.H.full <- selected[time.since.inf[selected] > time.to.tx[selected] & !is.na(time.to.tx[selected]) & race..wa[selected] == "H" & 
+                                         region[selected] == "OW" & tt.traj[selected] %in% c(2,4)]
+  selected.on.tx.OW.O.part <- selected[time.since.inf[selected] > time.to.tx[selected] & !is.na(time.to.tx[selected]) & race..wa[selected] == "O" & 
+                                         region[selected] == "OW" & tt.traj[selected] %in% c(1,3)]
+  selected.on.tx.OW.O.full <- selected[time.since.inf[selected] > time.to.tx[selected] & !is.na(time.to.tx[selected]) & race..wa[selected] == "O" & 
+                                         region[selected] == "OW" & tt.traj[selected] %in% c(2,4)]
+  selected.on.tx.EW.B.part <- selected[time.since.inf[selected] > time.to.tx[selected] & !is.na(time.to.tx[selected]) & race..wa[selected] == "B" & 
+                                         region[selected] == "EW" & tt.traj[selected] %in% c(1,3)]
+  selected.on.tx.EW.B.full <- selected[time.since.inf[selected] > time.to.tx[selected] & !is.na(time.to.tx[selected]) & race..wa[selected] == "B" & 
+                                         region[selected] == "EW" & tt.traj[selected] %in% c(2,4)]
+  selected.on.tx.EW.H.part <- selected[time.since.inf[selected] > time.to.tx[selected] & !is.na(time.to.tx[selected]) & race..wa[selected] == "H" & 
+                                         region[selected] == "EW" & tt.traj[selected] %in% c(1,3)]
+  selected.on.tx.EW.H.full <- selected[time.since.inf[selected] > time.to.tx[selected] & !is.na(time.to.tx[selected]) & race..wa[selected] == "H" & 
+                                         region[selected] == "EW" & tt.traj[selected] %in% c(2,4)]
+  selected.on.tx.EW.O.part <- selected[time.since.inf[selected] > time.to.tx[selected] & !is.na(time.to.tx[selected]) & race..wa[selected] == "O" & 
+                                         region[selected] == "EW" & tt.traj[selected] %in% c(1,3)]
+  selected.on.tx.EW.O.full <- selected[time.since.inf[selected] > time.to.tx[selected] & !is.na(time.to.tx[selected]) & race..wa[selected] == "O" & 
+                                         region[selected] == "EW" & tt.traj[selected] %in% c(2,4)]
+  
+  #' For each group defined by race/ethnicity, region, and partial vs. full adherence, calculate the expected cumulative time off/on treatment using the
+  #' offon matrices and time since treatment initiation + time from infection to treatment
+  cum.time.off.tx[selected.on.tx.KC.B.part] <- round(time.to.tx[selected.on.tx.KC.B.part] + offon.KC.B.part[(-tx.init.time[selected.on.tx.KC.B.part] + 1), 1])
+  cum.time.on.tx[selected.on.tx.KC.B.part] <- round(offon.KC.B.part[(-tx.init.time[selected.on.tx.KC.B.part] + 1), 2])
+  cum.time.off.tx[selected.on.tx.KC.B.full] <- round(time.to.tx[selected.on.tx.KC.B.full] + offon.KC.B.full[(-tx.init.time[selected.on.tx.KC.B.full] + 1), 1])
+  cum.time.on.tx[selected.on.tx.KC.B.full] <- round(offon.KC.B.full[(-tx.init.time[selected.on.tx.KC.B.full] + 1), 2])
+  cum.time.off.tx[selected.on.tx.KC.H.part] <- round(time.to.tx[selected.on.tx.KC.H.part] + offon.KC.H.part[(-tx.init.time[selected.on.tx.KC.H.part] + 1), 1])
+  cum.time.on.tx[selected.on.tx.KC.H.part] <- round(offon.KC.H.part[(-tx.init.time[selected.on.tx.KC.H.part] + 1), 2])
+  cum.time.off.tx[selected.on.tx.KC.H.full] <- round(time.to.tx[selected.on.tx.KC.H.full] + offon.KC.H.full[(-tx.init.time[selected.on.tx.KC.H.full] + 1), 1])
+  cum.time.on.tx[selected.on.tx.KC.H.full] <- round(offon.KC.H.full[(-tx.init.time[selected.on.tx.KC.H.full] + 1), 2])
+  cum.time.off.tx[selected.on.tx.KC.O.part] <- round(time.to.tx[selected.on.tx.KC.O.part] + offon.KC.O.part[(-tx.init.time[selected.on.tx.KC.O.part] + 1), 1])
+  cum.time.on.tx[selected.on.tx.KC.O.part] <- round(offon.KC.O.part[(-tx.init.time[selected.on.tx.KC.O.part] + 1), 2])
+  cum.time.off.tx[selected.on.tx.KC.O.full] <- round(time.to.tx[selected.on.tx.KC.O.full] + offon.KC.O.full[(-tx.init.time[selected.on.tx.KC.O.full] + 1), 1])
+  cum.time.on.tx[selected.on.tx.KC.O.full] <- round(offon.KC.O.full[(-tx.init.time[selected.on.tx.KC.O.full] + 1), 2])
+  
+  cum.time.off.tx[selected.on.tx.OW.B.part] <- round(time.to.tx[selected.on.tx.OW.B.part] + offon.OW.B.part[(-tx.init.time[selected.on.tx.OW.B.part] + 1), 1])
+  cum.time.on.tx[selected.on.tx.OW.B.part] <- round(offon.OW.B.part[(-tx.init.time[selected.on.tx.OW.B.part] + 1), 2])
+  cum.time.off.tx[selected.on.tx.OW.B.full] <- round(time.to.tx[selected.on.tx.OW.B.full] + offon.OW.B.full[(-tx.init.time[selected.on.tx.OW.B.full] + 1), 1])
+  cum.time.on.tx[selected.on.tx.OW.B.full] <- round(offon.OW.B.full[(-tx.init.time[selected.on.tx.OW.B.full] + 1), 2])
+  cum.time.off.tx[selected.on.tx.OW.H.part] <- round(time.to.tx[selected.on.tx.OW.H.part] + offon.OW.H.part[(-tx.init.time[selected.on.tx.OW.H.part] + 1), 1])
+  cum.time.on.tx[selected.on.tx.OW.H.part] <- round(offon.OW.H.part[(-tx.init.time[selected.on.tx.OW.H.part] + 1), 2])
+  cum.time.off.tx[selected.on.tx.OW.H.full] <- round(time.to.tx[selected.on.tx.OW.H.full] + offon.OW.H.full[(-tx.init.time[selected.on.tx.OW.H.full] + 1), 1])
+  cum.time.on.tx[selected.on.tx.OW.H.full] <- round(offon.OW.H.full[(-tx.init.time[selected.on.tx.OW.H.full] + 1), 2])
+  cum.time.off.tx[selected.on.tx.OW.O.part] <- round(time.to.tx[selected.on.tx.OW.O.part] + offon.OW.O.part[(-tx.init.time[selected.on.tx.OW.O.part] + 1), 1])
+  cum.time.on.tx[selected.on.tx.OW.O.part] <- round(offon.OW.O.part[(-tx.init.time[selected.on.tx.OW.O.part] + 1), 2])
+  cum.time.off.tx[selected.on.tx.OW.O.full] <- round(time.to.tx[selected.on.tx.OW.O.full] + offon.OW.O.full[(-tx.init.time[selected.on.tx.OW.O.full] + 1), 1])
+  cum.time.on.tx[selected.on.tx.OW.O.full] <- round(offon.OW.O.full[(-tx.init.time[selected.on.tx.OW.O.full] + 1), 2])
+  
+  cum.time.off.tx[selected.on.tx.EW.B.part] <- round(time.to.tx[selected.on.tx.EW.B.part] + offon.EW.B.part[(-tx.init.time[selected.on.tx.EW.B.part] + 1), 1])
+  cum.time.on.tx[selected.on.tx.EW.B.part] <- round(offon.EW.B.part[(-tx.init.time[selected.on.tx.EW.B.part] + 1), 2])
+  cum.time.off.tx[selected.on.tx.EW.B.full] <- round(time.to.tx[selected.on.tx.EW.B.full] + offon.EW.B.full[(-tx.init.time[selected.on.tx.EW.B.full] + 1), 1])
+  cum.time.on.tx[selected.on.tx.EW.B.full] <- round(offon.EW.B.full[(-tx.init.time[selected.on.tx.EW.B.full] + 1), 2])
+  cum.time.off.tx[selected.on.tx.EW.H.part] <- round(time.to.tx[selected.on.tx.EW.H.part] + offon.EW.H.part[(-tx.init.time[selected.on.tx.EW.H.part] + 1), 1])
+  cum.time.on.tx[selected.on.tx.EW.H.part] <- round(offon.EW.H.part[(-tx.init.time[selected.on.tx.EW.H.part] + 1), 2])
+  cum.time.off.tx[selected.on.tx.EW.H.full] <- round(time.to.tx[selected.on.tx.EW.H.full] + offon.EW.H.full[(-tx.init.time[selected.on.tx.EW.H.full] + 1), 1])
+  cum.time.on.tx[selected.on.tx.EW.H.full] <- round(offon.EW.H.full[(-tx.init.time[selected.on.tx.EW.H.full] + 1), 2])
+  cum.time.off.tx[selected.on.tx.EW.O.part] <- round(time.to.tx[selected.on.tx.EW.O.part] + offon.EW.O.part[(-tx.init.time[selected.on.tx.EW.O.part] + 1), 1])
+  cum.time.on.tx[selected.on.tx.EW.O.part] <- round(offon.EW.O.part[(-tx.init.time[selected.on.tx.EW.O.part] + 1), 2])
+  cum.time.off.tx[selected.on.tx.EW.O.full] <- round(time.to.tx[selected.on.tx.EW.O.full] + offon.EW.O.full[(-tx.init.time[selected.on.tx.EW.O.full] + 1), 1])
+  cum.time.on.tx[selected.on.tx.EW.O.full] <- round(offon.EW.O.full[(-tx.init.time[selected.on.tx.EW.O.full] + 1), 2])
+  
+  #' For each group, calculate the expected time step from infection at which AIDS will occur based on the offon matrix and time from infection to tx initiation
+  exp.aids.time[selected.on.tx.KC.B.part] <- NA
+  for (i in 1:length(selected.on.tx.KC.B.part)) {
+    exp.aids.time[selected.on.tx.KC.B.part][i] <- time.to.tx[selected.on.tx.KC.B.part][i] + 
+      min(which(offon.KC.B.part[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.KC.B.part][i])))
+  }
+  exp.aids.time[selected.on.tx.KC.B.full] <- NA
+  for (i in 1:length(selected.on.tx.KC.B.full)) {
+    exp.aids.time[selected.on.tx.KC.B.full][i] <- time.to.tx[selected.on.tx.KC.B.full][i] + 
+      min(which(offon.KC.B.full[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.KC.B.full][i])))
+  }
+  exp.aids.time[selected.on.tx.KC.H.part] <- NA
+  for (i in 1:length(selected.on.tx.KC.H.part)) {
+    exp.aids.time[selected.on.tx.KC.H.part][i] <- time.to.tx[selected.on.tx.KC.H.part][i] + 
+      min(which(offon.KC.H.part[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.KC.H.part][i])))
+  }
+  exp.aids.time[selected.on.tx.KC.H.full] <- NA
+  for (i in 1:length(selected.on.tx.KC.H.full)) {
+    exp.aids.time[selected.on.tx.KC.H.full][i] <- time.to.tx[selected.on.tx.KC.H.full][i] + 
+      min(which(offon.KC.H.full[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.KC.H.full][i])))
+  }
+  exp.aids.time[selected.on.tx.KC.O.part] <- NA
+  for (i in 1:length(selected.on.tx.KC.O.part)) {
+    exp.aids.time[selected.on.tx.KC.O.part][i] <- time.to.tx[selected.on.tx.KC.O.part][i] + 
+      min(which(offon.KC.O.part[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.KC.O.part][i])))
+  }
+  exp.aids.time[selected.on.tx.KC.O.full] <- NA
+  for (i in 1:length(selected.on.tx.KC.O.full)) {
+    exp.aids.time[selected.on.tx.KC.O.full][i] <- time.to.tx[selected.on.tx.KC.O.full][i] + 
+      min(which(offon.KC.O.full[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.KC.O.full][i])))
+  }
+  
+  exp.aids.time[selected.on.tx.OW.B.part] <- NA
+  for (i in 1:length(selected.on.tx.OW.B.part)) {
+    exp.aids.time[selected.on.tx.OW.B.part][i] <- time.to.tx[selected.on.tx.OW.B.part][i] + 
+      min(which(offon.OW.B.part[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.OW.B.part][i])))
+  }
+  exp.aids.time[selected.on.tx.OW.B.full] <- NA
+  for (i in 1:length(selected.on.tx.OW.B.full)) {
+    exp.aids.time[selected.on.tx.OW.B.full][i] <- time.to.tx[selected.on.tx.OW.B.full][i] + 
+      min(which(offon.OW.B.full[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.OW.B.full][i])))
+  }
+  exp.aids.time[selected.on.tx.OW.H.part] <- NA
+  for (i in 1:length(selected.on.tx.OW.H.part)) {
+    exp.aids.time[selected.on.tx.OW.H.part][i] <- time.to.tx[selected.on.tx.OW.H.part][i] + 
+      min(which(offon.OW.H.part[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.OW.H.part][i])))
+  }
+  exp.aids.time[selected.on.tx.OW.H.full] <- NA
+  for (i in 1:length(selected.on.tx.OW.H.full)) {
+    exp.aids.time[selected.on.tx.OW.H.full][i] <- time.to.tx[selected.on.tx.OW.H.full][i] + 
+      min(which(offon.OW.H.full[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.OW.H.full][i])))
+  }
+  exp.aids.time[selected.on.tx.OW.O.part] <- NA
+  for (i in 1:length(selected.on.tx.OW.O.part)) {
+    exp.aids.time[selected.on.tx.OW.O.part][i] <- time.to.tx[selected.on.tx.OW.O.part][i] + 
+      min(which(offon.OW.O.part[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.OW.O.part][i])))
+  }
+  exp.aids.time[selected.on.tx.OW.O.full] <- NA
+  for (i in 1:length(selected.on.tx.OW.O.full)) {
+    exp.aids.time[selected.on.tx.OW.O.full][i] <- time.to.tx[selected.on.tx.OW.O.full][i] + 
+      min(which(offon.OW.O.full[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.OW.O.full][i])))
+  }
+  
+  exp.aids.time[selected.on.tx.EW.B.part] <- NA
+  for (i in 1:length(selected.on.tx.EW.B.part)) {
+    exp.aids.time[selected.on.tx.EW.B.part][i] <- time.to.tx[selected.on.tx.EW.B.part][i] + 
+      min(which(offon.EW.B.part[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.EW.B.part][i])))
+  }
+  exp.aids.time[selected.on.tx.EW.B.full] <- NA
+  for (i in 1:length(selected.on.tx.EW.B.full)) {
+    exp.aids.time[selected.on.tx.EW.B.full][i] <- time.to.tx[selected.on.tx.EW.B.full][i] + 
+      min(which(offon.EW.B.full[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.EW.B.full][i])))
+  }
+  exp.aids.time[selected.on.tx.EW.H.part] <- NA
+  for (i in 1:length(selected.on.tx.EW.H.part)) {
+    exp.aids.time[selected.on.tx.EW.H.part][i] <- time.to.tx[selected.on.tx.EW.H.part][i] + 
+      min(which(offon.EW.H.part[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.EW.H.part][i])))
+  }
+  exp.aids.time[selected.on.tx.EW.H.full] <- NA
+  for (i in 1:length(selected.on.tx.EW.H.full)) {
+    exp.aids.time[selected.on.tx.EW.H.full][i] <- time.to.tx[selected.on.tx.EW.H.full][i] + 
+      min(which(offon.EW.H.full[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.EW.H.full][i])))
+  }
+  exp.aids.time[selected.on.tx.EW.O.part] <- NA
+  for (i in 1:length(selected.on.tx.EW.O.part)) {
+    exp.aids.time[selected.on.tx.EW.O.part][i] <- time.to.tx[selected.on.tx.EW.O.part][i] + 
+      min(which(offon.EW.O.part[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.EW.O.part][i])))
+  }
+  exp.aids.time[selected.on.tx.EW.O.full] <- NA
+  for (i in 1:length(selected.on.tx.EW.O.full)) {
+    exp.aids.time[selected.on.tx.EW.O.full][i] <- time.to.tx[selected.on.tx.EW.O.full][i] + 
+      min(which(offon.EW.O.full[ ,1] > (dat$param$max.time.off.tx.int - time.to.tx[selected.on.tx.EW.O.full][i])))
+  }
+  
+  
   ### All tt.traj groups: Assign stage of infection 
   stage[selected] <- (time.since.inf[selected] <= vlar.int) * 1 +
-      (time.since.inf[selected] > vlar.int) * (time.since.inf[selected] <= vl.acute.int) * 2 +
-      (time.since.inf[selected] > vl.acute.int) * (cum.time.off.tx[selected] < dat$param$max.time.off.tx.int) * 3 +
-      (time.since.inf[selected] > vl.acute.int) * (cum.time.off.tx[selected] >= dat$param$max.time.off.tx.int) * 4
+    (time.since.inf[selected] > vlar.int) * (time.since.inf[selected] <= vl.acute.int) * 2 +
+    (time.since.inf[selected] > vl.acute.int) * (cum.time.off.tx[selected] < dat$param$max.time.off.tx.int) * 3 +
+    (time.since.inf[selected] > vl.acute.int) * (cum.time.off.tx[selected] >= dat$param$max.time.off.tx.int) * 4
   stage.time[selected][stage[selected] == 1] <- time.since.inf[selected][stage[selected] == 1]
   stage.time[selected][stage[selected] == 2] <- time.since.inf[selected][stage[selected] == 2] - vlar.int
   stage.time[selected][stage[selected] == 3] <- time.since.inf[selected][stage[selected] == 3] - vl.acute.int
-  stage.time[selected][stage[selected] == 4 & (time.since.inf[selected] < time.to.tx[selected])] <- 
-      time.since.inf[selected][stage[selected] == 4 & (time.since.inf[selected] < time.to.tx[selected])] - dat$param$max.time.off.tx.int
-  stage.time[selected][stage[selected] == 4 & (time.since.inf[selected] >= time.to.tx[selected])] <- 
-    time.since.inf[selected][stage[selected] == 4 & (time.since.inf[selected] >= time.to.tx[selected])] - 
-    exp.aids.time[stage[selected] == 4 & (time.since.inf[selected] >= time.to.tx[selected])]
+  stage.time[selected][stage[selected] == 4 & (time.since.inf[selected] <= time.to.tx[selected] | is.na(time.to.tx[selected]))] <- 
+    time.since.inf[selected][stage[selected] == 4 & (time.since.inf[selected] <= time.to.tx[selected] | is.na(time.to.tx[selected]))] - dat$param$max.time.off.tx.int # If not yet initiated tx (or just initiated) and in stage 4, stage.time = time since infection - number of days off treatment for a before onset of AIDS
+  stage.time[selected][stage[selected] == 4 & (time.since.inf[selected] > time.to.tx[selected] & !is.na(time.to.tx[selected]))] <- 
+    time.since.inf[selected][stage[selected] == 4 & (time.since.inf[selected] > time.to.tx[selected] & !is.na(time.to.tx[selected]))] - 
+    exp.aids.time[selected][stage[selected] == 4 & (time.since.inf[selected] > time.to.tx[selected] & !is.na(time.to.tx[selected]))]
   
   
   ### All tt.traj groups: Assign VL (assuming a linear rate of change in VL up to peak viremia in acute phase and from peak down to set point)
-
+  
   ##' To set VL in the AIDS phase, define a variable average consecutive time off tx
   ##' - For those who not yet inititated tx, set time.off.tx to time since infected.
   ##' - For those who disontinued, set to avg time off before reinitiating
   cons.time.off.tx <- rep(NA, length(selected))
   cons.time.off.tx[tx.status[selected] == 1] <- 0
-  cons.time.off.tx[time.since.inf[selected] < time.to.tx[selected]] <- time.since.inf[selected]
-  cons.time.off.tx[tx.status[selected] == 0 & (time.since.inf[selected] >= time.to.tx[selected]) & tt.traj[selected] %in% c(1,3)] <- 
-    (1 / (tx.reinit.full[selected] * tx.reinit.part.rr))
-  cons.time.off.tx[tx.status[selected] == 0 & (time.since.inf[selected] >= time.to.tx[selected]) & tt.traj[selected] %in% c(2,4)] <- 
-      (1 / (tx.reinit.full[selected]))
+  cons.time.off.tx[time.since.inf[selected] <= time.to.tx[selected] & !is.na(time.to.tx[selected])] <- 
+    time.since.inf[selected][time.since.inf[selected] <= time.to.tx[selected] & !is.na(time.to.tx[selected])]
+  cons.time.off.tx[tx.status[selected] == 0 & (time.since.inf[selected] > time.to.tx[selected] & !is.na(time.to.tx[selected])) & tt.traj[selected] %in% c(1,3)] <- 
+    (1 / (tx.reinit.full[selected][tx.status[selected] == 0 & (time.since.inf[selected] > time.to.tx[selected] & !is.na(time.to.tx[selected])) & tt.traj[selected] %in% c(1,3)] * tx.reinit.part.rr))
+  cons.time.off.tx[tx.status[selected] == 0 & (time.since.inf[selected] > time.to.tx[selected] & !is.na(time.to.tx[selected])) & tt.traj[selected] %in% c(2,4)] <- 
+    (1 / (tx.reinit.full[selected][tx.status[selected] == 0 & (time.since.inf[selected] > time.to.tx[selected] & !is.na(time.to.tx[selected])) & tt.traj[selected] %in% c(2,4)]))
   
   ##' Assume that, upon stopping ART in the AIDS phase, VL rises at the same rate as it would in the chronic phase up to set point and then
   ##' rises at the slope that VL rises in untreated AIDS to go from set point to the max level in 2 years. To implement this, first define 
@@ -640,32 +859,32 @@ init_status_msm_whamp <- function(dat) {
   
   vl.rise.int <- rep(NA, length(selected))
   vl.rise.int <- (vlsp - vl.supp)/vl.up.slope
-
+  
   ## if stage 4, set vl according to slope of change in VL and time since tx. If in stage 3, assume all off tx are at set point
   vl[selected] <- (time.since.inf[selected] <= vlar.int) * (vlap * time.since.inf[selected] / vlar.int) +
     (time.since.inf[selected] > vlar.int) * (time.since.inf[selected] <= vl.acute.int) *
     ((vlsp - vlap) * (time.since.inf[selected] - vlar.int) / vlaf.int + vlap) +
     (time.since.inf[selected] > vl.acute.int) * (cum.time.off.tx[selected] < dat$param$max.time.off.tx.int) * vlsp +
     (cum.time.off.tx[selected] >= dat$param$max.time.off.tx.int) * (cons.time.off.tx < vl.rise.int) * 
-      (vl.supp + (cons.time.off.tx * vl.up.slope)) + 
+    (vl.supp + (cons.time.off.tx * vl.up.slope)) + 
     (cum.time.off.tx[selected] >= dat$param$max.time.off.tx.int) * (cons.time.off.tx >= vl.rise.int) * 
-      pmin((vlsp + (cons.time.off.tx - vl.rise.int) * vlds), vlaidsp)
+    pmin((vlsp + (cons.time.off.tx - vl.rise.int) * vlds), vlaidsp)
   ##' We assume that all who are on tx are at their suppressed levels. This doesn't account for the fact that some people may have 
   ##' recently reinitiated and not yet achieved on-treatment levels. But we assume all men in the chronic phase who are off tx are 
   ##' at set point, so it balances out for them.
-  vl[selected][tx.status[selected] == 1] <- vl.supp
-
-
+  vl[selected][tx.status[selected] == 1] <- vl.supp[tx.status[selected] == 1]
+  
+  
   ### Last neg test before present for negatives
   selected <- which(status == 0 & tt.traj %in% c(3, 4))
   
   if (dat$param$testing.pattern == "interval") {
-      tslt <- ceiling(runif(length(selected),
-                            min = 0,
-                            max = test.int[selected]))
+    tslt <- ceiling(runif(length(selected),
+                          min = 0,
+                          max = test.int[selected]))
   }
   if (dat$param$testing.pattern == "memoryless") {
-      stop("Intertest interval parameter calculated assuming interval method. Revise parameter estimation procedure for memoryless process.")
+    stop("Intertest interval parameter calculated assuming interval method. Revise parameter estimation procedure for memoryless process.")
   }
   last.neg.test[selected] <- -tslt
   
