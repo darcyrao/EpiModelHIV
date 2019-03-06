@@ -83,7 +83,7 @@ trans_msm_whamp <- function(dat, at) {
   colnames(disc.ip)[1:2] <- colnames(disc.rp)[1:2] <- c("ins", "rec")
 
 
-  # PATP: Insertive Man Infected (Col 1) --------------------------------
+  # PATP: Insertive Man Infected (in disc.ip, infected partner id = col 1) --------------------------------
 
   # Attributes of infected
   ip.vl <- vl[disc.ip[, 1]]
@@ -142,7 +142,7 @@ trans_msm_whamp <- function(dat, at) {
   stopifnot(ip.tprob >= 0, ip.tprob <= 1)
 
 
-  # PATP: Receptive Man Infected (Col 2) --------------------------------
+  # PATP: Receptive Man Infected (in disc.rp, infected partner id = col 2) --------------------------------
 
   # Attributes of infected
   rp.vl <- vl[disc.rp[, 2]]
