@@ -59,12 +59,12 @@ disclose_msm_whamp <- function(dat, at){
     # Check for discordant rels
     posneg <- el[which(status[el[, 1]] - status[el[, 2]] == 1), , drop = FALSE]
     negpos <- el[which(status[el[, 2]] - status[el[, 1]] == 1), , drop = FALSE]
-    disc.el <- rbind(posneg, negpos[, 2:1])
+    disc.el <- rbind(posneg, negpos[, 2:1]) # this edgelist is ordered with the pos partner in col 1
 
     # Check for not already disclosed
     discl.list <- dat$temp$discl.list
-    disclose.cdl <- discl.list[, 1] * 1e7 + discl.list[, 2]  --# Check what this does - why multiply by 1e7? what is being added?
-    discord.cdl <- uid[disc.el[, 1]] * 1e7 + uid[disc.el[, 2]] --# Check what this does - why multiply by 1e7? What is being added?
+    disclose.cdl <- discl.list[, 1] * 1e7 + discl.list[, 2]  
+    discord.cdl <- uid[disc.el[, 1]] * 1e7 + uid[disc.el[, 2]] 
     notdiscl <- !(discord.cdl %in% disclose.cdl)
 
 
@@ -88,7 +88,7 @@ disclose_msm_whamp <- function(dat, at){
         new.rel <- ((uid[nd.dx[, 1]] * 1e7 + uid[nd.dx[, 2]]) %in%
                       (new.edges[, 1] * 1e7 + new.edges[, 2])) |
                    ((uid[nd.dx[, 2]] * 1e7 + uid[nd.dx[, 1]]) %in%
-                      (new.edges[, 1] * 1e7 + new.edges[, 2])) #-- should this be a 1?
+                      (new.edges[, 1] * 1e7 + new.edges[, 2]))
 
         # Check if diag is new
         new.dx <- diag.time[nd.dx[, 1]] == at
