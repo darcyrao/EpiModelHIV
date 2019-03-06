@@ -39,7 +39,7 @@ prep_msm_whamp <- function(dat, at) {
   prepClass <- dat$attr$prepClass
   prepLastRisk <- dat$attr$prepLastRisk
   prepStartTime <- dat$attr$prepStartTime
-  prepDiscont <- dat$attr$prepDiscont
+  prepDiscont <- dat$attr$prepDisc
   spontDisc <- dat$attr$spontDisc
   # prepLastStiScreen <- dat$attr$prepLastStiScreen
 
@@ -78,11 +78,11 @@ prep_msm_whamp <- function(dat, at) {
   ind2 <- dat$attr$prep.ind.uai.risk
 
   twind <- at - dat$param$prep.risk.int
-  idsEligStart <- intersect(which(ind1 == at | ind2 >= twind),
+  
+  prepElig[which(ind1 == at | ind2 >= twind)] <- 1
+  
+  idsEligStart <- intersect(which(prepElig == 1),
                             idsEligStart)
-
-  prepElig[idsEligStart] <- 1
-
   
   # No longer indicated for PrEP
   idsNoIndic <- which((ind1 < at | is.na(ind1)) & 
@@ -122,7 +122,7 @@ prep_msm_whamp <- function(dat, at) {
   # All discontinuation
   idsStp <- c(idsStpDx, idsStpDth, idsEligStop, idsDiscont)
   
-  # Calculate mean time to discontinuation among those who stopped
+  # Time to discontinuation among those who stopped
   time.to.disc <- rep(NA, length(idsStp))
   time.to.disc <- at - prepStartTime[idsStp]
   
@@ -142,8 +142,8 @@ prep_msm_whamp <- function(dat, at) {
     sum(prepElig == 1 & region %in% c("OW", "EW"), na.rm = TRUE)
   
   # For each group, sample ids to start PrEP if current coverage < coverage threshold
-  idsEligSt.KC <- idsEligStart[which(region %in% c("KC"))]
-  idsEligSt.oth <- idsEligStart[which(region %in% c("OW", "EW"))]
+  idsEligSt.KC <- idsEligStart[which(region[idsEligStart] %in% c("KC"))]
+  idsEligSt.oth <- idsEligStart[which(region[idsEligStart] %in% c("OW", "EW"))]
   
   nStart.KC <- pmax(0, pmin(length(idsEligSt.KC), round((prep.coverage.KC - prep.cov.curr.KC) *
                                         sum(prepElig == 1 & region %in% c("KC"), na.rm = TRUE))))
@@ -184,7 +184,7 @@ prep_msm_whamp <- function(dat, at) {
     
     # Discontinuation group
     needgp <- which(is.na(prepDiscont[idsStart]))
-    prepDiscont[idsStart[needgp]] <- rbinom(length(needgp, 1, prep.discontinue)) 
+    prepDiscont[idsStart[needgp]] <- rbinom(length(needgp), 1, prep.discontinue) 
     
   }
   
@@ -201,7 +201,7 @@ prep_msm_whamp <- function(dat, at) {
   dat$attr$prepStartTime <- prepStartTime
   dat$attr$prepClass <- prepClass
   dat$attr$prepLastRisk <- prepLastRisk
-  dat$attr$prepLastStiScreen <- prepLastStiScreen
+  # dat$attr$prepLastStiScreen <- prepLastStiScreen
   dat$attr$prepDiscont <- prepDiscont
   dat$attr$spontDisc <- spontDisc
 
@@ -216,7 +216,7 @@ prep_msm_whamp <- function(dat, at) {
   dat$epi$prep.cov.KC[at] <- prep.cov.KC
   dat$epi$prep.cov.oth[at] <- prep.cov.oth
   dat$epi$prepStart[at] <- length(idsStart)
-  dat$epi$time.on.prep <- time.on.prep # Vector with the total time on PrEP among those who discontinued in this time step
+  dat$epi$time.to.disc <- time.to.disc # Vector with the total time on PrEP among those who discontinued in this time step
   dat$epi$time.since.prep.start <- time.since.prep.start # Vector with the elapsed time on PrEP among current users
 
   return(dat)
