@@ -26,6 +26,7 @@ condoms_msm_whamp <- function(dat, at) {
 
   # Attributes
   uid <- dat$attr$uid
+  age <- dat$attr$age
   diag.status <- dat$attr$diag.status
   prepStat <- dat$attr$prepStat
   prepClass <- dat$attr$prepClass
@@ -49,8 +50,8 @@ condoms_msm_whamp <- function(dat, at) {
 
     if (type == "main") {
       el.main <- el[el[, "ptype"] == 1, ]
-      age.p1 <- ifelse(age[el.main[, 1]] %in% c(18:34), "Y", "O")
-      age.p2 <- ifelse(age[el.main[, 2]] %in% c(18:34), "Y", "O")
+      age.p1 <- ifelse(age[el.main[, 1]] <35, "Y", "O")
+      age.p2 <- ifelse(age[el.main[, 2]] <35, "Y", "O")
       num.YY <- (age.p1 == "Y") + (age.p2 == "Y")
       cond.prob <- (num.YY == 2) * (dat$param$cond.main.YY.prob) +
         (num.YY == 1) * (dat$param$cond.main.other.prob) +
@@ -96,14 +97,28 @@ condoms_msm_whamp <- function(dat, at) {
       }
     }
     
-    # Adjust base condom probs to match observed after setting cond.prob.adj to 1 for those who are partnered with always condom users
+    #' Adjust base condom probs so that the overall probability of condom use matches observed after setting 
+    #' cond.prob.adj to 1 for those who are partnered with always condom users. Observed data on condom use are
+    #' from a sample of egos and reflect their condom use preferences as well as those of their partners. The observed
+    #' average probability of condom use from the sample = 1 * proportion always condom users + condom prob among men 
+    #' who are not always condom users * (1 - proportion always condom users). So after setting the condom prob to 1 for
+    #' men partnered with always condom users, we need to adjust the probability in other dyads to match the observed
+    #' average probability of condom use.
     if (type %in% "pers") {
-      n.set.to.always <- sum((ca1 == 1  & ca2 !=1) | (ca2 == 1 & ca1 !=1)) # count the number of nodes set to be always condom users because their partner is an always condom user
-      cond.prob.adj <- (cond.prob.adj[cond.prob.adj < 1] - (1 * n.set.to.always))/(1 - n.set.to.always) # Adjust the probability of condom use among dyads that don't always use condoms such that the average level of condom use in the pop matches observed levels
+      obs.prob <- dat$param$cond.pers.prob * (1 - dat$param$cond.pers.always.prob) + 1 * dat$param$cond.pers.always.prob # Define the observed overall condom prob we want to match
+      n.edges <- nrow(elt)
+      n.always <- sum(ca1 == 1  | ca2 == 1) # number of dyads set to use condoms because one or both partnres is an always condom user
+      n.not.always <- sum(ca1 == 0 & ca2 == 0) # number of dyads in which neither member is an always condom user
+      adjusted.prob <- (obs.prob - (n.always / n.edges)) / (n.not.always / n.edges) # Calculated the probability of condom use among dyads that don't always use condoms such that the average level of condom use in the pop matches observed levels
+      cond.prob.adj[cond.prob.adj < 1] <- adjusted.prob 
     }
     if (type %in% "inst") {
-      n.set.to.always <- sum((ca1 == 1  & ca2 !=1) | (ca2 == 1 & ca1 !=1)) # count the number of nodes set to be always condom users because their partner is an always condom user
-      cond.prob.adj <- (cond.prob.adj[cond.prob.adj < 1] - (1 * n.set.to.always))/(1 - n.set.to.always) # Adjust the probability of condom use among dyads that don't always use condoms such that the average level of condom use in the pop matches observed levels
+      obs.prob <- dat$param$cond.inst.prob * (1 - dat$param$cond.inst.always.prob) + 1 * dat$param$cond.inst.always.prob # Define the observed overall condom prob we want to match
+      n.edges <- nrow(elt)
+      n.always <- sum(ca1 == 1  | ca2 == 1) # number of dyads set to use condoms because one or both partnres is an always condom user
+      n.not.always <- sum(ca1 == 0 & ca2 == 0) # number of dyads in which neither member is an always condom user
+      adjusted.prob <- (obs.prob - (n.always / n.edges)) / (n.not.always / n.edges) # Calculated the probability of condom use among dyads that don't always use condoms such that the average level of condom use in the pop matches observed levels
+      cond.prob.adj[cond.prob.adj < 1] <- adjusted.prob 
     }
     
     # Transform to UAI logit
@@ -151,11 +166,12 @@ condoms_msm_whamp <- function(dat, at) {
       uai.prob[idsRC] <- 1 - (1 - uai.prob[idsRC]) * (1 - rcomp.prob)
     }
     
-    # Continued risk compensation after PrEP discontinuation - only if the partner is not an always condom user
+    # Continued risk compensation after PrEP discontinuation - only if the partner is not an always condom user 
     if (rcomp.discont == TRUE){
-      ids.spontDisc <- which((prepStat[elt[, 1]] == 0 & prepClass[elt[, 1]] %in% rcomp.adh.groups & spontDisc[elt[, 1]] == 1 & cond.always[elt[, 2]] !=1) |
-                               (prepStat[elt[, 2]] == 0 & prepClass[elt[, 2]] %in% rcomp.adh.groups & spontDisc[elt[, 2]] == 1 & cond.always[elt[, 1]] !=1))
-      uai.prob[ids.spontDisc] <- 1 - (1 - uai.prob[ids.spontDisc]) * (1 - rcomp.prob)
+      ids.spontDisc <- which((prepStat[elt[, 1]] == 0 & prepClass[elt[, 1]] %in% rcomp.adh.groups & spontDisc[elt[, 1]] == 1 & cond.always[elt[, 2]] == 0) |
+                               (prepStat[elt[, 2]] == 0 & prepClass[elt[, 2]] %in% rcomp.adh.groups & spontDisc[elt[, 2]] == 1 & cond.always[elt[, 1]] == 0))
+      idsRC.disc <- setdiff(ids.spontDisc, idsRC) # If partner is on PrEP and risk compensates, don't add effect of continued risk compensation from discontinued partner
+      uai.prob[idsRC.disc] <- 1 - (1 - uai.prob[idsRC.disc]) * (1 - rcomp.prob)
       
     }
 
