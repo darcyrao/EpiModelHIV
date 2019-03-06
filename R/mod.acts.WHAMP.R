@@ -58,14 +58,13 @@ acts_msm_whamp <- function(dat, at) {
     st1 <- status[el[, 1]]
     st2 <- status[el[, 2]]
     disc <- abs(st1 - st2) == 1
-    el[which(disc == 1 & st2 == 1), ] <- el[which(disc == 1 & st2 == 1), 2:1]
+    el[which(disc == 1 & st2 == 1), ] <- el[which(disc == 1 & st2 == 1), 2:1] # If discordant, pos partners in col 1
     el <- cbind(el, status[el[, 1]], status[el[, 2]])
     colnames(el) <- c("p1", "p2", "st1", "st2")
 
     if (nrow(el) > 0) {
 
       # Base AI rates
-      ai.rate <- rep(NA, nrow(el))
       ai.rate <- base.ai.rate * ai.scale
 
       # ## STI associated cessation of activity
@@ -75,7 +74,7 @@ acts_msm_whamp <- function(dat, at) {
 
       # Final act number
       if (fixed == FALSE) {
-        ai <- rpois(length(ai.rate), ai.rate)
+        ai <- rpois(nrow(el), ai.rate)
       } else {
         ai <- round(ai.rate)
       }
