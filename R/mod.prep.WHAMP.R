@@ -56,14 +56,13 @@ prep_msm_whamp <- function(dat, at) {
   prep.class.prob <- dat$param$prep.class.prob
   prep.discontinue <- dat$param$prep.discont
   prep.discont.prob <- dat$param$prep.discont.prob
-  prep.start.step <- dat$param$prep.start
-  
+
   # Set coverage quota for the current time step
   if (at == prep.start.step){
     prep.coverage.KC <- prep.coverage.init.KC
     prep.coverage.oth <- prep.coverage.init.oth
   }
-  if (at > dat$param$prep.start.step & is.finite(prep.start.step)){
+  if (at > prep.start.step & is.finite(prep.start.step)){
     prep.coverage.KC <- min(prep.coverage.init.KC + (at - prep.start.step)*prep.scaleup.KC, prep.cov.max.KC)
     prep.coverage.oth <- min(prep.coverage.init.oth + (at - prep.start.step)*prep.scaleup.oth, prep.cov.max.oth)
   }
@@ -279,39 +278,44 @@ riskhist_msm_whamp <- function(dat, at) {
   inst.deg <- get_degree(dat$el[[3]])
   
   
-  ## Preconditions ##
-  
-  # Any UAI
-  uai.any <- unique(c(el2$p1[el2$uai > 0],
-                      el2$p2[el2$uai > 0]))
-  
-  # Monogamous partnerships: 2-sided
-  tot.deg <- main.deg + casl.deg + inst.deg
-  uai.mono <- intersect(which(tot.deg == 1), uai.any)
-  
-  # "Negative" partnerships
-  tneg <- unique(c(el2$p1[el2$st1 == 0], el2$p2[el2$st1 == 0])) ##-- should'nt this be el2$p2[el2$st2] ==0] ?
-  fneg <- unique(c(el2$p1[which(dx[el2$p1] == 0)], el2$p2[which(dx[el2$p1] == 0)])) ##-- should'nt this be el2$p2[which(dx[el2$p2] ==0] ?
-  all.neg <- c(tneg, fneg)
-  
   ## Condition 1: ongoing positive partner who has disclosed
-  discord <- el2[el2$st1 == 1 & el2$ptype %in% 1:2, ]
+  
+  discord.ong <- el2[el2$st1 == 1 & el2$ptype %in% c(1:2), ]
   
   # Disclosure
   discl.list <- dat$temp$discl.list
   disclose.cdl <- discl.list[, 1] * 1e7 + discl.list[, 2]
-  delt.cdl <- uid[discord[, 1]] * 1e7 + uid[discord[, 2]]
+  delt.cdl <- uid[discord.ong[, 1]] * 1e7 + uid[discord.ong[, 2]]
   discl <- (delt.cdl %in% disclose.cdl)
-  ai.sd <- discord$p2[discl == TRUE]
+  ai.sd <- discord.ong$p2[discl == TRUE]
   
   dat$attr$prep.ind.discord.ongoing[ai.sd] <- at
   
   ## Condition 2: UAI outside of a 2-sided "monogamous" partnership
   ##               with a partner tested negative in past 6 months
-  mono.neg <- intersect(uai.mono, all.neg)
-  part.id1 <- c(el2[el2$p1 %in% mono.neg, 2], el2[el2$p2 %in% mono.neg, 1])
+  
+  # Any UAI
+  uai.any <- unique(c(el2$p1[el2$uai > 0],
+                      el2$p2[el2$uai > 0]))
+  
+  # Monogamous partnerships (2-sided)
+  tot.deg <- main.deg + casl.deg + inst.deg
+  tot.deg.p1 <- tot.deg[el2$p1]
+  tot.deg.p2 <- tot.deg[el2$p2]
+  monog.2sided <- unique(c(el2$p1[tot.deg.p1 == 1 & tot.deg.p2 == 1],
+                           el2$p2[tot.deg.p1 == 1 & tot.deg.p2 == 1]))
+  
+  # "Negative" partnerships
+  tneg <- unique(c(el2$p1[el2$st1 == 0], el2$p2[el2$st1 == 0]))
+  fneg <- unique(c(el2$p1[which(dx[el2$p1] == 0)], el2$p2[which(dx[el2$p1] == 0)]))
+  all.neg <- c(tneg, fneg)
+  
+
+  uai.mono <- intersect(monog.2sided, uai.any)
+  uai.mono.neg <- intersect(uai.mono, all.neg)
+  part.id1 <- c(el2[el2$p1 %in% uai.mono.neg, 2], el2[el2$p2 %in% uai.mono.neg, 1])
   part.recently.tested <- since.test[part.id1] <= (180/time.unit)
-  mono.neg.recently.tested <- mono.neg[which(part.recently.tested == TRUE)]
+  mono.neg.recently.tested <- uai.mono.neg[which(part.recently.tested == TRUE)]
   
   uai.risk <- setdiff(uai.any, mono.neg.recently.tested)
   dat$attr$prep.ind.uai.risk[uai.risk] <- at
