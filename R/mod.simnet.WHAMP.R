@@ -11,7 +11,7 @@
 #' @keywords module msm
 #'
 #' @export
-#'
+#' 
 simnet_msm_whamp <- function(dat, at) {
 
   ## Edges correction
