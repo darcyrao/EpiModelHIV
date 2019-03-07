@@ -396,7 +396,7 @@ This will be used to assign an attribute to indicate men who will discontinue
 while they are still candidates for PrEP. The remainder will discontinue only
 if their risk changes such that they are no longer eligilbe for the intervention.}
 
-\item{prep.discont.prob}{Probability per time step that of halting PrEP for men who 
+\item{prep.discont.prob}{Probability per time step of halting PrEP for men who 
 discontinue.}
 
 \item{rcomp.prob}{Level of risk compensation from 0 to 1, where 0 is no risk
