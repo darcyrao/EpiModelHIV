@@ -11,11 +11,11 @@
 #' @export
 #'
 prep_msm_whamp <- function(dat, at) {
-
+  
   # Function Selection ------------------------------------------------------
   
   if (at >= dat$param$riskh.start) {
-    dat <- riskhist_msm(dat, at)
+    dat <- riskhist_msm_whamp(dat, at)
   } else {
     return(dat)
   }
@@ -149,7 +149,7 @@ prep_msm_whamp <- function(dat, at) {
                                         sum(prepElig == 1 & region %in% c("KC"), na.rm = TRUE))))
   nStart.oth <- pmax(0, pmin(length(idsEligSt.oth), round((prep.coverage.oth - prep.cov.curr.oth) *
                                         sum(prepElig == 1 & region %in% c("OW", "EW"), na.rm = TRUE))))
-
+  
   idsStart.KC <- NULL
   if (nStart.KC > 0) {
     if (prep.init.rate >= 1) {
