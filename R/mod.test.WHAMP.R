@@ -45,7 +45,7 @@ test_msm_whamp <- function(dat, at) {
 
   # Calculate intertest interval as a function of age
   centered.age <- (age - mean.age.iti)
-  test.int <- iti.coefs[1] + centered.age * iti.coefs[2] + centered.age^2 * iti.coefs[3]
+  test.int <- (iti.coefs[1] + centered.age * iti.coefs[2] + centered.age^2 * iti.coefs[3]) / dat$param$time.unit
   
   ## Process
 
