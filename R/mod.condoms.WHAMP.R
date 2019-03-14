@@ -110,6 +110,9 @@ condoms_msm_whamp <- function(dat, at) {
       n.always <- sum(ca1 == 1  | ca2 == 1) # number of dyads set to use condoms because one or both partnres is an always condom user
       n.not.always <- sum(ca1 == 0 & ca2 == 0) # number of dyads in which neither member is an always condom user
       adjusted.prob <- (obs.prob - (n.always / n.edges)) / (n.not.always / n.edges) # Calculated the probability of condom use among dyads that don't always use condoms such that the average level of condom use in the pop matches observed levels
+      if(adjusted.prob <0) {
+        stop("Adjusted condom probability must be >=0")
+      }
       cond.prob.adj[cond.prob.adj < 1] <- adjusted.prob 
     }
     if (type %in% "inst") {
@@ -118,6 +121,9 @@ condoms_msm_whamp <- function(dat, at) {
       n.always <- sum(ca1 == 1  | ca2 == 1) # number of dyads set to use condoms because one or both partnres is an always condom user
       n.not.always <- sum(ca1 == 0 & ca2 == 0) # number of dyads in which neither member is an always condom user
       adjusted.prob <- (obs.prob - (n.always / n.edges)) / (n.not.always / n.edges) # Calculated the probability of condom use among dyads that don't always use condoms such that the average level of condom use in the pop matches observed levels
+      if(adjusted.prob <0) {
+        stop("Adjusted condom probability must be >=0")
+      }
       cond.prob.adj[cond.prob.adj < 1] <- adjusted.prob 
     }
     
