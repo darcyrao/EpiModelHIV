@@ -3,7 +3,6 @@
 \name{tx_msm}
 \alias{tx_msm}
 \alias{tx_het}
-\alias{tx_het}
 \title{Treatment Module}
 \usage{
 tx_msm(dat, at)

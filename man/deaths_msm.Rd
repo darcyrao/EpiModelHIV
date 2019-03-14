@@ -3,7 +3,6 @@
 \name{deaths_msm}
 \alias{deaths_msm}
 \alias{deaths_het}
-\alias{deaths_het}
 \title{Death Module}
 \usage{
 deaths_msm(dat, at)

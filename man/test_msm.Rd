@@ -3,7 +3,6 @@
 \name{test_msm}
 \alias{test_msm}
 \alias{dx_het}
-\alias{dx_het}
 \title{HIV Testing Module}
 \usage{
 test_msm(dat, at)

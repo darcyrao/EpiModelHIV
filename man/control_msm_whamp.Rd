@@ -5,18 +5,18 @@
 \title{Epidemic Model Control Settings for the WHAMP model}
 \usage{
 control_msm_whamp(simno = 1, nsims = 1, ncores = 1, nsteps = 100,
-  start = 1, initialize.FUN = initialize_msm_whamp, aging.FUN = aging_msm,
-  deaths.FUN = deaths_msm_whamp, births.FUN = births_msm_whamp,
-  test.FUN = test_msm_whamp, tx.FUN = tx_msm_whamp,
-  progress.FUN = progress_msm_whamp, vl.FUN = vl_msm_whamp,
-  aiclass.FUN = update_aiclass_msm_whamp, roleclass.FUN = NULL,
-  resim_nets.FUN = simnet_msm_whamp, disclose.FUN = disclose_msm_whamp,
-  acts.FUN = acts_msm_whamp, condoms.FUN = condoms_msm_whamp,
-  position.FUN = position_msm_whamp, prep.FUN = prep_msm_whamp,
-  trans.FUN = trans_msm_whamp, stitrans.FUN = NULL, stirecov.FUN = NULL,
-  stitx.FUN = NULL, prev.FUN = prevalence_msm_whamp,
-  verbose.FUN = verbose_msm, save.nwstats = FALSE, verbose = TRUE,
-  verbose.int = 1, ...)
+  start = 1, initialize.FUN = initialize_msm_whamp,
+  aging.FUN = aging_msm, deaths.FUN = deaths_msm_whamp,
+  births.FUN = births_msm_whamp, test.FUN = test_msm_whamp,
+  tx.FUN = tx_msm_whamp, progress.FUN = progress_msm_whamp,
+  vl.FUN = vl_msm_whamp, aiclass.FUN = update_aiclass_msm_whamp,
+  roleclass.FUN = NULL, resim_nets.FUN = simnet_msm_whamp,
+  disclose.FUN = disclose_msm_whamp, acts.FUN = acts_msm_whamp,
+  condoms.FUN = condoms_msm_whamp, position.FUN = position_msm_whamp,
+  prep.FUN = prep_msm_whamp, trans.FUN = trans_msm_whamp,
+  stitrans.FUN = NULL, stirecov.FUN = NULL, stitx.FUN = NULL,
+  prev.FUN = prevalence_msm_whamp, verbose.FUN = verbose_msm,
+  save.nwstats = FALSE, verbose = TRUE, verbose.int = 1, ...)
 }
 \arguments{
 \item{simno}{Unique ID for the simulation run, used for file naming purposes

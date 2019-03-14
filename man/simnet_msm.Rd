@@ -3,7 +3,6 @@
 \name{simnet_msm}
 \alias{simnet_msm}
 \alias{simnet_het}
-\alias{simnet_het}
 \title{Network Resimulation Module}
 \usage{
 simnet_msm(dat, at)

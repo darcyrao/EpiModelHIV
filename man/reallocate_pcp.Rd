@@ -2,7 +2,6 @@
 % Please edit documentation in R/utilities.R, R/utilities.WHAMP.R
 \name{reallocate_pcp}
 \alias{reallocate_pcp}
-\alias{reallocate_pcp}
 \title{Proportionally Reallocate PrEP Adherence Class Probability}
 \usage{
 reallocate_pcp(in.pcp = c(0.211, 0.07, 0.1, 0.619), reall = 0)

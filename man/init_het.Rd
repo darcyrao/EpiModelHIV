@@ -2,17 +2,16 @@
 % Please edit documentation in R/params.R, R/params.WHAMP.R
 \name{init_het}
 \alias{init_het}
-\alias{init_het}
 \title{Initial Conditions for Stochastic Network Model of HIV-1 Infection in
        Sub-Saharan Africa}
 \usage{
-init_het(i.prev.male = 0.05, i.prev.feml = 0.05, ages.male = seq(18, 55,
-  7/365), ages.feml = seq(18, 55, 7/365), inf.time.dist = "geometric",
-  max.inf.time = 5 * 365, ...)
+init_het(i.prev.male = 0.05, i.prev.feml = 0.05, ages.male = seq(18,
+  55, 7/365), ages.feml = seq(18, 55, 7/365),
+  inf.time.dist = "geometric", max.inf.time = 5 * 365, ...)
 
-init_het(i.prev.male = 0.05, i.prev.feml = 0.05, ages.male = seq(18, 55,
-  7/365), ages.feml = seq(18, 55, 7/365), inf.time.dist = "geometric",
-  max.inf.time = 5 * 365, ...)
+init_het(i.prev.male = 0.05, i.prev.feml = 0.05, ages.male = seq(18,
+  55, 7/365), ages.feml = seq(18, 55, 7/365),
+  inf.time.dist = "geometric", max.inf.time = 5 * 365, ...)
 }
 \arguments{
 \item{i.prev.male}{Prevalence of initially infected males.}

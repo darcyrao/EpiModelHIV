@@ -2,7 +2,6 @@
 % Please edit documentation in R/utilities.R, R/utilities.WHAMP.R
 \name{apportion_lr}
 \alias{apportion_lr}
-\alias{apportion_lr}
 \title{Apportion Least-Remainder Method}
 \usage{
 apportion_lr(vector.length, values, proportions, shuffled = FALSE)

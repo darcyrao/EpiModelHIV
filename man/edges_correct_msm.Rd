@@ -3,8 +3,6 @@
 \name{edges_correct_msm}
 \alias{edges_correct_msm}
 \alias{edges_correct_het}
-\alias{edges_correct_msm}
-\alias{edges_correct_het}
 \title{Adjustment for the Edges Coefficient with Changing Network Size}
 \usage{
 edges_correct_msm(dat, at)

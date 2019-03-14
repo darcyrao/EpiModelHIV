@@ -3,7 +3,6 @@
 \name{births_msm}
 \alias{births_msm}
 \alias{births_het}
-\alias{births_het}
 \title{Births Module}
 \usage{
 births_msm(dat, at)

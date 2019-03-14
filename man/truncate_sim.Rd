@@ -2,7 +2,6 @@
 % Please edit documentation in R/utilities.R, R/utilities.WHAMP.R
 \name{truncate_sim}
 \alias{truncate_sim}
-\alias{truncate_sim}
 \title{Truncate Simulation Time Series}
 \usage{
 truncate_sim(x, at)

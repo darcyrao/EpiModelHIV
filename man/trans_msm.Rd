@@ -3,7 +3,6 @@
 \name{trans_msm}
 \alias{trans_msm}
 \alias{trans_het}
-\alias{trans_het}
 \title{Transmission Module}
 \usage{
 trans_msm(dat, at)

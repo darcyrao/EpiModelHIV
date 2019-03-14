@@ -2,7 +2,6 @@
 % Please edit documentation in R/mod.initialize.R, R/mod.initialize.WHAMP.R
 \name{reinit_msm}
 \alias{reinit_msm}
-\alias{reinit_msm}
 \title{Re-Initialization Module}
 \usage{
 reinit_msm(x, param, init, control, s)

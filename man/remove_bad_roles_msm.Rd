@@ -2,7 +2,6 @@
 % Please edit documentation in R/mod.initialize.R, R/mod.initialize.WHAMP.R
 \name{remove_bad_roles_msm}
 \alias{remove_bad_roles_msm}
-\alias{remove_bad_roles_msm}
 \title{Removes any sexual partnerships prohibited by sexual role mixing}
 \usage{
 remove_bad_roles_msm(nw)

@@ -2,7 +2,6 @@
 % Please edit documentation in R/utilities.R, R/utilities.WHAMP.R
 \name{sourceDir}
 \alias{sourceDir}
-\alias{sourceDir}
 \title{Source All Files in a Directory}
 \usage{
 sourceDir(path, verbose = TRUE, ...)

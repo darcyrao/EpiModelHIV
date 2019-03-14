@@ -3,7 +3,6 @@
 \name{vl_msm}
 \alias{vl_msm}
 \alias{vl_het}
-\alias{vl_het}
 \title{Viral Load Module}
 \usage{
 vl_msm(dat, at)

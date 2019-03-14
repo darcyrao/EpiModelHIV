@@ -2,7 +2,6 @@
 % Please edit documentation in R/estimation.R, R/estimation.WHAMP.R
 \name{make_nw_het}
 \alias{make_nw_het}
-\alias{make_nw_het}
 \title{Calculate Network Statistics}
 \usage{
 make_nw_het(n = 10000, meandeg = 0.8, prop.male = 0.5,

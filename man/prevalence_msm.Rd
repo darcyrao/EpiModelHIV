@@ -3,7 +3,6 @@
 \name{prevalence_msm}
 \alias{prevalence_msm}
 \alias{prevalence_het}
-\alias{prevalence_het}
 \title{Prevalence Calculations within Time Steps}
 \usage{
 prevalence_msm(dat, at)

@@ -2,7 +2,6 @@
 % Please edit documentation in R/utilities.R, R/utilities.WHAMP.R
 \name{get_args}
 \alias{get_args}
-\alias{get_args}
 \title{Get Arguments from EpiModel Parameterization Functions}
 \usage{
 get_args(formal.args, dot.args)
