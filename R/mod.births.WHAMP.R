@@ -196,8 +196,8 @@ setBirthAttr_msm_whamp <- function(dat, at, nBirths) {
   dat$attr$riskg[newIds] <- sample(c("Y1", "Y2", "Y3", "Y4"), nBirths, replace = TRUE)
 
   # UAI group
-  p1 <- dat$param$cond.pers.always.prob
-  p2 <- dat$param$cond.inst.always.prob
+  p1 <- dat$param$cond.pers.always.prob * dat$param$cond.rr
+  p2 <- dat$param$cond.inst.always.prob * dat$param$cond.rr
   rho <- dat$param$cond.always.prob.corr
   uai.always <- bindata::rmvbin(nBirths, c(p1, p2), bincorr = (1 - rho) * diag(2) + rho)
   dat$attr$cond.always.pers[newIds] <- uai.always[, 1]
