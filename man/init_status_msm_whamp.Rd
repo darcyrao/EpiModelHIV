@@ -72,6 +72,7 @@ Sets the initial individual-level disease status of persons
 \keyword{calculated}
 \keyword{chronic}
 \keyword{column}
+\keyword{cons.time.off.tx}
 \keyword{consecutive}
 \keyword{constant}
 \keyword{constrained}
@@ -187,7 +188,6 @@ Sets the initial individual-level disease status of persons
 \keyword{this,}
 \keyword{those}
 \keyword{time}
-\keyword{time.off.tx}
 \keyword{to}
 \keyword{treatment}
 \keyword{treatment,}
