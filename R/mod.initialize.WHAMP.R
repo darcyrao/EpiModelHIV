@@ -351,7 +351,7 @@ init_status_msm_whamp <- function(dat) {
   dat$attr$status <- status
 
   # Intertest interval
-  test.int <- dat$param$test.int
+  test.int <- rep(dat$param$test.int, num)
 
   # Treatment trajectory
   tt.traj <- rep(NA, num)
