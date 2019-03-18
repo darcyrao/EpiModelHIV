@@ -21,7 +21,7 @@
 #'
 #' @keywords module msm
 #' @export
-#'
+#' 
 condoms_msm_whamp <- function(dat, at) {
 
   # Attributes
