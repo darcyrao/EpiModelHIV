@@ -5,20 +5,19 @@
 \title{Epidemic Model Parameters for the WHAMP model}
 \usage{
 param_msm_whamp(nwstats, racedist = sumto1(c(0.0549, 0.0421, 0.4739,
-  0.0309, 0.0166, 0.2807, 0.0222, 0.0021, 0.0767)),
-  iti.coefs = c(415.796063738122, 5.46732489852761, -0.318623224804563),
-  mean.age.iti = 36.77193, testing.pattern = "interval",
-  test.window.int = 21, tt.traj.KC.B.prob = c(0.081 * (1 - 0.839),
-  0.081 * (0.839), (1 - 0.081) * (1 - 0.839), (1 - 0.081) * (0.839)),
-  tt.traj.KC.H.prob = c(0.064 * (1 - 0.902), 0.064 * (0.902), (1 - 0.064)
-  * (1 - 0.902), (1 - 0.064) * (0.902)), tt.traj.KC.O.prob = c(0.105 * (1
-  - 0.92), 0.105 * (0.92), (1 - 0.105) * (1 - 0.92), (1 - 0.105) * (0.92)),
-  tt.traj.OW.B.prob = c(0.121 * (1 - 0.811), 0.121 * (0.811), (1 - 0.121)
-  * (1 - 0.811), (1 - 0.121) * (0.811)), tt.traj.OW.H.prob = c(0.102 * (1
-  - 0.885), 0.102 * (0.885), (1 - 0.102) * (1 - 0.885), (1 - 0.102) *
+  0.0309, 0.0166, 0.2807, 0.0222, 0.0021, 0.0767)), test.int = 436,
+  testing.pattern = "interval", test.window.int = 21,
+  tt.traj.KC.B.prob = c(0.08 * (1 - 0.839), 0.08 * (0.839), (1 - 0.081) *
+  (1 - 0.839), (1 - 0.081) * (0.839)), tt.traj.KC.H.prob = c(0.064 * (1 -
+  0.902), 0.064 * (0.902), (1 - 0.064) * (1 - 0.902), (1 - 0.064) *
+  (0.902)), tt.traj.KC.O.prob = c(0.104 * (1 - 0.92), 0.104 * (0.92), (1
+  - 0.105) * (1 - 0.92), (1 - 0.105) * (0.92)),
+  tt.traj.OW.B.prob = c(0.12 * (1 - 0.811), 0.12 * (0.811), (1 - 0.121) *
+  (1 - 0.811), (1 - 0.121) * (0.811)), tt.traj.OW.H.prob = c(0.102 * (1 -
+  0.885), 0.102 * (0.885), (1 - 0.102) * (1 - 0.885), (1 - 0.102) *
   (0.885)), tt.traj.OW.O.prob = c(0.148 * (1 - 0.905), 0.148 * (0.905),
   (1 - 0.148) * (1 - 0.905), (1 - 0.148) * (0.905)),
-  tt.traj.EW.B.prob = c(0.162 * (1 - 0.759), 0.162 * (0.759), (1 - 0.162)
+  tt.traj.EW.B.prob = c(0.161 * (1 - 0.759), 0.161 * (0.759), (1 - 0.162)
   * (1 - 0.759), (1 - 0.162) * (0.759)), tt.traj.EW.H.prob = c(0.14 * (1
   - 0.847), 0.14 * (0.847), (1 - 0.14) * (1 - 0.847), (1 - 0.14) *
   (0.847)), tt.traj.EW.O.prob = c(0.192 * (1 - 0.874), 0.192 * (0.874),
@@ -91,11 +90,7 @@ param_msm_whamp(nwstats, racedist = sumto1(c(0.0549, 0.0421, 0.4739,
 black, other; other western WA Hispanic, black, and other, eastern WA Hispanic,
 black, and other)}
 
-\item{iti.coefs}{GLM coefficients for median intertest interval among men who test
-(intercept, centered age, centered age squared)}
-
-\item{mean.age.iti}{Mean age from the sample used to fit the GLM tor median ITI, 
-for use in calculating centered age.}
+\item{test.int}{Average interest interval in days for men who test regularly}
 
 \item{testing.pattern}{Method for HIV testing, with options \code{"memoryless"}
 for constant hazard without regard to time since previous test, or
