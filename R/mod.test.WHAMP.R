@@ -35,18 +35,13 @@ test_msm_whamp <- function(dat, at) {
 
   # Parameters
   testing.pattern <- dat$param$testing.pattern
-  mean.age.iti <- dat$param$mean.age.iti
-  iti.coefs <- dat$param$iti.coefs
+  test.int <- dat$param$test.int
   twind.int <- dat$param$test.window.int
   sympt.int <- dat$param$sympt.onset.int
 
   tsincelntst <- at - dat$attr$last.neg.test
   tsincelntst[is.na(tsincelntst)] <- at - dat$attr$arrival.time[is.na(tsincelntst)]
 
-  # Calculate intertest interval as a function of age
-  centered.age <- (age - mean.age.iti)
-  test.int <- (iti.coefs[1] + centered.age * iti.coefs[2] + centered.age^2 * iti.coefs[3]) / dat$param$time.unit
-  
   ## Process
 
   if (testing.pattern == "memoryless") {

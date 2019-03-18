@@ -350,9 +350,8 @@ init_status_msm_whamp <- function(dat) {
   }
   dat$attr$status <- status
 
-  # Calculate intertest interval as a function of age
-  centered.age <- (age - dat$param$mean.age.iti)
-  test.int <- (dat$param$iti.coefs[1] + centered.age * dat$param$iti.coefs[2] + centered.age^2 * dat$param$iti.coefs[3]) / dat$param$time.unit
+  # Intertest interval
+  test.int <- dat$param$test.int
 
   # Treatment trajectory
   tt.traj <- rep(NA, num)

@@ -11,10 +11,7 @@
 #' @param racedist Population distribution by race/ethnicity and region (King County Hispanic,
 #'        black, other; other western WA Hispanic, black, and other, eastern WA Hispanic,
 #'        black, and other)
-#' @param iti.coefs GLM coefficients for median intertest interval among men who test  
-#'        (intercept, centered age, centered age squared)
-#' @param mean.age.iti Mean age from the sample used to fit the GLM tor median ITI, 
-#'        for use in calculating centered age.
+#' @param test.int Average interest interval in days for men who test regularly
 #' @param testing.pattern Method for HIV testing, with options \code{"memoryless"}
 #'        for constant hazard without regard to time since previous test, or
 #'        \code{"interval"} deterministic fixed intervals.
@@ -297,8 +294,7 @@ param_msm_whamp <- function(nwstats,
                             
                       racedist = sumto1(c(0.0549, 0.0421, 0.4739, 0.0309, 0.0166, 0.2807, 0.0222, 0.0021, 0.0767)),
                       
-                      iti.coefs = c(417.3690669, 4.9449687, -0.3124086),
-                      mean.age.iti = 37.44382,
+                      test.int = 436,
                       testing.pattern = "interval",
                       test.window.int = 21,
 
