@@ -81,8 +81,9 @@ condoms_msm_whamp <- function(dat, at) {
     ## Process ##
 
     # Base condom probs
-    cond.prob.adj <- cond.prob * cond.rr
-
+    cond.prob.base <- cond.prob * cond.rr
+    cond.prob.adj <- cond.prob.base
+    
     # UAI group
     if (type %in% c("pers", "inst")) {
       ca1 <- cond.always[elt[, 1]]
@@ -105,7 +106,8 @@ condoms_msm_whamp <- function(dat, at) {
     #' men partnered with always condom users, we need to adjust the probability in other dyads to match the observed
     #' average probability of condom use.
     if (type %in% "pers") {
-      obs.prob <- dat$param$cond.pers.prob * (1 - dat$param$cond.pers.always.prob) + 1 * dat$param$cond.pers.always.prob # Define the observed overall condom prob we want to match
+      cond.always.prob <- dat$param$cond.pers.always.prob * dat$param$cond.rr
+      obs.prob <- cond.prob.base * (1 - cond.always.prob) + 1 * cond.always.prob # Define the observed overall condom prob we want to match (adjuted for cond.rr)
       n.edges <- nrow(elt)
       n.always <- sum(ca1 == 1  | ca2 == 1) # number of dyads set to use condoms because one or both partnres is an always condom user
       n.not.always <- sum(ca1 == 0 & ca2 == 0) # number of dyads in which neither member is an always condom user
@@ -116,7 +118,8 @@ condoms_msm_whamp <- function(dat, at) {
       cond.prob.adj[cond.prob.adj < 1] <- adjusted.prob 
     }
     if (type %in% "inst") {
-      obs.prob <- dat$param$cond.inst.prob * (1 - dat$param$cond.inst.always.prob) + 1 * dat$param$cond.inst.always.prob # Define the observed overall condom prob we want to match
+      cond.always.prob <- dat$param$cond.inst.always.prob * dat$param$cond.rr
+      obs.prob <- cond.prob.base * (1 - cond.always.prob) + 1 * cond.always.prob # Define the observed overall condom prob we want to match
       n.edges <- nrow(elt)
       n.always <- sum(ca1 == 1  | ca2 == 1) # number of dyads set to use condoms because one or both partnres is an always condom user
       n.not.always <- sum(ca1 == 0 & ca2 == 0) # number of dyads in which neither member is an always condom user
