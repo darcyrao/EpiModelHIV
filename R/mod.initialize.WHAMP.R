@@ -283,7 +283,7 @@ remove_bad_roles_msm <- function(nw) {
 #' @keywords initiation utility msm
 #'
 init_status_msm_whamp <- function(dat) {
-
+  
   age <- dat$attr$age
   race..wa <- dat$attr$race..wa
   region <- dat$attr$region
@@ -774,10 +774,11 @@ init_status_msm_whamp <- function(dat) {
   ### All tt.traj groups: Assign VL (assuming a linear rate of change in VL up to peak viremia in acute phase and from peak down to set point)
   
   ##' To set VL in the AIDS phase, define a variable average consecutive time off tx
-  ##' - For those who not yet inititated tx, set time.off.tx to time since infected.
+  ##' - For those who have not yet inititated tx, set cons.time.off.tx to time since infected.
   ##' - For those who disontinued, set to avg time off before reinitiating
   cons.time.off.tx <- rep(NA, length(selected))
   cons.time.off.tx[tx.status[selected] == 1] <- 0
+  cons.time.off.tx[diag.status[selected] == 0] <- time.since.inf[selected][diag.status[selected] == 0]
   cons.time.off.tx[time.since.inf[selected] <= time.to.tx[selected] & !is.na(time.to.tx[selected])] <- 
     time.since.inf[selected][time.since.inf[selected] <= time.to.tx[selected] & !is.na(time.to.tx[selected])]
   cons.time.off.tx[tx.status[selected] == 0 & (time.since.inf[selected] > time.to.tx[selected] & !is.na(time.to.tx[selected])) & tt.traj[selected] %in% c(1,3)] <- 
