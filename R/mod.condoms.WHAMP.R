@@ -1,8 +1,9 @@
 
+
 #' @title Condom Use Module
 #'
 #' @description Module function stochastically simulates potential condom use
-#'              for each act on the discordant edgelist for the WHAMP model
+#'              for each act on the discordant edgelist for the WHAMP model.
 #'
 #' @inheritParams aging_msm
 #'
@@ -11,7 +12,7 @@
 #' based on the partnership type and, for main partnerships, age combination. Other
 #' modifiers for the probability of condom use in that pair are diagnosis of
 #' disease, disclosure of status, full or partial HIV viral suppression
-#' given HIV anti-retroviral therapy, and PrEP use. If \code{rcomp.discont == TRUE},
+#' given HIV anti-retroviral therapy, and PrEP use. If \code{rcomp.discont} is TRUE,
 #' condom use stays at on-PrEP risk compensation levels after spontaneous 
 #' discontinuation.
 #'
@@ -20,8 +21,9 @@
 #' condoms were used in that act.
 #'
 #' @keywords module msm
-#' @export
 #' 
+#' @export
+#'
 condoms_msm_whamp <- function(dat, at) {
 
   # Attributes
