@@ -24,14 +24,16 @@
 #'
 prevalence_msm_whamp <- function(dat, at) {
 
-  ## Variables
-
   # Attributes
 
   active <- dat$attr$active
   race..wa <- dat$attr$race..wa
   region <- dat$attr$region
+  tt.traj <- dat$attr$tt.traj
   status <- dat$attr$status
+  diag.status <- dat$attr$diag.status
+  tx.status <- dat$attr$tx.status
+  vl <- dat$attr$vl
   prepStat <- dat$attr$prepStat
   prepElig <- dat$attr$prepElig
   # rGC <- dat$attr$rGC
@@ -42,7 +44,6 @@ prevalence_msm_whamp <- function(dat, at) {
   # uGC.sympt <- dat$attr$uGC.sympt
   # rCT.sympt <- dat$attr$rCT.sympt
   # uCT.sympt <- dat$attr$uCT.sympt
-
 
   nsteps <- dat$control$nsteps
   rNA <- rep(NA, nsteps)
@@ -55,6 +56,15 @@ prevalence_msm_whamp <- function(dat, at) {
     dat$epi$num.KC <- rNA
     dat$epi$num.OW <- rNA
     dat$epi$num.EW <- rNA
+    
+    dat$epi$dth.neg..wa <- rNA
+    dat$epi$dth.pos..wa <- rNA
+    dat$epi$dth.age <- rNA
+    dat$epi$dth.pos.bkg <- rNA
+    dat$epi$nBirths.B..wa <- rNA
+    dat$epi$nBirths.H..wa <- rNA
+    dat$epi$nBirths.O..wa <- rNA
+    
     dat$epi$s.num <- rNA
     dat$epi$i.num <- rNA
     dat$epi$i.num.H..wa <- rNA
@@ -72,13 +82,30 @@ prevalence_msm_whamp <- function(dat, at) {
     dat$epi$i.prev.EW <- rNA
     dat$epi$incid <- rNA
     dat$epi$ir100 <- rNA
-
+    dat$epi$prev.dx <- rNA
+    dat$epi$prev.dx.H <- rNA
+    dat$epi$prev.dx.B <- rNA
+    dat$epi$prev.dx.O <- rNA
+    dat$epi$prev.dx.KC <- rNA
+    dat$epi$prev.dx.OW <- rNA
+    dat$epi$prev.dx.EW <- rNA
+    
     dat$epi$prepCurr <- rNA
     dat$epi$prepCov <- rNA
     dat$epi$prepElig <- rNA
     dat$epi$prepStart <- rNA
     dat$epi$i.num.prep0 <- rNA
     dat$epi$i.num.prep1 <- rNA
+    dat$epi$i.prev.prep0 <- rNA
+    dat$epi$i.prev.prep1 <- rNA
+    
+    dat$epi$tt.traj.1 <- rNA
+    dat$epi$tt.traj.2 <- rNA
+    dat$epi$tt.traj.3 <- rNA
+    dat$epi$tt.traj.4 <- rNA
+    dat$epi$undx <- rNA
+    dat$epi$ontx <- rNA
+    dat$epi$vs <- rNA
 
     # dat$epi$prev.rgc <- rNA
     # dat$epi$prev.ugc <- rNA
@@ -132,6 +159,7 @@ prevalence_msm_whamp <- function(dat, at) {
   dat$epi$num.KC[at] <- sum(region == "KC", na.rm = TRUE)
   dat$epi$num.OW[at] <- sum(region == "OW", na.rm = TRUE)
   dat$epi$num.EW[at] <- sum(region == "EW", na.rm = TRUE)
+  
   dat$epi$s.num[at] <- sum(status == 0, na.rm = TRUE)
   dat$epi$i.num[at] <- sum(status == 1, na.rm = TRUE)
   dat$epi$i.num.H..wa[at] <- sum(status == 1 & race..wa == "H", na.rm = TRUE)
@@ -147,6 +175,13 @@ prevalence_msm_whamp <- function(dat, at) {
   dat$epi$i.prev.KC[at] <- dat$epi$i.num.KC[at] / dat$epi$num.KC[at]
   dat$epi$i.prev.OW[at] <- dat$epi$i.num.OW[at] / dat$epi$num.OW[at]
   dat$epi$i.prev.EW[at] <- dat$epi$i.num.EW[at] / dat$epi$num.EW[at]
+  dat$epi$prev.dx[at] <- sum(diag.status == 1, na.rm = TRUE) / dat$epi$num[at]
+  dat$epi$prev.dx.H[at] <- sum(diag.status == 1 & race..wa == "H", na.rm = TRUE) / dat$epi$num.H..wa[at]
+  dat$epi$prev.dx.B[at] <- sum(diag.status == 1 & race..wa == "B", na.rm = TRUE) / dat$epi$num.B..wa[at]
+  dat$epi$prev.dx.O[at] <- sum(diag.status == 1 & race..wa == "O", na.rm = TRUE) / dat$epi$num.O..wa[at]
+  dat$epi$prev.dx.KC[at] <- sum(diag.status == 1 & region == "KC", na.rm = TRUE) / dat$epi$num.KC[at]
+  dat$epi$prev.dx.OW[at] <- sum(diag.status == 1 & region == "OW", na.rm = TRUE) / dat$epi$num.OW[at]
+  dat$epi$prev.dx.EW[at] <- sum(diag.status == 1 & region == "EW", na.rm = TRUE) / dat$epi$num.EW[at]
   
   # Incidence rates per 100 per year overall and by attribute
   dat$epi$ir100[at] <- (dat$epi$incid[at] / (sum(status == 0, na.rm = TRUE)) + dat$epi$incid[at]) * 5200 
@@ -170,12 +205,20 @@ prevalence_msm_whamp <- function(dat, at) {
   dat$epi$i.num.prep0[at] <- sum((is.na(prepStat) | prepStat == 0) & status == 1, na.rm = TRUE)
   dat$epi$i.num.prep1[at] <- sum(prepStat == 1 & status == 1, na.rm = TRUE)
   dat$epi$i.prev.prep0[at] <- dat$epi$i.num.prep0[at] /
-    sum((is.na(prepStat) | prepStat == 0), na.rm = TRUE)
+    sum(prepStat == 0, na.rm = TRUE)
   if (at == 1) {
     dat$epi$i.prev.prep1[1] <- 0
   } else {
     dat$epi$i.prev.prep1[at] <- dat$epi$i.num.prep1[at] / sum(prepStat == 1, na.rm = TRUE)
   }
+  
+  dat$epi$tt.traj.1[at] <- sum(tt.traj == 1 & status == 1, na.rm = TRUE) / sum(status == 1, na.rm = TRUE)
+  dat$epi$tt.traj.2[at] <- sum(tt.traj == 2 & status == 1, na.rm = TRUE) / sum(status == 1, na.rm = TRUE)
+  dat$epi$tt.traj.3[at] <- sum(tt.traj == 3 & status == 1, na.rm = TRUE) / sum(status == 1, na.rm = TRUE)
+  dat$epi$tt.traj.4[at] <- sum(tt.traj == 4 & status == 1, na.rm = TRUE) / sum(status == 1, na.rm = TRUE)
+  dat$epi$undx[at] <- sum(status == 1 & !(diag.status == 1), na.rm = TRUE) / sum(status == 1, na.rm = TRUE)
+  dat$epi$ontx[at] <- sum(status == 1 & tx.status == 1, na.rm = TRUE) / sum(status == 1, na.rm = TRUE)
+  dat$epi$vs[at] <- sum(status ==1 & vl <= 1.5, na.rm = TRUE) / sum(status == 1, na.rm = TRUE)
 
   # dat$epi$prev.rgc[at] <- sum(rGC == 1, na.rm = TRUE) / dat$epi$num[at]
   # dat$epi$prev.ugc[at] <- sum(uGC == 1, na.rm = TRUE) / dat$epi$num[at]
