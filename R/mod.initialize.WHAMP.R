@@ -106,8 +106,8 @@ initialize_msm_whamp <- function(x, param, init, control, s) {
   dat$attr$riskg <- get.vertex.attribute(nw[[3]], "riskg")
 
   # UAI group
-  p1 <- dat$param$cond.pers.always.prob
-  p2 <- dat$param$cond.inst.always.prob
+  p1 <- dat$param$cond.pers.always.prob * dat$param$cond.rr
+  p2 <- dat$param$cond.inst.always.prob * dat$param$cond.rr
   rho <- dat$param$cond.always.prob.corr
   uai.always <- bindata::rmvbin(num, c(p1, p2), bincorr = (1 - rho) * diag(2) + rho)
   dat$attr$cond.always.pers <- uai.always[, 1]
