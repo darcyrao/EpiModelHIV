@@ -297,8 +297,8 @@ param_msm_whamp <- function(nwstats,
                             
                       racedist = sumto1(c(0.0549, 0.0421, 0.4739, 0.0309, 0.0166, 0.2807, 0.0222, 0.0021, 0.0767)),
                       
-                      iti.coefs = c(415.796063738122, 5.46732489852761, -0.318623224804563),
-                      mean.age.iti = 36.77193,
+                      iti.coefs = c(417.3690669, 4.9449687, -0.3124086),
+                      mean.age.iti = 37.44382,
                       testing.pattern = "interval",
                       test.window.int = 21,
 
