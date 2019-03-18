@@ -77,8 +77,8 @@ setBirthAttr_msm_whamp <- function(dat, at, nBirths) {
   
   # Distribute new births by race/ethnicity and region according to proportion of the population in each group
   prop.race.region <- dat$param$racedist
-  race.region <- sample(apportion_lr(nBirths, c("KC.H", "KC.B", "KC.O", "OW.H", "OW.B", "OW.O", "EW.H", "EW.B", "EW.O"), 
-                                    prop.race.region))
+  race.region <- sample(c("KC.H", "KC.B", "KC.O", "OW.H", "OW.B", "OW.O", "EW.H", "EW.B", "EW.O"), nBirths,
+                         replace = TRUE, prob = prop.race.region)
   
   new.KC.B <- which(race.region %in% "KC.B") 
   new.KC.H <- which(race.region %in% "KC.H") 
@@ -206,6 +206,13 @@ setBirthAttr_msm_whamp <- function(dat, at, nBirths) {
   # PrEP
   dat$attr$prepStat[newIds] <- 0
 
+  
+  ## Summary Output
+  dat$epi$nBirths.B..wa[at] <- nBirths.B..wa
+  dat$epi$nBirths.H..wa[at] <- nBirths.H..wa
+  dat$epi$nBirths.O..wa[at] <- nBirths.O..wa
+  
+  
   return(dat)
 }
 
