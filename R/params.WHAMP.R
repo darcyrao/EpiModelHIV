@@ -520,9 +520,9 @@ param_msm_whamp <- function(nwstats,
 #'
 #' @export
 init_msm_whamp <- function(nwstats,
-                     prev.H..wa = 0.08, #-- Surveillance data on prevalent diagnoses suggest 7.7% prevalence for Other, 17.3% for Black, 12.0% for Hispanic. Note this underestimates true prevalence bc it only counts diagnosed cases. We set starting prevalence to 70% of this for each group to reach equilibrium faster
-                     prev.B..wa = 0.12,
-                     prev.O..wa = 0.05,
+                     prev.H..wa = 0.10, #-- Surveillance data on prevalent diagnoses suggest 7.7% prevalence for Other, 17.3% for Black, 12.0% for Hispanic. Note this underestimates true prevalence bc it only counts diagnosed cases. We set starting prevalence to slightly less than this for each group to reach equilibrium faster
+                     prev.B..wa = 0.15,
+                     prev.O..wa = 0.065,
                      prev.ugc = 0, #--This model will not represent STIs
                      prev.rgc = 0,
                      prev.uct = 0,
