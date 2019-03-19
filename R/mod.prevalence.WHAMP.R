@@ -29,6 +29,7 @@ prevalence_msm_whamp <- function(dat, at) {
   active <- dat$attr$active
   race..wa <- dat$attr$race..wa
   region <- dat$attr$region
+  age <- dat$attr$age
   tt.traj <- dat$attr$tt.traj
   status <- dat$attr$status
   diag.status <- dat$attr$diag.status
@@ -56,6 +57,14 @@ prevalence_msm_whamp <- function(dat, at) {
     dat$epi$num.KC <- rNA
     dat$epi$num.OW <- rNA
     dat$epi$num.EW <- rNA
+    dat$epi$num.18to24 <- rNA
+    dat$epi$num.25to29 <- rNA
+    dat$epi$num.30to34 <- rNA
+    dat$epi$num.35to39 <- rNA
+    dat$epi$num.40to44 <- rNA
+    dat$epi$num.45to49 <- rNA
+    dat$epi$num.50to54 <- rNA
+    dat$epi$num.55to59 <- rNA
     
     dat$epi$dth.neg..wa <- rNA
     dat$epi$dth.pos..wa <- rNA
@@ -92,8 +101,12 @@ prevalence_msm_whamp <- function(dat, at) {
     
     dat$epi$prepCurr <- rNA
     dat$epi$prepCov <- rNA
+    dat$epi$prep.cov.KC <- rNA
+    dat$epi$prep.cov.oth <- rNA
     dat$epi$prepElig <- rNA
     dat$epi$prepStart <- rNA
+    dat$epi$time.to.disc <- rNA
+    dat$epi$time.since.prep.start <- rNA
     dat$epi$i.num.prep0 <- rNA
     dat$epi$i.num.prep1 <- rNA
     dat$epi$i.prev.prep0 <- rNA
@@ -159,6 +172,14 @@ prevalence_msm_whamp <- function(dat, at) {
   dat$epi$num.KC[at] <- sum(region == "KC", na.rm = TRUE)
   dat$epi$num.OW[at] <- sum(region == "OW", na.rm = TRUE)
   dat$epi$num.EW[at] <- sum(region == "EW", na.rm = TRUE)
+  dat$epi$num.18to24 <- sum(age >= 18 & age <25)
+  dat$epi$num.25to29 <- sum(age >= 25 & age <30)
+  dat$epi$num.30to34 <- sum(age >= 30 & age <35)
+  dat$epi$num.35to39 <- sum(age >= 35 & age <40)
+  dat$epi$num.40to44 <- sum(age >= 40 & age <45)
+  dat$epi$num.45to49 <- sum(age >= 45 & age <50)
+  dat$epi$num.50to54 <- sum(age >= 50 & age <55)
+  dat$epi$num.55to59 <- sum(age >= 55)
   
   dat$epi$s.num[at] <- sum(status == 0, na.rm = TRUE)
   dat$epi$i.num[at] <- sum(status == 1, na.rm = TRUE)
