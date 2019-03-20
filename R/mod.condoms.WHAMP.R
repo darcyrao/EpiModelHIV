@@ -1,5 +1,4 @@
 
-
 #' @title Condom Use Module
 #'
 #' @description Module function stochastically simulates potential condom use
@@ -23,7 +22,7 @@
 #' @keywords module msm
 #' 
 #' @export
-#'
+
 condoms_msm_whamp <- function(dat, at) {
 
   # Attributes
@@ -100,13 +99,13 @@ condoms_msm_whamp <- function(dat, at) {
       }
     }
     
-    #' Adjust base condom probs so that the overall probability of condom use matches observed after setting 
-    #' cond.prob.adj to 1 for those who are partnered with always condom users. Observed data on condom use are
-    #' from a sample of egos and reflect their condom use preferences as well as those of their partners. The observed
-    #' average probability of condom use from the sample = 1 * proportion always condom users + condom prob among men 
-    #' who are not always condom users * (1 - proportion always condom users). So after setting the condom prob to 1 for
-    #' men partnered with always condom users, we need to adjust the probability in other dyads to match the observed
-    #' average probability of condom use.
+    # Adjust base condom probs so that the overall probability of condom use matches observed after setting 
+    # cond.prob.adj to 1 for those who are partnered with always condom users. Observed data on condom use are
+    # from a sample of egos and reflect their condom use preferences as well as those of their partners. The observed
+    # average probability of condom use from the sample = 1 * proportion always condom users + condom prob among men 
+    # who are not always condom users * (1 - proportion always condom users). So after setting the condom prob to 1 for
+    # men partnered with always condom users, we need to adjust the probability in other dyads to match the observed
+    # average probability of condom use.
     if (type %in% "pers") {
       cond.always.prob <- dat$param$cond.pers.always.prob * dat$param$cond.rr
       obs.prob <- cond.prob.base * (1 - cond.always.prob) + 1 * cond.always.prob # Define the observed overall condom prob we want to match (adjuted for cond.rr)
