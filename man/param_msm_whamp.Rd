@@ -42,7 +42,7 @@ param_msm_whamp(nwstats, racedist = sumto1(c(0.0549, 0.0421, 0.4739,
   growth.rate = 1.0001441/7, birth.age = 18, exit.age = 60,
   asmr.rr.pos = c(3.791, 2.974, 1.984), URAI.prob = 0.0082 * 1.09,
   UIAI.prob = 0.0031 * 1.09, acute.rr = 6, circ.rr = 0.4,
-  condom.rr = 0.295, disc.outset.main.prob = 1,
+  condom.rr = 0.295, tprob.scalar = 1, disc.outset.main.prob = 1,
   disc.at.diag.main.prob = 1, disc.post.diag.main.prob = 0,
   disc.outset.pers.prob = 0.5671, disc.at.diag.pers.prob = 1,
   disc.post.diag.pers.prob = 0, disc.inst.prob = 0.4918,
@@ -52,7 +52,7 @@ param_msm_whamp(nwstats, racedist = sumto1(c(0.0549, 0.0421, 0.4739,
   base.ai.main.rate = 0.1864, base.ai.pers.rate = 0.118,
   ai.scale = 1, cond.main.YY.prob = 0.3391,
   cond.main.other.prob = 0.1399, cond.pers.always.prob = 0.0924,
-  cond.pers.prob = 0.3925, cond.inst.always.prob = 0.1982,
+  cond.pers.prob = 0.4001, cond.inst.always.prob = 0.1982,
   cond.inst.prob = 0.4138, cond.always.prob.corr = 0.6009,
   cond.rr = 1, cond.diag.main.beta = -0.67,
   cond.discl.main.beta = -0.85, cond.diag.pers.beta = -0.67,
@@ -246,6 +246,9 @@ negative insertive partner is circumcised.}
 
 \item{condom.rr}{Relative risk of infection from anal sex when a condom is
 used.}
+
+\item{tprob.scalar}{General relative scaler for all per-act probability of 
+transmission for model calibration.}
 
 \item{disc.outset.main.prob}{Probability that an HIV-infected MSM will
 disclose his status at the start of a main partnership.}

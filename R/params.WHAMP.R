@@ -111,6 +111,8 @@
 #'        negative insertive partner is circumcised.
 #' @param condom.rr Relative risk of infection from anal sex when a condom is
 #'        used.
+#' @param tprob.scalar General relative scaler for all per-act probability of 
+#'        transmission for model calibration.
 #' @param disc.outset.main.prob Probability that an HIV-infected MSM will
 #'        disclose his status at the start of a main partnership.
 #' @param disc.at.diag.main.prob Probability that an MSM already in a main
@@ -357,6 +359,7 @@ param_msm_whamp <- function(nwstats,
                       acute.rr = 6,
                       circ.rr = 0.4,
                       condom.rr = 0.295,
+                      tprob.scalar = 1,
 
                       disc.outset.main.prob = 1,
                       disc.at.diag.main.prob = 1,
@@ -382,7 +385,7 @@ param_msm_whamp <- function(nwstats,
                       cond.main.YY.prob = 0.3391,
                       cond.main.other.prob = 0.1399,
                       cond.pers.always.prob = 0.0924,
-                      cond.pers.prob = 0.3925,
+                      cond.pers.prob = 0.4001,
                       cond.inst.always.prob = 0.1982,
                       cond.inst.prob = 0.4138,
                       cond.always.prob.corr = 0.6009,
