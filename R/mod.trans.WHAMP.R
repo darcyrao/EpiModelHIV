@@ -53,8 +53,8 @@ trans_msm_whamp <- function(dat, at) {
   # uCT <- dat$attr$uCT
 
   # Parameters
-  URAI.prob <- dat$param$URAI.prob
-  UIAI.prob <- dat$param$UIAI.prob
+  URAI.prob <- dat$param$URAI.prob * dat$param$tprob.scalar
+  UIAI.prob <- dat$param$UIAI.prob * dat$param$tprob.scalar
   acute.rr <- dat$param$acute.rr
   condom.rr <- dat$param$condom.rr
   circ.rr <- dat$param$circ.rr
