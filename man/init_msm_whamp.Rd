@@ -4,8 +4,8 @@
 \alias{init_msm_whamp}
 \title{Epidemic Model Initial Conditions for the WHAMP model}
 \usage{
-init_msm_whamp(nwstats, prev.H..wa = 0.1, prev.B..wa = 0.15,
-  prev.O..wa = 0.065, prev.ugc = 0, prev.rgc = 0, prev.uct = 0,
+init_msm_whamp(nwstats, prev.H..wa = 0.09, prev.B..wa = 0.13,
+  prev.O..wa = 0.06, prev.ugc = 0, prev.rgc = 0, prev.uct = 0,
   prev.rct = 0, ...)
 }
 \arguments{
