@@ -6,6 +6,12 @@
 \usage{
 nwfeatures_msm_whamp(dat, at)
 }
+\arguments{
+\item{dat}{Master data list object of class \code{dat} containing networks,
+individual-level attributes, and summary statistics.}
+
+\item{at}{Current time step.}
+}
 \value{
 This function returns the \code{dat} object with the updated partnership list for diagnostics
 on \code{dat$plist}.
@@ -17,7 +23,7 @@ Module function for tracking features of the sexual newtork over time.
 At each time step, the cross-network degree distribution is calculated and stored, along with
 statistics about race, region, and age mixing, and the duration of active ties.
 }
-\keyword{SHAMP}
-\keyword{cocnurrency}
+\keyword{WHAMP}
 \keyword{diagnostics}
 \keyword{module}
+\keyword{network}
