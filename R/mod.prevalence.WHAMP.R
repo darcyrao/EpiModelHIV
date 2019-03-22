@@ -120,6 +120,50 @@ prevalence_msm_whamp <- function(dat, at) {
     dat$epi$ontx <- rNA
     dat$epi$vs <- rNA
 
+    # network stats
+    dat$epi$duplicates.mp <- rNA # count overlapping main and pers partnerships between the same nodes
+    dat$epi$duplicates.mpi <- rNA # count overlapping main, pers, and inst partnerships between the same nodes
+    dat$epi$deg.main <- rNA
+    dat$epi$deg.pers <- rNA
+    dat$epi$deg.inst <- rNA
+    dat$epi$main0pers0 <- rNA
+    dat$epi$main0pers1 <- rNA
+    dat$epi$main0pers2 <- rNA
+    dat$epi$main1pers0 <- rNA
+    dat$epi$main1pers1 <- rNA
+    dat$epi$main1pers2 <- rNA
+    dat$epi$meaninst.00 <- rNA  # mean inst degree for groups defined by main and pers partnerships
+    dat$epi$meaninst.01 <- rNA
+    dat$epi$meaninst.02 <- rNA
+    dat$epi$meaninst.10 <- rNA
+    dat$epi$meaninst.11 <- rNA
+    dat$epi$meaninst.12 <- rNA
+    dat$epi$prop.hom.m.B <- rNA
+    dat$epi$prop.hom.m.H <- rNA
+    dat$epi$prop.hom.m.O <- rNA
+    dat$epi$prop.hom.m.KC <- rNA
+    dat$epi$prop.hom.m.OW <- rNA
+    dat$epi$prop.hom.m.EW <- rNA
+    dat$epi$sqrtadiff.m <- rNA
+    dat$epi$badroles.m <- rNA
+    dat$epi$prop.hom.p.B <- rNA
+    dat$epi$prop.hom.p.H <- rNA
+    dat$epi$prop.hom.p.O <- rNA
+    dat$epi$prop.hom.p.KC <- rNA
+    dat$epi$prop.hom.p.OW <- rNA
+    dat$epi$prop.hom.p.EW <- rNA
+    dat$epi$sqrtadiff.p <- rNA
+    dat$epi$badroles.p <- rNA
+    dat$epi$prop.hom.i.B <- rNA
+    dat$epi$prop.hom.i.H <- rNA
+    dat$epi$prop.hom.i.O <- rNA
+    dat$epi$prop.hom.i.KC <- rNA
+    dat$epi$prop.hom.i.OW <- rNA
+    dat$epi$prop.hom.i.EW <- rNA
+    dat$epi$sqrtadiff.i <- rNA
+    dat$epi$badroles.i <- rNA
+    
+
     # dat$epi$prev.rgc <- rNA
     # dat$epi$prev.ugc <- rNA
     # dat$epi$prev.gc <- rNA
