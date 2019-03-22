@@ -655,7 +655,6 @@ control_msm_whamp <- function(simno = 1,
                         save.nwstats = FALSE,
                         verbose = TRUE,
                         verbose.int = 1,
-                        save.nw = FALSE,
                         ...) {
 
   formal.args <- formals(sys.function())
@@ -673,7 +672,7 @@ control_msm_whamp <- function(simno = 1,
 
   p$save.other = c("attr", "temp", "el", "p", "cel.temp", "cel.complete")
 
-  p$save.network = save.nw
+  p$save.network = FALSE
 
   class(p) <- "control.net"
   return(p)

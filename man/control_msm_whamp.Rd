@@ -17,8 +17,7 @@ control_msm_whamp(simno = 1, nsims = 1, ncores = 1, nsteps = 100,
   prep.FUN = prep_msm_whamp, trans.FUN = trans_msm_whamp,
   stitrans.FUN = NULL, stirecov.FUN = NULL, stitx.FUN = NULL,
   prev.FUN = prevalence_msm_whamp, verbose.FUN = verbose_msm,
-  save.nwstats = FALSE, verbose = TRUE, verbose.int = 1,
-  save.nw = FALSE, ...)
+  save.nwstats = FALSE, verbose = TRUE, verbose.int = 1, ...)
 }
 \arguments{
 \item{simno}{Unique ID for the simulation run, used for file naming purposes
