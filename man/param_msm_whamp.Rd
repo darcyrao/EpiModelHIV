@@ -5,8 +5,8 @@
 \title{Epidemic Model Parameters for the WHAMP model}
 \usage{
 param_msm_whamp(nwstats, racedist = sumto1(c(0.0549, 0.0421, 0.4739,
-  0.0309, 0.0166, 0.2807, 0.0222, 0.0021, 0.0767)), test.int = 436,
-  testing.pattern = "interval", test.window.int = 21,
+  0.0309, 0.0166, 0.2807, 0.0222, 0.0021, 0.0767)), nw_track = TRUE,
+  test.int = 436, testing.pattern = "interval", test.window.int = 21,
   tt.traj.KC.B.prob = c(0.08 * (1 - 0.839), 0.08 * (0.839), (1 - 0.08) *
   (1 - 0.839), (1 - 0.08) * (0.839)), tt.traj.KC.H.prob = c(0.064 * (1 -
   0.902), 0.064 * (0.902), (1 - 0.064) * (1 - 0.902), (1 - 0.064) *
@@ -89,6 +89,10 @@ param_msm_whamp(nwstats, racedist = sumto1(c(0.0549, 0.0421, 0.4739,
 \item{racedist}{Population distribution by race/ethnicity and region (King County Hispanic,
 black, other; other western WA Hispanic, black, and other, eastern WA Hispanic,
 black, and other)}
+
+\item{nw_track}{Sets whether to run the script in the nwfeatures_msm_whamp function to
+track features of the sexual network (degree distribution, mixing, partnership age)
+over time, with optoins \code{TRUE} or \code{FALSE}}
 
 \item{test.int}{Average interest interval in days for men who test regularly}
 

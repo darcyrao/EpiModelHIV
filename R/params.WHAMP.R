@@ -11,6 +11,9 @@
 #' @param racedist Population distribution by race/ethnicity and region (King County Hispanic,
 #'        black, other; other western WA Hispanic, black, and other, eastern WA Hispanic,
 #'        black, and other)
+#' @param nw_track Sets whether to run the script in the nwfeatures_msm_whamp function to
+#'        track features of the sexual network (degree distribution, mixing, partnership age)
+#'        over time, with optoins \code{TRUE} or \code{FALSE}
 #' @param test.int Average interest interval in days for men who test regularly
 #' @param testing.pattern Method for HIV testing, with options \code{"memoryless"}
 #'        for constant hazard without regard to time since previous test, or
@@ -295,6 +298,8 @@
 param_msm_whamp <- function(nwstats,
                             
                       racedist = sumto1(c(0.0549, 0.0421, 0.4739, 0.0309, 0.0166, 0.2807, 0.0222, 0.0021, 0.0767)),
+                      
+                      nw_track = TRUE,
                       
                       test.int = 436,
                       testing.pattern = "interval",
