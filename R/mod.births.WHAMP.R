@@ -26,7 +26,7 @@
 #' @export
 #'
 births_msm_whamp <- function(dat, at){
-
+  
   ## Determine the number of births needed to balance general mortality and the number aging out
   
   nBirths.gen <- dat$epi$dth.neg..wa[at] + dat$epi$dth.pos.bkg[at] # Births to replace those who died from general mortality
@@ -36,6 +36,13 @@ births_msm_whamp <- function(dat, at){
   nBirths.growth <- round(sum(dat$epi$num.H..wa[at - 1], dat$epi$num.B..wa[at - 1], dat$epi$num.O..wa[at - 1])*(dat$param$growth.rate - 1))
   
   nBirths <- nBirths.gen + nBirths.age + nBirths.growth
+  
+  ## If change.size = TRUE, set number of births to rescale the population
+  if (at == 2) {
+    if (dat$param$change.size == TRUE) {
+      nBirths <- dat$param$new.size - sum(dat$attr$active == 1, na.rm = TRUE)
+    }
+  }
   
   ## Update Attr
   

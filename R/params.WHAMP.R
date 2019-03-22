@@ -8,12 +8,14 @@
 #'
 #' @param nwstats Target statistics for the network model. An object of class
 #'        \code{nwstats} output from \code{\link{calc_nwstats_msm}}.
+#' @param change.size If \code{TRUE}, change the size of the network for epidemic simulations
+#' @param new.size Size to which to scale the population for epidemic simulations
 #' @param racedist Population distribution by race/ethnicity and region (King County Hispanic,
 #'        black, other; other western WA Hispanic, black, and other, eastern WA Hispanic,
 #'        black, and other)
 #' @param nw_track Sets whether to run the script in the nwfeatures_msm_whamp function to
 #'        track features of the sexual network (degree distribution, mixing, partnership age)
-#'        over time, with optoins \code{TRUE} or \code{FALSE}
+#'        over time, with options \code{TRUE} or \code{FALSE}
 #' @param test.int Average interest interval in days for men who test regularly
 #' @param testing.pattern Method for HIV testing, with options \code{"memoryless"}
 #'        for constant hazard without regard to time since previous test, or
@@ -296,7 +298,9 @@
 #' @export
 #'
 param_msm_whamp <- function(nwstats,
-                            
+                          
+                      change.size = FALSE,
+                      new.size = 90000,
                       racedist = sumto1(c(0.0549, 0.0421, 0.4739, 0.0309, 0.0166, 0.2807, 0.0222, 0.0021, 0.0767)),
                       
                       nw_track = TRUE,
@@ -651,6 +655,7 @@ control_msm_whamp <- function(simno = 1,
                         save.nwstats = FALSE,
                         verbose = TRUE,
                         verbose.int = 1,
+                        save.nw = FALSE,
                         ...) {
 
   formal.args <- formals(sys.function())
@@ -668,7 +673,7 @@ control_msm_whamp <- function(simno = 1,
 
   p$save.other = c("attr", "temp", "el", "p", "cel.temp", "cel.complete")
 
-  p$save.network = FALSE
+  p$save.network = save.nw
 
   class(p) <- "control.net"
   return(p)
