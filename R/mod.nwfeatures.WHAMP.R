@@ -2,7 +2,7 @@
 #'
 #' @description Module function for tracking features of the sexual newtork over time.
 #'
-#' @inheritParams aging_whamp
+#' @inheritParams aging_msm
 #'
 #' @details
 #' At each time step, the cross-network degree distribution is calculated and stored, along with
@@ -12,7 +12,7 @@
 #' This function returns the \code{dat} object with the updated partnership list for diagnostics
 #' on \code{dat$plist}.
 #'
-#' @keywords module SHAMP cocnurrency diagnostics
+#' @keywords module WHAMP network diagnostics
 #' @export
 #'
 nwfeatures_msm_whamp <- function(dat, at){
