@@ -115,7 +115,7 @@ nwfeatures_msm_whamp <- function(dat, at){
     dat$epi$prop.hom.m.EW[at] <- sum(cel.m$region1 %in% "EW" & cel.m$region2 %in% "EW" / 
                                       sum(cel.m$region1 %in% "EW" | cel.m$region2 %in% "EW"))
     
-    dat$epi$sqrtadiff.m[at] <- mean(sqrt(cel.m$age1) = sqrt(cel.m$age2))
+    dat$epi$sqrtadiff.m[at] <- mean(abs(sqrt(cel.m$age1) - sqrt(cel.m$age2)))
     
     dat$epi$badroles.m[at] <- sum((cel.m$role1 %in% "R" & cel.m$role2 %in% "R") | 
                                     (cel.m$role1 %in% "I" & cel.m$role2 %in% "I"))
@@ -135,7 +135,7 @@ nwfeatures_msm_whamp <- function(dat, at){
     dat$epi$prop.hom.p.EW[at] <- sum(cel.p$region1 %in% "EW" & cel.p$region2 %in% "EW" / 
                                        sum(cel.p$region1 %in% "EW" | cel.p$region2 %in% "EW"))
     
-    dat$epi$sqrtadiff.p[at] <- mean(sqrt(cel.p$age1) = sqrt(cel.p$age2))
+    dat$epi$sqrtadiff.p[at] <- mean(abs(sqrt(cel.p$age1) - sqrt(cel.p$age2)))
     
     dat$epi$badroles.p[at] <- sum((cel.p$role1 %in% "R" & cel.p$role2 %in% "R") | 
                                     (cel.p$role1 %in% "I" & cel.p$role2 %in% "I"))
@@ -155,7 +155,7 @@ nwfeatures_msm_whamp <- function(dat, at){
     dat$epi$prop.hom.i.EW[at] <- sum(cel.i$region1 %in% "EW" & cel.i$region2 %in% "EW" / 
                                        sum(cel.i$region1 %in% "EW" | cel.i$region2 %in% "EW"))
     
-    dat$epi$sqrtadiff.i[at] <- mean(sqrt(cel.i$age1) = sqrt(cel.i$age2))
+    dat$epi$sqrtadiff.i[at] <- mean(abs(sqrt(cel.i$age1) - sqrt(cel.i$age2)))
     
     dat$epi$badroles.i[at] <- sum((cel.i$role1 %in% "R" & cel.i$role2 %in% "R") | 
                                     (cel.i$role1 %in% "I" & cel.i$role2 %in% "I"))
