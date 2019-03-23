@@ -126,9 +126,23 @@ setBirthAttr_msm_whamp <- function(dat, at, nBirths) {
   dat$attr$region[newIds] <- region
   
 
-  # New entries will enter at age 18
+  ## If at = 2 and change.size = TRUE, distribute age according to agedist
+  if (at == 2 & dat$param$change.size == TRUE) {
+    new.n.by.age <- table(apportion_lr(nBirths, c("18-24", "25-29", "30-34", "35-39", "40-44", "45-49", "50-54", "55-59"), dat$param$agedist))
+    dat$attr$age[newIds] <- sample(c(sample(seq(18, 24.999, 1 / (365 / dat$param$time.unit)), new.n.by.age[[1]], TRUE),
+                                     sample(seq(25, 29.999, 1 / (365 / dat$param$time.unit)), new.n.by.age[[2]], TRUE),
+                                     sample(seq(30, 34.999, 1 / (365 / dat$param$time.unit)), new.n.by.age[[3]], TRUE),
+                                     sample(seq(35, 39.999, 1 / (365 / dat$param$time.unit)), new.n.by.age[[4]], TRUE),
+                                     sample(seq(40, 44.999, 1 / (365 / dat$param$time.unit)), new.n.by.age[[5]], TRUE),
+                                     sample(seq(45, 49.999, 1 / (365 / dat$param$time.unit)), new.n.by.age[[6]], TRUE),
+                                     sample(seq(50, 54.999, 1 / (365 / dat$param$time.unit)), new.n.by.age[[7]], TRUE),
+                                     sample(seq(55, 59.999, 1 / (365 / dat$param$time.unit)), new.n.by.age[[8]], TRUE)))
+    dat$attr$sqrt.age[newIds] <- sqrt(dat$attr$age[newIds])    
+  } else {
+  # Otherwise new entries will enter at age 18
   dat$attr$age[newIds] <- rep(dat$param$birth.age, nBirths)
   dat$attr$sqrt.age[newIds] <- sqrt(dat$attr$age[newIds])
+  }
 
   # Disease status and related
   dat$attr$status[newIds] <- rep(0, nBirths)
