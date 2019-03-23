@@ -422,8 +422,8 @@ base_nw_msm_whamp <- function(nwstats) {
   riskg[age>=18 & age<50] <- riskg.18to49
   riskg[age>=50] <- riskg.50to59
 
-  attr.names <- c("race", "race..wa", "region", "riskg", "sqrt.age", "role.class")
-  attr.values <- list(race, race..wa, region, riskg, sqrt.age, role)
+  attr.names <- c("race..wa", "region", "riskg", "sqrt.age", "role.class")
+  attr.values <- list(race..wa, region, riskg, sqrt.age, role)
   nw <- network::set.vertex.attribute(nw, attr.names, attr.values)
 
   return(nw)
