@@ -13,6 +13,7 @@
 #' @param racedist Population distribution by race/ethnicity and region (King County Hispanic,
 #'        black, other; other western WA Hispanic, black, and other, eastern WA Hispanic,
 #'        black, and other)
+#' @param agedist Target population age structure (proportion in each group 18-24, 25-29... 55-59)
 #' @param nw_track Sets whether to run the script in the nwfeatures_msm_whamp function to
 #'        track features of the sexual network (degree distribution, mixing, partnership age)
 #'        over time, with options \code{TRUE} or \code{FALSE}
@@ -302,7 +303,7 @@ param_msm_whamp <- function(nwstats,
                       change.size = FALSE,
                       new.size = 90000,
                       racedist = sumto1(c(0.0549, 0.0421, 0.4739, 0.0309, 0.0166, 0.2807, 0.0222, 0.0021, 0.0767)),
-                      
+                      agedist = sumto1(c(0.1594, 0.1319, 0.1292, 0.1173, 0.1183, 0.1148, 0.1071, 0.122)),
                       nw_track = TRUE,
                       
                       test.int = 436,
