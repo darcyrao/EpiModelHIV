@@ -22,15 +22,13 @@ nwfeatures_msm_whamp <- function(dat, at){
     # Variables --------------------------------------------------------------
     
     # Attributes
-    
+
     uid <- dat$attr$uid
     race..wa <- dat$attr$race..wa
     region <- dat$attr$region
     age <- floor(dat$attr$age)
     riskg <- dat$attr$riskg
     role <- dat$attr$role.class
-    deg.main <- dat$attr$deg.main
-    deg.pers <- dat$attr$deg.pers
     cel.temp <- dat$cel.temp
     cel.complete <- dat$cel.complete
     
@@ -75,15 +73,17 @@ nwfeatures_msm_whamp <- function(dat, at){
                        "riskg1","riskg2","role1","role2", "ID")
     
     ##Calculate degree distributions
+    deg.main <- get_degree(dat$el[[1]])
+    deg.pers <- get_degree(dat$el[[2]])
     dat$epi$deg.main[at] <- mean(deg.main)
     dat$epi$deg.pers[at] <- mean(deg.pers)
     dat$epi$deg.inst[at] <- mean(get_degree(dat$el[[3]]))
-    dat$epi$main0pers0[at] <- prop.table(table(dat$attr$deg.main, dat$attr$deg.pers))[1,1]
-    dat$epi$main0pers1[at] <- prop.table(table(dat$attr$deg.main, dat$attr$deg.pers))[1,2]
-    dat$epi$main0pers2[at] <- prop.table(table(dat$attr$deg.main, dat$attr$deg.pers))[1,3]
-    dat$epi$main1pers0[at] <- prop.table(table(dat$attr$deg.main, dat$attr$deg.pers))[2,1]
-    dat$epi$main1pers1[at] <- prop.table(table(dat$attr$deg.main, dat$attr$deg.pers))[2,2]
-    dat$epi$main1pers2[at] <- prop.table(table(dat$attr$deg.main, dat$attr$deg.pers))[2,3]
+    dat$epi$main0pers0[at] <- prop.table(table(deg.main, deg.pers))[1,1]
+    dat$epi$main0pers1[at] <- prop.table(table(deg.main, deg.pers))[1,2]
+    dat$epi$main0pers2[at] <- prop.table(table(deg.main, deg.pers))[1,3]
+    dat$epi$main1pers0[at] <- prop.table(table(deg.main, deg.pers))[2,1]
+    dat$epi$main1pers1[at] <- prop.table(table(deg.main, deg.pers))[2,2]
+    dat$epi$main1pers2[at] <- prop.table(table(deg.main, deg.pers))[2,3]
     
     # Calculate the mean number of inst partnerships for groups defined by main and pers partnerships
     n.inst <- get_degree(dat$el[[3]])
@@ -101,19 +101,19 @@ nwfeatures_msm_whamp <- function(dat, at){
     cel.i <- cel[cel$type %in% "inst", ]
     
     # Main
-    dat$epi$prop.hom.m.B[at] <- sum(cel.m$race1 %in% "B" & cel.m$race2 %in% "B") / 
-                          sum(cel.m$race1 %in% "B" | cel.m$race2 %in% "B")
-    dat$epi$prop.hom.m.H[at] <- sum(cel.m$race1 %in% "H" & cel.m$race2 %in% "H") / 
-                          sum(cel.m$race1 %in% "H" | cel.m$race2 %in% "H")
-    dat$epi$prop.hom.m.O[at] <- sum(cel.m$race1 %in% "O" & cel.m$race2 %in% "O") / 
-                          sum(cel.m$race1 %in% "O" | cel.m$race2 %in% "O")
+    dat$epi$prop.hom.m.B[at] <- (2*sum(cel.m$race1 %in% "B" & cel.m$race2 %in% "B")) / 
+                          sum(deg.main[race..wa %in% "B"])
+    dat$epi$prop.hom.m.H[at] <- (2*sum(cel.m$race1 %in% "H" & cel.m$race2 %in% "H")) / 
+                          sum(deg.main[race..wa %in% "H"])
+    dat$epi$prop.hom.m.O[at] <- (2*sum(cel.m$race1 %in% "O" & cel.m$race2 %in% "O")) / 
+                          sum(deg.main[race..wa %in% "O"])
     
-    dat$epi$prop.hom.m.KC[at] <- sum(cel.m$region1 %in% "KC" & cel.m$region2 %in% "KC") / 
-                                      sum(cel.m$region1 %in% "KC" | cel.m$region2 %in% "KC")
-    dat$epi$prop.hom.m.OW[at] <- sum(cel.m$region1 %in% "OW" & cel.m$region2 %in% "OW") / 
-                                      sum(cel.m$region1 %in% "OW" | cel.m$region2 %in% "OW")
-    dat$epi$prop.hom.m.EW[at] <- sum(cel.m$region1 %in% "EW" & cel.m$region2 %in% "EW") / 
-                                      sum(cel.m$region1 %in% "EW" | cel.m$region2 %in% "EW")
+    dat$epi$prop.hom.m.KC[at] <- (2*sum(cel.m$region1 %in% "KC" & cel.m$region2 %in% "KC")) / 
+                                      sum(deg.main[region %in% "KC"])
+    dat$epi$prop.hom.m.OW[at] <- (2*sum(cel.m$region1 %in% "OW" & cel.m$region2 %in% "OW")) / 
+                                      sum(deg.main[region %in% "OW"])
+    dat$epi$prop.hom.m.EW[at] <- (2*sum(cel.m$region1 %in% "EW" & cel.m$region2 %in% "EW")) / 
+                                      sum(deg.main[region %in% "EW"])
     
     dat$epi$sqrtadiff.m[at] <- mean(abs(sqrt(cel.m$age1) - sqrt(cel.m$age2)))
     
@@ -121,19 +121,19 @@ nwfeatures_msm_whamp <- function(dat, at){
                                     (cel.m$role1 %in% "I" & cel.m$role2 %in% "I"))
     
     # Pers
-    dat$epi$prop.hom.p.B[at] <- sum(cel.p$race1 %in% "B" & cel.p$race2 %in% "B") / 
-      sum(cel.p$race1 %in% "B" | cel.p$race2 %in% "B")
-    dat$epi$prop.hom.p.H[at] <- sum(cel.p$race1 %in% "H" & cel.p$race2 %in% "H") / 
-      sum(cel.p$race1 %in% "H" | cel.p$race2 %in% "H")
-    dat$epi$prop.hom.p.O[at] <- sum(cel.p$race1 %in% "O" & cel.p$race2 %in% "O") / 
-      sum(cel.p$race1 %in% "O" | cel.p$race2 %in% "O")
+    dat$epi$prop.hom.p.B[at] <- (2*sum(cel.p$race1 %in% "B" & cel.p$race2 %in% "B")) / 
+      sum(deg.pers[race..wa %in% "B"])
+    dat$epi$prop.hom.p.H[at] <- (2*sum(cel.p$race1 %in% "H" & cel.p$race2 %in% "H")) / 
+      sum(deg.pers[race..wa %in% "H"])
+    dat$epi$prop.hom.p.O[at] <- (2*sum(cel.p$race1 %in% "O" & cel.p$race2 %in% "O")) / 
+      sum(deg.pers[race..wa %in% "O"])
     
-    dat$epi$prop.hom.p.KC[at] <- sum(cel.p$region1 %in% "KC" & cel.p$region2 %in% "KC") / 
-      sum(cel.p$region1 %in% "KC" | cel.p$region2 %in% "KC")
-    dat$epi$prop.hom.p.OW[at] <- sum(cel.p$region1 %in% "OW" & cel.p$region2 %in% "OW") / 
-      sum(cel.p$region1 %in% "OW" | cel.p$region2 %in% "OW")
-    dat$epi$prop.hom.p.EW[at] <- sum(cel.p$region1 %in% "EW" & cel.p$region2 %in% "EW") / 
-      sum(cel.p$region1 %in% "EW" | cel.p$region2 %in% "EW")
+    dat$epi$prop.hom.p.KC[at] <- (2*sum(cel.p$region1 %in% "KC" & cel.p$region2 %in% "KC")) / 
+      sum(deg.pers[region %in% "KC"])
+    dat$epi$prop.hom.p.OW[at] <- (2*sum(cel.p$region1 %in% "OW" & cel.p$region2 %in% "OW")) / 
+      sum(deg.pers[region %in% "OW"])
+    dat$epi$prop.hom.p.EW[at] <- (2*sum(cel.p$region1 %in% "EW" & cel.p$region2 %in% "EW")) / 
+      sum(deg.pers[region %in% "EW"])
     
     dat$epi$sqrtadiff.p[at] <- mean(abs(sqrt(cel.p$age1) - sqrt(cel.p$age2)))
     
@@ -141,19 +141,19 @@ nwfeatures_msm_whamp <- function(dat, at){
                                     (cel.p$role1 %in% "I" & cel.p$role2 %in% "I"))
     
     # Inst
-    dat$epi$prop.hom.i.B[at] <- sum(cel.i$race1 %in% "B" & cel.i$race2 %in% "B") / 
-      sum(cel.i$race1 %in% "B" | cel.i$race2 %in% "B")
-    dat$epi$prop.hom.i.H[at] <- sum(cel.i$race1 %in% "H" & cel.i$race2 %in% "H") / 
-      sum(cel.i$race1 %in% "H" | cel.i$race2 %in% "H")
-    dat$epi$prop.hom.i.O[at] <- sum(cel.i$race1 %in% "O" & cel.i$race2 %in% "O") / 
-      sum(cel.i$race1 %in% "O" | cel.i$race2 %in% "O")
+    dat$epi$prop.hom.i.B[at] <- (2*sum(cel.i$race1 %in% "B" & cel.i$race2 %in% "B")) / 
+      sum(n.inst[race..wa %in% "B"])
+    dat$epi$prop.hom.i.H[at] <- (2*sum(cel.i$race1 %in% "H" & cel.i$race2 %in% "H")) / 
+      sum(n.inst[race..wa %in% "H"])
+    dat$epi$prop.hom.i.O[at] <- (2*sum(cel.i$race1 %in% "O" & cel.i$race2 %in% "O")) / 
+      sum(n.inst[race..wa %in% "O"])
     
-    dat$epi$prop.hom.i.KC[at] <- sum(cel.i$region1 %in% "KC" & cel.i$region2 %in% "KC") / 
-      sum(cel.i$region1 %in% "KC" | cel.i$region2 %in% "KC")
-    dat$epi$prop.hom.i.OW[at] <- sum(cel.i$region1 %in% "OW" & cel.i$region2 %in% "OW") / 
-      sum(cel.i$region1 %in% "OW" | cel.i$region2 %in% "OW")
-    dat$epi$prop.hom.i.EW[at] <- sum(cel.i$region1 %in% "EW" & cel.i$region2 %in% "EW") / 
-      sum(cel.i$region1 %in% "EW" | cel.i$region2 %in% "EW")
+    dat$epi$prop.hom.i.KC[at] <- (2*sum(cel.i$region1 %in% "KC" & cel.i$region2 %in% "KC")) / 
+      sum(n.inst[region %in% "KC"])
+    dat$epi$prop.hom.i.OW[at] <- (2*sum(cel.i$region1 %in% "OW" & cel.i$region2 %in% "OW")) / 
+      sum(n.inst[region %in% "OW"])
+    dat$epi$prop.hom.i.EW[at] <- (2*sum(cel.i$region1 %in% "EW" & cel.i$region2 %in% "EW")) / 
+      sum(n.inst[region %in% "EW"])
     
     dat$epi$sqrtadiff.i[at] <- mean(abs(sqrt(cel.i$age1) - sqrt(cel.i$age2)))
     
