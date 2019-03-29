@@ -141,6 +141,7 @@ prevalence_msm_whamp <- function(dat, at) {
     dat$epi$prop.hom.m.B <- rNA
     dat$epi$prop.hom.m.H <- rNA
     dat$epi$prop.hom.m.O <- rNA
+    dat$epi$prop.hom.m.region <- rNA
     dat$epi$prop.hom.m.KC <- rNA
     dat$epi$prop.hom.m.OW <- rNA
     dat$epi$prop.hom.m.EW <- rNA
@@ -149,6 +150,7 @@ prevalence_msm_whamp <- function(dat, at) {
     dat$epi$prop.hom.p.B <- rNA
     dat$epi$prop.hom.p.H <- rNA
     dat$epi$prop.hom.p.O <- rNA
+    dat$epi$prop.hom.p.region <- rNA
     dat$epi$prop.hom.p.KC <- rNA
     dat$epi$prop.hom.p.OW <- rNA
     dat$epi$prop.hom.p.EW <- rNA
@@ -157,6 +159,7 @@ prevalence_msm_whamp <- function(dat, at) {
     dat$epi$prop.hom.i.B <- rNA
     dat$epi$prop.hom.i.H <- rNA
     dat$epi$prop.hom.i.O <- rNA
+    dat$epi$prop.hom.i.region <- rNA
     dat$epi$prop.hom.i.KC <- rNA
     dat$epi$prop.hom.i.OW <- rNA
     dat$epi$prop.hom.i.EW <- rNA

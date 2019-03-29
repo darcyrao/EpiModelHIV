@@ -22,7 +22,6 @@ nwfeatures_msm_whamp <- function(dat, at){
     # Variables --------------------------------------------------------------
     
     # Attributes
-
     uid <- dat$attr$uid
     race..wa <- dat$attr$race..wa
     region <- dat$attr$region
@@ -108,6 +107,8 @@ nwfeatures_msm_whamp <- function(dat, at){
     dat$epi$prop.hom.m.O[at] <- (2*sum(cel.m$race1 %in% "O" & cel.m$race2 %in% "O")) / 
                           sum(deg.main[race..wa %in% "O"])
     
+    dat$epi$prop.hom.m.region[at] <- (2*sum(cel.m$region1 == cel.m$region2)) / 
+                                      sum(deg.main)
     dat$epi$prop.hom.m.KC[at] <- (2*sum(cel.m$region1 %in% "KC" & cel.m$region2 %in% "KC")) / 
                                       sum(deg.main[region %in% "KC"])
     dat$epi$prop.hom.m.OW[at] <- (2*sum(cel.m$region1 %in% "OW" & cel.m$region2 %in% "OW")) / 
@@ -128,6 +129,8 @@ nwfeatures_msm_whamp <- function(dat, at){
     dat$epi$prop.hom.p.O[at] <- (2*sum(cel.p$race1 %in% "O" & cel.p$race2 %in% "O")) / 
       sum(deg.pers[race..wa %in% "O"])
     
+    dat$epi$prop.hom.p.region[at] <- (2*sum(cel.p$region1 == cel.p$region2)) / 
+      sum(deg.pers)
     dat$epi$prop.hom.p.KC[at] <- (2*sum(cel.p$region1 %in% "KC" & cel.p$region2 %in% "KC")) / 
       sum(deg.pers[region %in% "KC"])
     dat$epi$prop.hom.p.OW[at] <- (2*sum(cel.p$region1 %in% "OW" & cel.p$region2 %in% "OW")) / 
@@ -148,6 +151,8 @@ nwfeatures_msm_whamp <- function(dat, at){
     dat$epi$prop.hom.i.O[at] <- (2*sum(cel.i$race1 %in% "O" & cel.i$race2 %in% "O")) / 
       sum(n.inst[race..wa %in% "O"])
     
+    dat$epi$prop.hom.i.region[at] <- (2*sum(cel.i$region1 == cel.i$region2)) / 
+      sum(n.inst)
     dat$epi$prop.hom.i.KC[at] <- (2*sum(cel.i$region1 %in% "KC" & cel.i$region2 %in% "KC")) / 
       sum(n.inst[region %in% "KC"])
     dat$epi$prop.hom.i.OW[at] <- (2*sum(cel.i$region1 %in% "OW" & cel.i$region2 %in% "OW")) / 
