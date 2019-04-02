@@ -4,9 +4,9 @@
 \alias{init_msm_whamp}
 \title{Epidemic Model Initial Conditions for the WHAMP model}
 \usage{
-init_msm_whamp(nwstats, prev.H..wa = 0.09, prev.B..wa = 0.13,
-  prev.O..wa = 0.06, prev.ugc = 0, prev.rgc = 0, prev.uct = 0,
-  prev.rct = 0, ...)
+init_msm_whamp(nwstats, prev.H..wa = 0.8 * 0.1206, prev.B..wa = 0.8 *
+  0.1693, prev.O..wa = 0.8 * 0.0705, prev.ugc = 0, prev.rgc = 0,
+  prev.uct = 0, prev.rct = 0, ...)
 }
 \arguments{
 \item{nwstats}{Target statistics for the network model. An object of class
