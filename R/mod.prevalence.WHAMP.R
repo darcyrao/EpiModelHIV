@@ -121,6 +121,7 @@ prevalence_msm_whamp <- function(dat, at) {
     dat$epi$vs <- rNA
 
     # network stats
+    if(dat$param$nw_track == TRUE){
     dat$epi$duplicates.mp <- rNA # count overlapping main and pers partnerships between the same nodes
     dat$epi$duplicates.mpi <- rNA # count overlapping main, pers, and inst partnerships between the same nodes
     dat$epi$deg.main <- rNA
@@ -165,7 +166,7 @@ prevalence_msm_whamp <- function(dat, at) {
     dat$epi$prop.hom.i.EW <- rNA
     dat$epi$sqrtadiff.i <- rNA
     dat$epi$badroles.i <- rNA
-    
+    }
 
     # dat$epi$prev.rgc <- rNA
     # dat$epi$prev.ugc <- rNA
