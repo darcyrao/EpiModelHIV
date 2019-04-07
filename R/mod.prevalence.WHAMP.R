@@ -91,6 +91,7 @@ prevalence_msm_whamp <- function(dat, at) {
     dat$epi$i.prev.EW <- rNA
     dat$epi$incid <- rNA
     dat$epi$ir100 <- rNA
+    dat$epi$prev.all <- rNA
     dat$epi$prev.dx <- rNA
     dat$epi$prev.dx.H <- rNA
     dat$epi$prev.dx.B <- rNA
@@ -237,13 +238,14 @@ prevalence_msm_whamp <- function(dat, at) {
   dat$epi$i.num.KC[at] <- sum(status == 1 & region == "KC", na.rm = TRUE)
   dat$epi$i.num.OW[at] <- sum(status == 1 & region == "OW", na.rm = TRUE)
   dat$epi$i.num.EW[at] <- sum(status == 1 & region == "EW", na.rm = TRUE)
-  dat$epi$i.prev[at] <- dat$epi$i.num[at] / dat$epi$num[at]
+  dat$epi$i.prev[at] <- sum(diag.status == 1, na.rm = TRUE) / dat$epi$num[at] # Set the same as prev.dx to test artifacts in abc code. New var prev.all records true prevlance
   dat$epi$i.prev.H..wa[at] <- dat$epi$i.num.H..wa[at] / dat$epi$num.H..wa[at]
   dat$epi$i.prev.B..wa[at] <- dat$epi$i.num.B..wa[at] / dat$epi$num.B..wa[at]
   dat$epi$i.prev.O..wa[at] <- dat$epi$i.num.O..wa[at] / dat$epi$num.O..wa[at]
   dat$epi$i.prev.KC[at] <- dat$epi$i.num.KC[at] / dat$epi$num.KC[at]
   dat$epi$i.prev.OW[at] <- dat$epi$i.num.OW[at] / dat$epi$num.OW[at]
   dat$epi$i.prev.EW[at] <- dat$epi$i.num.EW[at] / dat$epi$num.EW[at]
+  dat$epi$prev.all[at] <- dat$epi$i.num[at] / dat$epi$num[at]
   dat$epi$prev.dx[at] <- sum(diag.status == 1, na.rm = TRUE) / dat$epi$num[at]
   dat$epi$prev.dx.H[at] <- sum(diag.status == 1 & race..wa == "H", na.rm = TRUE) / dat$epi$num.H..wa[at]
   dat$epi$prev.dx.B[at] <- sum(diag.status == 1 & race..wa == "B", na.rm = TRUE) / dat$epi$num.B..wa[at]
