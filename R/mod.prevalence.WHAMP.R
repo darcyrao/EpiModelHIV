@@ -255,22 +255,22 @@ prevalence_msm_whamp <- function(dat, at) {
   dat$epi$prev.dx.EW[at] <- sum(diag.status == 1 & region == "EW", na.rm = TRUE) / dat$epi$num.EW[at]
   
   # Incidence rates per 100 per year overall and by attribute
-  dat$epi$ir100[at] <- (dat$epi$incid[at] / (sum(status == 0, na.rm = TRUE)) + dat$epi$incid[at]) * 5200 
-  dat$epi$ir100.B[at] <- (dat$epi$incid.B[at] / (sum(status == 0, na.rm = TRUE)) + dat$epi$incid.B[at]) * 5200 
-  dat$epi$ir100.H[at] <- (dat$epi$incid.H[at] / (sum(status == 0, na.rm = TRUE)) + dat$epi$incid.H[at]) * 5200
-  dat$epi$ir100.O[at] <- (dat$epi$incid.O[at] / (sum(status == 0, na.rm = TRUE)) + dat$epi$incid.O[at]) * 5200
-  dat$epi$ir100.KC[at] <- (dat$epi$incid.KC[at] / (sum(status == 0, na.rm = TRUE)) + dat$epi$incid.KC[at]) * 5200
-  dat$epi$ir100.OW[at] <- (dat$epi$incid.OW[at] / (sum(status == 0, na.rm = TRUE)) + dat$epi$incid.OW[at]) * 5200
-  dat$epi$ir100.EW[at] <- (dat$epi$incid.EW[at] / (sum(status == 0, na.rm = TRUE)) + dat$epi$incid.EW[at]) * 5200
-  dat$epi$ir100.18to24[at] <- (dat$epi$incid.18to24[at] / (sum(status == 0, na.rm = TRUE)) + dat$epi$incid.18to24[at]) * 5200
-  dat$epi$ir100.25to29[at] <- (dat$epi$incid.25to29[at] / (sum(status == 0, na.rm = TRUE)) + dat$epi$incid.25to29[at]) * 5200
-  dat$epi$ir100.30to34[at] <- (dat$epi$incid.30to34[at] / (sum(status == 0, na.rm = TRUE)) + dat$epi$incid.30to34[at]) * 5200
-  dat$epi$ir100.35to39[at] <- (dat$epi$incid.35to39[at] / (sum(status == 0, na.rm = TRUE)) + dat$epi$incid.35to39[at]) * 5200
-  dat$epi$ir100.40to44[at] <- (dat$epi$incid.40to44[at] / (sum(status == 0, na.rm = TRUE)) + dat$epi$incid.40to44[at]) * 5200
-  dat$epi$ir100.45to49[at] <- (dat$epi$incid.45to49[at] / (sum(status == 0, na.rm = TRUE)) + dat$epi$incid.45to49[at]) * 5200
-  dat$epi$ir100.50to54[at] <- (dat$epi$incid.50to54[at] / (sum(status == 0, na.rm = TRUE)) + dat$epi$incid.50to54[at]) * 5200
-  dat$epi$ir100.55to59[at] <- (dat$epi$incid.55to59[at] / (sum(status == 0, na.rm = TRUE)) + dat$epi$incid.55to59[at]) * 5200
-  
+  dat$epi$ir100[at] <- (dat$epi$incid[at] / ((sum(status == 0, na.rm = TRUE)) + dat$epi$incid[at])) * 5200 
+  # dat$epi$ir100.B[at] <- (dat$epi$incid.B[at] / ((sum(status == 0, na.rm = TRUE)) + dat$epi$incid.B[at])) * 5200 
+  # dat$epi$ir100.H[at] <- (dat$epi$incid.H[at] / ((sum(status == 0, na.rm = TRUE)) + dat$epi$incid.H[at])) * 5200
+  # dat$epi$ir100.O[at] <- (dat$epi$incid.O[at] / ((sum(status == 0, na.rm = TRUE)) + dat$epi$incid.O[at])) * 5200
+  # dat$epi$ir100.KC[at] <- (dat$epi$incid.KC[at] / ((sum(status == 0, na.rm = TRUE)) + dat$epi$incid.KC[at])) * 5200
+  # dat$epi$ir100.OW[at] <- (dat$epi$incid.OW[at] / ((sum(status == 0, na.rm = TRUE)) + dat$epi$incid.OW[at])) * 5200
+  # dat$epi$ir100.EW[at] <- (dat$epi$incid.EW[at] / ((sum(status == 0, na.rm = TRUE)) + dat$epi$incid.EW[at])) * 5200
+  # dat$epi$ir100.18to24[at] <- (dat$epi$incid.18to24[at] / ((sum(status == 0, na.rm = TRUE)) + dat$epi$incid.18to24[at])) * 5200
+  # dat$epi$ir100.25to29[at] <- (dat$epi$incid.25to29[at] / ((sum(status == 0, na.rm = TRUE)) + dat$epi$incid.25to29[at])) * 5200
+  # dat$epi$ir100.30to34[at] <- (dat$epi$incid.30to34[at] / ((sum(status == 0, na.rm = TRUE)) + dat$epi$incid.30to34[at])) * 5200
+  # dat$epi$ir100.35to39[at] <- (dat$epi$incid.35to39[at] / ((sum(status == 0, na.rm = TRUE)) + dat$epi$incid.35to39[at])) * 5200
+  # dat$epi$ir100.40to44[at] <- (dat$epi$incid.40to44[at] / ((sum(status == 0, na.rm = TRUE)) + dat$epi$incid.40to44[at])) * 5200
+  # dat$epi$ir100.45to49[at] <- (dat$epi$incid.45to49[at] / ((sum(status == 0, na.rm = TRUE)) + dat$epi$incid.45to49[at])) * 5200
+  # dat$epi$ir100.50to54[at] <- (dat$epi$incid.50to54[at] / ((sum(status == 0, na.rm = TRUE)) + dat$epi$incid.50to54[at])) * 5200
+  # dat$epi$ir100.55to59[at] <- (dat$epi$incid.55to59[at] / ((sum(status == 0, na.rm = TRUE)) + dat$epi$incid.55to59[at])) * 5200
+
   dat$epi$prepCurr[at] <- sum(prepStat == 1, na.rm = TRUE)
   dat$epi$prepElig[at] <- sum(prepElig == 1, na.rm = TRUE)
   dat$epi$i.num.prep0[at] <- sum((is.na(prepStat) | prepStat == 0) & status == 1, na.rm = TRUE)
