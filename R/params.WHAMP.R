@@ -670,8 +670,13 @@ control_msm_whamp <- function(simno = 1,
                                   USE.NAMES = FALSE) == TRUE)]
   p$bi.mods <- bi.mods
   p$user.mods <- grep(".FUN", names(dot.args), value = TRUE)
-
-  p$save.other = c("attr", "temp", "el", "p", "cel.temp", "cel.complete")
+  
+  if (!is.null(nwfeatures.FUN)) {
+    p$save.other = c("attr", "temp", "el", "p", "cel.temp", "cel.complete")
+  } else {
+    p$save.other = c("attr", "temp", "el", "p")
+  }
+  
 
   p$save.network = FALSE
 
