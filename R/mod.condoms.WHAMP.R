@@ -147,10 +147,10 @@ condoms_msm_whamp <- function(dat, at) {
     
     # Continued risk compensation after PrEP discontinuation - only if not diagnosed with HIV and the partner is not an always condom user 
     if (rcomp.discont == TRUE){
-      ids.spontDisc <- which((prepStat[elt[, 1]] == 0 & diag.status[elt[, 1]] != 1 & prepClass[elt[, 1]] %in% rcomp.adh.groups & 
-                                spontDisc[elt[, 1]] == 1 & cond.always[elt[, 2]] == 0) |
-                               (prepStat[elt[, 2]] == 0 & diag.status[elt[, 2]] != 1 & prepClass[elt[, 2]] %in% rcomp.adh.groups & 
-                                  spontDisc[elt[, 2]] == 1 & cond.always[elt[, 1]] == 0))
+      ids.spontDisc <- which((prepStat[elt[, 1]] == 0 & (diag.status[elt[, 1]] == 0 | is.na(diag.status[elt[,1]])) & 
+                                prepClass[elt[, 1]] %in% rcomp.adh.groups & spontDisc[elt[, 1]] == 1 & cond.always[elt[, 2]] == 0) |
+                               (prepStat[elt[, 2]] == 0 & (diag.status[elt[, 1]] == 0 | is.na(diag.status[elt[,1]])) & 
+                                  prepClass[elt[, 2]] %in% rcomp.adh.groups & spontDisc[elt[, 2]] == 1 & cond.always[elt[, 1]] == 0))
       idsRC.disc <- setdiff(ids.spontDisc, idsRC) # If partner is on PrEP and risk compensates, don't add effect of continued risk compensation from discontinued partner
       uai.prob[idsRC.disc] <- 1 - (1 - uai.prob[idsRC.disc]) * (1 - rcomp.prob)
       
