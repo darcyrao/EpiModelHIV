@@ -57,9 +57,9 @@ condoms_msm_whamp <- function(dat, at) {
       cond.prob <- (num.YY == 2) * (dat$param$cond.main.YY.prob) +
         (num.YY == 1) * (dat$param$cond.main.other.prob) +
         (num.YY == 0) * (dat$param$cond.main.other.prob)
+      cond.always <- NULL
       diag.beta <- dat$param$cond.diag.main.beta
       discl.beta <- dat$param$cond.discl.main.beta
-      cond.always <- NULL
       ptype <- 1
     }
     if (type == "pers") {
@@ -83,9 +83,14 @@ condoms_msm_whamp <- function(dat, at) {
 
     # Base condom probs
     cond.prob.base <- cond.prob * cond.rr
-    cond.prob.adj <- cond.prob.base
     
-    # Transform to UAI logit
+    if (type %in% c("pers", "inst")) {
+    cond.prob.adj <- rep(cond.prob.base, nrow(elt))
+    } else {
+      cond.prob.adj <- cond.prob.base
+    }
+    
+    # Transform base condom probs to UAI logit
     uai.prob <- 1 - cond.prob.adj
     uai.logodds <- log(uai.prob / (1 - uai.prob))
 
@@ -149,7 +154,7 @@ condoms_msm_whamp <- function(dat, at) {
     if (rcomp.discont == TRUE){
       ids.spontDisc <- which((prepStat[elt[, 1]] == 0 & (diag.status[elt[, 1]] == 0 | is.na(diag.status[elt[,1]])) & 
                                 prepClass[elt[, 1]] %in% rcomp.adh.groups & spontDisc[elt[, 1]] == 1 & cond.always[elt[, 2]] == 0) |
-                               (prepStat[elt[, 2]] == 0 & (diag.status[elt[, 1]] == 0 | is.na(diag.status[elt[,1]])) & 
+                               (prepStat[elt[, 2]] == 0 & (diag.status[elt[, 2]] == 0 | is.na(diag.status[elt[, 2]])) & 
                                   prepClass[elt[, 2]] %in% rcomp.adh.groups & spontDisc[elt[, 2]] == 1 & cond.always[elt[, 1]] == 0))
       idsRC.disc <- setdiff(ids.spontDisc, idsRC) # If partner is on PrEP and risk compensates, don't add effect of continued risk compensation from discontinued partner
       uai.prob[idsRC.disc] <- 1 - (1 - uai.prob[idsRC.disc]) * (1 - rcomp.prob)
