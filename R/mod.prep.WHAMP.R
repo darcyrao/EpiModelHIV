@@ -51,22 +51,13 @@ prep_msm_whamp <- function(dat, at) {
   prep.coverage.init.oth <- dat$param$prep.coverage.init.region[2]
   prep.scaleup.KC <- dat$param$prep.scaleup.rate[1]
   prep.scaleup.oth <- dat$param$prep.scaleup.rate[2]
-  prep.cov.max.KC <- dat$param$prep.cov.max.region[1]
-  prep.cov.max.oth <- dat$param$prep.cov.max.region[2]
+  prep.cov.max.KC <- dat$param$prep.cov.max[1]
+  prep.cov.max.oth <- dat$param$prep.cov.max[2]
+  prep.cov.max.all <- dat$param$prep.cov.max[3]
+  prep.max.time <- dat$param$prep.max.time
   prep.class.prob <- dat$param$prep.class.prob
   prep.discontinue <- dat$param$prep.discont
   prep.discont.prob <- dat$param$prep.discont.prob
-
-  # Set coverage quota for the current time step
-  if (at == prep.start.step){
-    prep.coverage.KC <- prep.coverage.init.KC
-    prep.coverage.oth <- prep.coverage.init.oth
-  }
-  if (at > prep.start.step & is.finite(prep.start.step)){
-    prep.coverage.KC <- min(prep.coverage.init.KC + (at - prep.start.step)*prep.scaleup.KC, prep.cov.max.KC)
-    prep.coverage.oth <- min(prep.coverage.init.oth + (at - prep.start.step)*prep.scaleup.oth, prep.cov.max.oth)
-  }
-
 
   ## Eligibility ---------------------------------------------------------------
 
@@ -134,21 +125,48 @@ prep_msm_whamp <- function(dat, at) {
   
 
   ## Initiation ----------------------------------------------------------------
-
-  # For each region, calculate the current coverage among eligible men
+  
+  # Calculate the proportion of eligible men in KC vs. other regions
+  prop.elig.kc <- sum(prepElig == 1 & region %in% "KC", na.rm = TRUE) / sum(prepElig == 1, na.rm = TRUE)
+  
+  # Calculate the current coverage among eligible men overall and by region
+  prep.cov.curr.all <- sum(prepStat == 1, na.rm = TRUE) / sum(prepElig ==1, na.rm = TRUE)
   prep.cov.curr.KC <- sum(prepStat == 1 & region %in% "KC", na.rm = TRUE)/
     sum(prepElig == 1 & region %in% "KC", na.rm = TRUE)
   prep.cov.curr.oth <- sum(prepStat == 1 & region %in% c("OW", "EW"), na.rm = TRUE)/
     sum(prepElig == 1 & region %in% c("OW", "EW"), na.rm = TRUE)
   
+  # Determine coverage quota for the current time step
+  if (at == prep.start.step){
+    prep.coverage.KC <- prep.coverage.init.KC
+    prep.coverage.oth <- prep.coverage.init.oth
+  }
+  
+  if (at > prep.start.step & is.finite(prep.start.step) & is.finite(prep.max.time)){ #If coverage maximum set overall
+    prep.scaleup.rate.all <- (prep.cov.max.all - dat$epi$prep.cov[prep.start.step]) / prep.max.time
+    prep.coverage.all <- min((dat$epi$prep.cov[at - 1] + prep.scaleup.rate.all), prep.cov.max.all)
+  }
+  if (at > prep.start.step & is.finite(prep.start.step) & !is.finite(prep.max.time)){ #If coverage maximum set by region
+    prep.coverage.KC <- min(dat$epi$prep.cov.kc[at-1] + prep.scaleup.KC, prep.cov.max.KC)
+    prep.coverage.oth <- min(dat$epi$prep.cov.oth[at-1] + prep.scaleup.oth, prep.cov.max.oth)
+  }
+  
   # For each group, sample ids to start PrEP if current coverage < coverage threshold
   idsEligSt.KC <- idsEligStart[which(region[idsEligStart] %in% c("KC"))]
   idsEligSt.oth <- idsEligStart[which(region[idsEligStart] %in% c("OW", "EW"))]
   
-  nStart.KC <- pmax(0, pmin(length(idsEligSt.KC), round((prep.coverage.KC - prep.cov.curr.KC) *
-                                        sum(prepElig == 1 & region %in% c("KC"), na.rm = TRUE))))
-  nStart.oth <- pmax(0, pmin(length(idsEligSt.oth), round((prep.coverage.oth - prep.cov.curr.oth) *
-                                        sum(prepElig == 1 & region %in% c("OW", "EW"), na.rm = TRUE))))
+  if(is.finite(prep.max.time)){ #If coverage maximum set overall, distribute number of new PrEP users by region according to proportion eligible
+    nStart.KC <- pmax(0, pmin(length(idsEligSt.KC), round((prep.coverage.all - prep.cov.curr.all) *
+                                                          sum(prepElig == 1, na.rm = TRUE) * prop.elig.kc)))
+    nStart.oth <- pmax(0, pmin(length(idsEligSt.oth), round((prep.coverage.all - prep.cov.curr.all) *
+                                                              sum(prepElig == 1, na.rm = TRUE) * (1-prop.elig.kc))))
+  }
+  if(!is.finite(prep.max.time)){ #If coverage maximum is set by region, define number of new users to meet current coverage threshold in each region
+    nStart.KC <- pmax(0, pmin(length(idsEligSt.KC), round((prep.coverage.KC - prep.cov.curr.KC) *
+                                                          sum(prepElig == 1 & region %in% c("KC"), na.rm = TRUE))))
+    nStart.oth <- pmax(0, pmin(length(idsEligSt.oth), round((prep.coverage.oth - prep.cov.curr.oth) *
+                                                            sum(prepElig == 1 & region %in% c("OW", "EW"), na.rm = TRUE))))
+  }
   
   idsStart.KC <- NULL
   if (nStart.KC > 0) {
