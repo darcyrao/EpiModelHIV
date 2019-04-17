@@ -99,8 +99,8 @@ prevalence_msm_whamp <- function(dat, at) {
     dat$epi$prep.cov.oth <- rNA
     dat$epi$prepElig <- rNA
     dat$epi$prepStart <- rNA
-    dat$epi$time.to.disc <- rNA
-    dat$epi$time.since.prep.start <- rNA
+    # dat$epi$time.to.disc <- rNA
+    # dat$epi$time.since.prep.start <- rNA
     dat$epi$i.num.prep0 <- rNA
     dat$epi$i.num.prep1 <- rNA
     dat$epi$i.prev.prep0 <- rNA
