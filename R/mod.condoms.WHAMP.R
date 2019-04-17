@@ -35,7 +35,13 @@ condoms_msm_whamp <- function(dat, at) {
 
   # Parameters
   rcomp.prob <- dat$param$rcomp.prob
-  rcomp.adh.groups <- dat$param$rcomp.adh.groups
+  if(dat$param$rcomp.adh.groups %in% "all"){
+    rcomp.adh.groups <- c(1:3)
+  } else if (dat$param$rcomp.adh.groups %in% "top2"){
+    rcomp.adh.groups <- c(2:3)
+  } else if (dat$param$rcomp.adh.groups %in% "top1"){
+    rcomp.adh.groups <- 3
+  }
   rcomp.main.only <- dat$param$rcomp.main.only
   rcomp.discl.only <- dat$param$rcomp.discl.only
   rcomp.discont <- dat$param$rcomp.discont
@@ -137,7 +143,7 @@ condoms_msm_whamp <- function(dat, at) {
     
     # PrEP Status (risk compensation)
     if (rcomp.prob > 0) {
-
+      
       idsRC <- which((prepStat[elt[, 1]] == 1 & prepClass[elt[, 1]] %in% rcomp.adh.groups) |
                        (prepStat[elt[, 2]] == 1 & prepClass[elt[, 2]] %in% rcomp.adh.groups))
 
