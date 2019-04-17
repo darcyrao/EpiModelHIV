@@ -151,13 +151,13 @@ prep_msm_whamp <- function(dat, at) {
       prep.coverage.oth <- prep.coverage.init.oth
     } 
     # 50% uptake by 2020 overall (over 3*52 time steps from PrEP start in 2017)
-    if (prep.uptake.scen == "tot.fity"){
+    if (prep.uptake.scen == "tot.fifty"){
       prep.cov.max <- 0.5
       prep.scaleup.rate.all <- (prep.cov.max - dat$epi$prep.cov[prep.start.step]) / (3*52)
       prep.coverage.all <- min((dat$epi$prep.cov[at - 1] + prep.scaleup.rate.all), prep.cov.max)
     }
     # 50% uptake by 2020 in each region (over 3*52 time steps from PrEP start in 2017)
-    if (prep.uptake.scen == "reg.fity"){
+    if (prep.uptake.scen == "reg.fifty"){
       prep.cov.max <- 0.5
       prep.scaleup.rate.KC <- (prep.cov.max - dat$epi$prep.cov.KC[prep.start.step]) / (3*52)
       prep.scaleup.rate.oth <- (prep.cov.max - dat$epi$prep.cov.oth[prep.start.step]) / (3*52)
