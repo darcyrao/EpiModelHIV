@@ -195,32 +195,31 @@
 #'        they're having AI.
 #'
 #' @param prep.start Time step at which the PrEP intervention should start.
-#' @param prep.class.prob The probability of adherence class in low adherence,
-#'        medium adherence, or high adherence groups.
+#' @param prep.adh PrEP adherence scenario, with options \code{"low"} and \code{"high"}
+#' @param prep.class.prob.low The proportion of men in low, medium, and high adherence
+#'        groups if \code{prep.adh} == "low".
+#' @param prep.class.prob.high The proportion of men in low, medium, and high adherence
+#'        groups if \code{prep.adh} == "high.
 #' @param prep.class.hr The hazard ratio for infection per act associated with each
 #'        level of adherence.
+#' @param prep.uptake.scen PrEP uptake scenarios, with options \code{"stable"} for
+#'        stable coverage at levels defined by \code{prep.coverage.init.region}, 
+#'        \code{"tot.fifty"} for increased uptake to 50 percent overall by 2020 (from 2017), 
+#'        \code{"reg.fifty"} for increased uptake up to 50 percent in each region (KC and other) 
+#'        by 2020, and \code{"max"} for increased uptake to levels defined by 
+#'        \code{"prep.cov.max"}, after hitting 50 percent overall in 2020.
 #' @param prep.coverage.init.region Vector of length 2 for the proportion of eligible men 
 #'        (eligibility defined by CAI and discordant partnership status in line with 
 #'        WA State guidelines) in King County and other counties in WA who are allowed 
 #'        to start PrEP once they become eligible at the time step in which PrEP is initiated
 #'        (as specified in \code{prep.start}).
+#' @param prep.cov.max Vector of length 2 for the maximum attainable PrEP coverage
+#'        for each region (King County vs. other counties). Upon reaching these values, 
+#'        PrEP uptake will stabilize.
 #' @param prep.cov.method The method for calculating PrEP coverage, with options
 #'        of \code{"curr"} to base the numerator on the number of people currently
 #'        on PrEP and \code{"ever"} to base it on the number of people ever on
 #'        PrEP.
-#' @param prep.scaleup.rate Vector of length 2 for the rate at which PrEP is  
-#'        scaled up per day from \code{prep.start} for each region (KC vs. other). 
-#'        Set to NA to calculate the rates based on overall target coverage, 
-#'        as specified in \code{prep.cov.max} and \code{prep.target.time}. 
-#'        For stable PrEP use, set to 0.
-#' @param prep.cov.max Vector of length 3 for the maximum attainable PrEP coverage
-#'        for each region (King County vs. other counties) and overall. Set the values for 
-#'        each region to NA to define an overall theshold, or set the overall threshold to NA 
-#'        to define coverage thresholds differentially by region. Upon reaching these values, 
-#'        PrEP uptake will stabilize.
-#' @param prep.max.time Number of time steps from \code{prep.start} by which PrEP coverage
-#'        is expected to reach prep.cov.max. Set to Inf if defining scaleup using rates in
-#'        \code{prep.scaleup.rate}.
 #' @param prep.init.rate The rate at which persons initiate PrEP conditional on
 #'        their eligibility, with 1 equal to instant start.
 #' @param prep.tst.int Testing interval for those who are actively on PrEP. This
@@ -243,8 +242,9 @@
 #'        per act, and 1 is a complete cessation of condom use following PrEP
 #'        initiation.
 #' @param rcomp.adh.groups PrEP adherence groups for whom risk compensation
-#'        occurs, as a vector with values 1, 2, 3 corresponding to
-#'        low adherence, medium adherence, and high adherence to PrEP.
+#'        occurs, with options \code{"all"} for everyone, \code{"top2"} for risk compensation
+#'        only in those with medium and high adherence, and \code{"top1"} for risk compensation
+#'        only in those with high adherence to PrEP.
 #' @param rcomp.main.only Logical, if risk compensation is limited to main
 #'        partnerships only, versus all partnerships.
 #' @param rcomp.discl.only Logical, if risk compensation is limited known-discordant
@@ -418,13 +418,14 @@ param_msm_whamp <- function(nwstats,
                       vv.iev.prob = 0.42,
 
                       prep.start = Inf, # Set to Inf for no PrEP
-                      prep.class.prob = c(0.05, 0.30, 0.65),
+                      prep.adh = "low",
+                      prep.class.prob.low = c(0.05, 0.30, 0.65),
+                      prep.class.prob.high = c(0.03, 0.07, 0.90),
                       prep.class.hr = c(0.69, 0.19, 0.04),
+                      prep.uptake.scen = "stable",
                       prep.coverage.init.region = c(0.4392,	0.2655),
+                      prep.cov.max = c(0.7497,	0.6232),
                       prep.cov.method = "curr",
-                      prep.scaleup.rate = c(0, 0), # Set to 0 for stable PrEP use
-                      prep.cov.max = c(0.7497,	0.6232, NA),
-                      prep.max.time = Inf, # set to Inf if no time limit
                       prep.init.rate = 1,
                       prep.tst.int = 90,
                       prep.risk.int = 365,
@@ -433,7 +434,7 @@ param_msm_whamp <- function(nwstats,
                       prep.discont.prob = 0.017724,
 
                       rcomp.prob = 0,
-                      rcomp.adh.groups = 1:3,
+                      rcomp.adh.groups = "all", 
                       rcomp.main.only = FALSE,
                       rcomp.discl.only = FALSE,
                       rcomp.discont = FALSE,
