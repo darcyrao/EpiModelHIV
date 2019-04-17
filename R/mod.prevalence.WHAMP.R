@@ -82,13 +82,6 @@ prevalence_msm_whamp <- function(dat, at) {
     dat$epi$i.num.KC <- rNA
     dat$epi$i.num.OW <- rNA
     dat$epi$i.num.EW <- rNA
-    dat$epi$i.prev <- rNA
-    dat$epi$i.prev.H..wa <- rNA
-    dat$epi$i.prev.B..wa <- rNA
-    dat$epi$i.prev.O..wa <- rNA
-    dat$epi$i.prev.KC <- rNA
-    dat$epi$i.prev.OW <- rNA
-    dat$epi$i.prev.EW <- rNA
     dat$epi$incid <- rNA
     dat$epi$ir100 <- rNA
     dat$epi$prev.all <- rNA
@@ -238,13 +231,7 @@ prevalence_msm_whamp <- function(dat, at) {
   dat$epi$i.num.KC[at] <- sum(status == 1 & region == "KC", na.rm = TRUE)
   dat$epi$i.num.OW[at] <- sum(status == 1 & region == "OW", na.rm = TRUE)
   dat$epi$i.num.EW[at] <- sum(status == 1 & region == "EW", na.rm = TRUE)
-  dat$epi$i.prev[at] <- sum(diag.status == 1, na.rm = TRUE) / dat$epi$num[at] # Set the same as prev.dx to test artifacts in abc code. New var prev.all records true prevlance
-  dat$epi$i.prev.H..wa[at] <- dat$epi$i.num.H..wa[at] / dat$epi$num.H..wa[at]
-  dat$epi$i.prev.B..wa[at] <- dat$epi$i.num.B..wa[at] / dat$epi$num.B..wa[at]
-  dat$epi$i.prev.O..wa[at] <- dat$epi$i.num.O..wa[at] / dat$epi$num.O..wa[at]
-  dat$epi$i.prev.KC[at] <- dat$epi$i.num.KC[at] / dat$epi$num.KC[at]
-  dat$epi$i.prev.OW[at] <- dat$epi$i.num.OW[at] / dat$epi$num.OW[at]
-  dat$epi$i.prev.EW[at] <- dat$epi$i.num.EW[at] / dat$epi$num.EW[at]
+
   dat$epi$prev.all[at] <- dat$epi$i.num[at] / dat$epi$num[at]
   dat$epi$prev.dx[at] <- sum(diag.status == 1, na.rm = TRUE) / dat$epi$num[at]
   dat$epi$prev.dx.H[at] <- sum(diag.status == 1 & race..wa == "H", na.rm = TRUE) / dat$epi$num.H..wa[at]
@@ -276,7 +263,7 @@ prevalence_msm_whamp <- function(dat, at) {
   dat$epi$i.num.prep0[at] <- sum((is.na(prepStat) | prepStat == 0) & status == 1, na.rm = TRUE)
   dat$epi$i.num.prep1[at] <- sum(prepStat == 1 & status == 1, na.rm = TRUE)
   dat$epi$i.prev.prep0[at] <- dat$epi$i.num.prep0[at] /
-    sum(prepStat == 0, na.rm = TRUE)
+    sum(prepStat == 0 | is.na(prepStat), na.rm = TRUE)
   if (at == 1) {
     dat$epi$i.prev.prep1[1] <- 0
   } else {
