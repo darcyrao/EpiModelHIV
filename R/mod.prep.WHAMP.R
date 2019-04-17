@@ -49,15 +49,16 @@ prep_msm_whamp <- function(dat, at) {
   prep.init.rate <- dat$param$prep.init.rate
   prep.coverage.init.KC <- dat$param$prep.coverage.init.region[1]
   prep.coverage.init.oth <- dat$param$prep.coverage.init.region[2]
-  prep.scaleup.KC <- dat$param$prep.scaleup.rate[1]
-  prep.scaleup.oth <- dat$param$prep.scaleup.rate[2]
+  prep.uptake.scen <- dat$param$prep.uptake.scen
   prep.cov.max.KC <- dat$param$prep.cov.max[1]
   prep.cov.max.oth <- dat$param$prep.cov.max[2]
-  prep.cov.max.all <- dat$param$prep.cov.max[3]
-  prep.max.time <- dat$param$prep.max.time
-  prep.class.prob <- dat$param$prep.class.prob
   prep.discontinue <- dat$param$prep.discont
   prep.discont.prob <- dat$param$prep.discont.prob
+  if(dat$param$prep.adh == "high"){
+    prep.class.prob <- dat$param$prep.class.prob.high
+  } else {
+    prep.class.prob <- dat$param$prep.class.prob.low
+  }
 
   ## Eligibility ---------------------------------------------------------------
 
@@ -114,8 +115,11 @@ prep_msm_whamp <- function(dat, at) {
   idsStp <- c(idsStpDx, idsStpDth, idsEligStop, idsDiscont)
   
   # Time to discontinuation among those who stopped
-  time.to.disc <- rep(NA, length(idsStp))
-  time.to.disc <- at - prepStartTime[idsStp]
+  if(length(idsStp > 0)){
+    time.to.disc <- rep(NA, length(idsStp))
+    time.to.disc <- at - prepStartTime[idsStp]
+  }
+ 
   
   # Reset PrEP status
   prepStat[idsStp] <- 0
@@ -126,7 +130,7 @@ prep_msm_whamp <- function(dat, at) {
 
   ## Initiation ----------------------------------------------------------------
   
-  # Calculate the proportion of eligible men in KC vs. other regions
+  # Calculate the proportion of eligible men who are in KC vs. other regions
   prop.elig.kc <- sum(prepElig == 1 & region %in% "KC", na.rm = TRUE) / sum(prepElig == 1, na.rm = TRUE)
   
   # Calculate the current coverage among eligible men overall and by region
@@ -142,26 +146,45 @@ prep_msm_whamp <- function(dat, at) {
     prep.coverage.oth <- prep.coverage.init.oth
   }
   
-  if (at > prep.start.step & is.finite(prep.start.step) & is.finite(prep.max.time)){ #If coverage maximum set overall
-    prep.scaleup.rate.all <- (prep.cov.max.all - dat$epi$prep.cov[prep.start.step]) / prep.max.time
-    prep.coverage.all <- min((dat$epi$prep.cov[at - 1] + prep.scaleup.rate.all), prep.cov.max.all)
-  }
-  if (at > prep.start.step & is.finite(prep.start.step) & !is.finite(prep.max.time)){ #If coverage maximum set by region
-    prep.coverage.KC <- min(dat$epi$prep.cov.kc[at-1] + prep.scaleup.KC, prep.cov.max.KC)
-    prep.coverage.oth <- min(dat$epi$prep.cov.oth[at-1] + prep.scaleup.oth, prep.cov.max.oth)
+  if (at > prep.start.step & is.finite(prep.start.step)){
+    # Stable PrEP use scenario
+    if (prep.uptake.scen == "stable"){
+      prep.coverage.KC <- prep.coverage.init.KC
+      prep.coverage.oth <- prep.coverage.init.oth
+    } 
+    # 50% uptake by 2020 overall (over 3*52 time steps from PrEP start in 2017)
+    if (prep.uptake.scen == "tot.fity"){
+      prep.cov.max <- 0.5
+      prep.scaleup.rate.all <- (prep.cov.max - dat$epi$prep.cov[prep.start.step]) / (3*52)
+      prep.coverage.all <- min((dat$epi$prep.cov[at - 1] + prep.scaleup.rate.all), prep.cov.max)
+    }
+    # 50% uptake by 2020 in each region (over 3*52 time steps from PrEP start in 2017)
+    if (prep.uptake.scen == "reg.fity"){
+      prep.cov.max <- 0.5
+      prep.scaleup.rate.KC <- (prep.cov.max - dat$epi$prep.cov.KC[prep.start.step]) / (3*52)
+      prep.scaleup.rate.oth <- (prep.cov.max - dat$epi$prep.cov.oth[prep.start.step]) / (3*52)
+      prep.coverage.KC <- min(dat$epi$prep.cov.KC[at-1] + prep.scaleup.rate.KC, prep.cov.max)
+      prep.coverage.oth <- min(dat$epi$prep.cov.oth[at-1] + prep.scaleup.rate.oth, prep.cov.max)
+    }
+    # Increase to maximum coverage in each region, after reaching 50% overall by 2020
+    if (prep.uptake.scen == "max"){
+      prep.cov.2020 <- 0.5
+      prep.scaleup.rate.all <- (prep.cov.2020 - dat$epi$prep.cov[prep.start.step]) / (3*52) # set scaleup rate based on rate needed to reach 50% by 2020
+      prep.coverage.KC <- min(dat$epi$prep.cov.KC[at-1] + prep.scaleup.rate.all, prep.cov.max.KC)
+      prep.coverage.oth <- min(dat$epi$prep.cov.oth[at-1] + prep.scaleup.rate.all, prep.cov.max.oth)
+    }
   }
   
   # For each group, sample ids to start PrEP if current coverage < coverage threshold
   idsEligSt.KC <- idsEligStart[which(region[idsEligStart] %in% c("KC"))]
   idsEligSt.oth <- idsEligStart[which(region[idsEligStart] %in% c("OW", "EW"))]
   
-  if(is.finite(prep.max.time)){ #If coverage maximum set overall, distribute number of new PrEP users by region according to proportion eligible
+  if(prep.uptake.scen == "tot.fifty"){ #If target coverage set overall, distribute number of new PrEP users by region according to proportion eligible
     nStart.KC <- pmax(0, pmin(length(idsEligSt.KC), round((prep.coverage.all - prep.cov.curr.all) *
                                                           sum(prepElig == 1, na.rm = TRUE) * prop.elig.kc)))
     nStart.oth <- pmax(0, pmin(length(idsEligSt.oth), round((prep.coverage.all - prep.cov.curr.all) *
                                                               sum(prepElig == 1, na.rm = TRUE) * (1-prop.elig.kc))))
-  }
-  if(!is.finite(prep.max.time)){ #If coverage maximum is set by region, define number of new users to meet current coverage threshold in each region
+  } else {
     nStart.KC <- pmax(0, pmin(length(idsEligSt.KC), round((prep.coverage.KC - prep.cov.curr.KC) *
                                                           sum(prepElig == 1 & region %in% c("KC"), na.rm = TRUE))))
     nStart.oth <- pmax(0, pmin(length(idsEligSt.oth), round((prep.coverage.oth - prep.cov.curr.oth) *
@@ -234,8 +257,8 @@ prep_msm_whamp <- function(dat, at) {
   dat$epi$prep.cov.KC[at] <- prep.cov.KC
   dat$epi$prep.cov.oth[at] <- prep.cov.oth
   dat$epi$prepStart[at] <- length(idsStart)
-  dat$epi$time.to.disc <- time.to.disc # Vector with the total time on PrEP among those who discontinued in this time step
-  dat$epi$time.since.prep.start <- time.since.prep.start # Vector with the elapsed time on PrEP among current users
+  dat$epi$time.to.disc <- mean(time.to.disc)
+  dat$epi$time.since.prep.start <- mean(time.since.prep.start)
 
   return(dat)
 }
