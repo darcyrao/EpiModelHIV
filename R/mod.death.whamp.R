@@ -51,7 +51,7 @@ deaths_msm_whamp <- function(dat, at) {
   dth.neg..wa <- c(deaths.H..wa.neg, deaths.B..wa.neg, deaths.O..wa.neg)
   
   
-  ## Disease deaths among HIV-pos
+  ## Deaths among HIV-pos
   asmr.H..wa.pos <-  c(dat$param$asmr.H..wa[1:17], 
                        dat$param$asmr.H..wa[18:44]*dat$param$asmr.rr.pos[1], 
                        dat$param$asmr.H..wa[45:54]*dat$param$asmr.rr.pos[2],
