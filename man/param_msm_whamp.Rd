@@ -60,11 +60,11 @@ param_msm_whamp(nwstats, change.size = FALSE, new.size = 90000,
   cond.discl.main.beta = -0.85, cond.diag.pers.beta = -0.67,
   cond.discl.pers.beta = -0.85, cond.diag.inst.beta = -0.67,
   cond.discl.inst.beta = -0.85, vv.iev.prob = 0.42, prep.start = Inf,
-  prep.class.prob = c(0.089, 0.127, 0.784), prep.class.hr = c(0.69,
-  0.19, 0.05), prep.coverage.init.region = c(0.4392, 0.2655),
+  prep.class.prob = c(0.05, 0.3, 0.65), prep.class.hr = c(0.69, 0.19,
+  0.04), prep.coverage.init.region = c(0.4392, 0.2655),
   prep.cov.method = "curr", prep.scaleup.rate = c(0, 0),
-  prep.cov.max.region = c(0.7497, 0.6232), prep.init.rate = 1,
-  prep.tst.int = 90, prep.risk.int = 365,
+  prep.cov.max = c(0.7497, 0.6232, NA), prep.max.time = Inf,
+  prep.init.rate = 1, prep.tst.int = 90, prep.risk.int = 365,
   prep.risk.reassess.method = "inst", prep.discont = 0.3,
   prep.discont.prob = 0.017724, rcomp.prob = 0,
   rcomp.adh.groups = 1:3, rcomp.main.only = FALSE,
@@ -388,11 +388,20 @@ on PrEP and \code{"ever"} to base it on the number of people ever on
 PrEP.}
 
 \item{prep.scaleup.rate}{Vector of length 2 for the rate at which PrEP is
-scaled up per day from \code{prep.start} for each region (KC vs. other)}
+scaled up per day from \code{prep.start} for each region (KC vs. other). 
+Set to NA to calculate the rates based on overall target coverage, 
+as specified in \code{prep.cov.max} and \code{prep.target.time}. 
+For stable PrEP use, set to 0.}
 
-\item{prep.cov.max.region}{Vector of length 2 for the maximum attainable PrEP coverage
-for each region (King County vs. other counties). Upon reaching these values, 
+\item{prep.cov.max}{Vector of length 3 for the maximum attainable PrEP coverage
+for each region (King County vs. other counties) and overall. Set the values for 
+each region to NA to define an overall theshold, or set the overall threshold to NA 
+to define coverage thresholds differentially by region. Upon reaching these values, 
 PrEP uptake will stabilize.}
+
+\item{prep.max.time}{Number of time steps from \code{prep.start} by which PrEP coverage
+is expected to reach prep.cov.max. Set to Inf if defining scaleup using rates in
+\code{prep.scaleup.rate}.}
 
 \item{prep.init.rate}{The rate at which persons initiate PrEP conditional on
 their eligibility, with 1 equal to instant start.}

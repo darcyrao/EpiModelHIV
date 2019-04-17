@@ -209,10 +209,18 @@
 #'        on PrEP and \code{"ever"} to base it on the number of people ever on
 #'        PrEP.
 #' @param prep.scaleup.rate Vector of length 2 for the rate at which PrEP is  
-#'        scaled up per day from \code{prep.start} for each region (KC vs. other)
-#' @param prep.cov.max.region Vector of length 2 for the maximum attainable PrEP coverage
-#'        for each region (King County vs. other counties). Upon reaching these values, 
+#'        scaled up per day from \code{prep.start} for each region (KC vs. other). 
+#'        Set to NA to calculate the rates based on overall target coverage, 
+#'        as specified in \code{prep.cov.max} and \code{prep.target.time}. 
+#'        For stable PrEP use, set to 0.
+#' @param prep.cov.max Vector of length 3 for the maximum attainable PrEP coverage
+#'        for each region (King County vs. other counties) and overall. Set the values for 
+#'        each region to NA to define an overall theshold, or set the overall threshold to NA 
+#'        to define coverage thresholds differentially by region. Upon reaching these values, 
 #'        PrEP uptake will stabilize.
+#' @param prep.max.time Number of time steps from \code{prep.start} by which PrEP coverage
+#'        is expected to reach prep.cov.max. Set to Inf if defining scaleup using rates in
+#'        \code{prep.scaleup.rate}.
 #' @param prep.init.rate The rate at which persons initiate PrEP conditional on
 #'        their eligibility, with 1 equal to instant start.
 #' @param prep.tst.int Testing interval for those who are actively on PrEP. This
@@ -410,12 +418,13 @@ param_msm_whamp <- function(nwstats,
                       vv.iev.prob = 0.42,
 
                       prep.start = Inf, # Set to Inf for no PrEP
-                      prep.class.prob = c(0.089, 0.127, 0.784),
-                      prep.class.hr = c(0.69, 0.19, 0.05),
+                      prep.class.prob = c(0.05, 0.30, 0.65),
+                      prep.class.hr = c(0.69, 0.19, 0.04),
                       prep.coverage.init.region = c(0.4392,	0.2655),
                       prep.cov.method = "curr",
                       prep.scaleup.rate = c(0, 0), # Set to 0 for stable PrEP use
-                      prep.cov.max.region = c(0.7497,	0.6232),
+                      prep.cov.max = c(0.7497,	0.6232, NA),
+                      prep.max.time = Inf, # set to Inf if no time limit
                       prep.init.rate = 1,
                       prep.tst.int = 90,
                       prep.risk.int = 365,
