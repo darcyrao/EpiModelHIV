@@ -142,6 +142,7 @@ prep_msm_whamp <- function(dat, at) {
   if (at == prep.start.step){
     prep.coverage.KC <- prep.coverage.init.KC
     prep.coverage.oth <- prep.coverage.init.oth
+    prep.coverage.all <- prep.coverage.init.KC*prop.elig.kc + prep.coverage.init.oth*(1-prop.elig.kc)
   }
   
   if (at > prep.start.step & is.finite(prep.start.step)){
