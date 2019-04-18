@@ -47,11 +47,13 @@ prep_msm_whamp <- function(dat, at) {
   prep.risk.reassess.method <- dat$param$prep.risk.reassess.method
   prep.start.step <- dat$param$prep.start
   prep.init.rate <- dat$param$prep.init.rate
-  prep.coverage.init.KC <- dat$param$prep.coverage.init.region[1]
-  prep.coverage.init.oth <- dat$param$prep.coverage.init.region[2]
   prep.uptake.scen <- dat$param$prep.uptake.scen
-  prep.cov.max.KC <- dat$param$prep.cov.max[1]
-  prep.cov.max.oth <- dat$param$prep.cov.max[2]
+  if(prep.uptake.scen == "lower"){
+    prep.coverage.init <- dat$param$prep.coverage.init.low
+  } else {
+    prep.coverage.init <- dat$param$prep.coverage.init
+  }
+  prep.cov.max <- dat$param$prep.cov.max
   prep.discontinue <- dat$param$prep.discont
   prep.discont.prob <- dat$param$prep.discont.prob
   if(dat$param$prep.adh == "high"){
@@ -63,7 +65,8 @@ prep_msm_whamp <- function(dat, at) {
   ## Eligibility ---------------------------------------------------------------
 
   # Base eligibility
-  idsEligStart <- which(active == 1 & status == 0 & prepStat == 0 & lnt == at)
+  idsEligStart <- which(active == 1 & (diag.status == 0 | is.na(diag.status)) & 
+                          prepStat == 0 & lnt == at & tt.traj %in% c(3,4))
 
   # Core eligiblity
   ind1 <- dat$attr$prep.ind.discord.ongoing
@@ -128,89 +131,70 @@ prep_msm_whamp <- function(dat, at) {
 
   ## Initiation ----------------------------------------------------------------
   
-  # Calculate the proportion of eligible men who are in KC vs. other regions
-  prop.elig.kc <- sum(prepElig == 1 & region %in% "KC", na.rm = TRUE) / sum(prepElig == 1, na.rm = TRUE)
-  
-  # Calculate the current coverage among eligible men overall and by region
-  prep.cov.curr.all <- sum(prepStat == 1, na.rm = TRUE) / sum(prepElig ==1, na.rm = TRUE)
-  prep.cov.curr.KC <- sum(prepStat == 1 & region %in% "KC", na.rm = TRUE)/
-    sum(prepElig == 1 & region %in% "KC", na.rm = TRUE)
-  prep.cov.curr.oth <- sum(prepStat == 1 & region %in% c("OW", "EW"), na.rm = TRUE)/
-    sum(prepElig == 1 & region %in% c("OW", "EW"), na.rm = TRUE)
+  # Calculate the current coverage among eligible men
+  prep.cov.curr <- sum(prepStat == 1, na.rm = TRUE) / sum(prepElig ==1, na.rm = TRUE)
   
   # Determine coverage quota for the current time step
   if (at == prep.start.step){
-    prep.coverage.KC <- prep.coverage.init.KC
-    prep.coverage.oth <- prep.coverage.init.oth
-    prep.coverage.all <- prep.coverage.init.KC*prop.elig.kc + prep.coverage.init.oth*(1-prop.elig.kc)
+    prep.coverage <- prep.coverage.init
   }
   
   if (at > prep.start.step & is.finite(prep.start.step)){
-    # Stable PrEP use scenario
-    if (prep.uptake.scen == "stable"){
-      prep.coverage.KC <- prep.coverage.init.KC
-      prep.coverage.oth <- prep.coverage.init.oth
+    # Stable PrEP use scenarios
+    if (prep.uptake.scen %in% c("stable", "lower")){
+      prep.coverage <- prep.coverage.init
     } 
-    # 50% uptake by 2020 overall (over 3*52 time steps from PrEP start in 2017)
-    if (prep.uptake.scen == "tot.fifty"){
+    # 50% uptake by 2020 (over 3*52 time steps from PrEP start in 2017)
+    if (prep.uptake.scen == "fifty"){
       prep.cov.max <- 0.5
-      prep.scaleup.rate.all <- (prep.cov.max - dat$epi$prep.cov[prep.start.step]) / (3*52)
-      prep.coverage.all <- min((dat$epi$prep.cov[at - 1] + prep.scaleup.rate.all), prep.cov.max)
-    }
-    # 50% uptake by 2020 in each region (over 3*52 time steps from PrEP start in 2017)
-    if (prep.uptake.scen == "reg.fifty"){
-      prep.cov.max <- 0.5
-      prep.scaleup.rate.KC <- (prep.cov.max - dat$epi$prep.cov.KC[prep.start.step]) / (3*52)
-      prep.scaleup.rate.oth <- (prep.cov.max - dat$epi$prep.cov.oth[prep.start.step]) / (3*52)
-      prep.coverage.KC <- min(dat$epi$prep.cov.KC[at-1] + prep.scaleup.rate.KC, prep.cov.max)
-      prep.coverage.oth <- min(dat$epi$prep.cov.oth[at-1] + prep.scaleup.rate.oth, prep.cov.max)
+      prep.scaleup.rate <- (prep.cov.max - prep.coverage.init) / (3*52)
+      prep.coverage <- min((dat$epi$prep.cov[at - 1] + prep.scaleup.rate), prep.cov.max)
     }
     # Increase to maximum coverage in each region, after reaching 50% overall by 2020
     if (prep.uptake.scen == "max"){
       prep.cov.2020 <- 0.5
-      prep.scaleup.rate.all <- (prep.cov.2020 - dat$epi$prep.cov[prep.start.step]) / (3*52) # set scaleup rate based on rate needed to reach 50% by 2020
-      prep.coverage.KC <- min(dat$epi$prep.cov.KC[at-1] + prep.scaleup.rate.all, prep.cov.max.KC)
-      prep.coverage.oth <- min(dat$epi$prep.cov.oth[at-1] + prep.scaleup.rate.all, prep.cov.max.oth)
+      prep.scaleup.rate <- (prep.cov.2020 - prep.coverage.init) / (3*52) # set scaleup rate based on rate needed to reach 50% by 2020
+      prep.coverage <- min(dat$epi$prep.cov[at-1] + prep.scaleup.rate, prep.cov.max)
     }
   }
   
-  # For each group, sample ids to start PrEP if current coverage < coverage threshold
-  idsEligSt.KC <- idsEligStart[which(region[idsEligStart] %in% c("KC"))]
-  idsEligSt.oth <- idsEligStart[which(region[idsEligStart] %in% c("OW", "EW"))]
+  # Assign PrEP use
   
-  if(prep.uptake.scen == "tot.fifty"){ #If target coverage set overall, distribute number of new PrEP users by region according to proportion eligible
-    nStart.KC <- pmax(0, pmin(length(idsEligSt.KC), round((prep.coverage.all - prep.cov.curr.all) *
-                                                          sum(prepElig == 1, na.rm = TRUE) * prop.elig.kc)))
-    nStart.oth <- pmax(0, pmin(length(idsEligSt.oth), round((prep.coverage.all - prep.cov.curr.all) *
-                                                              sum(prepElig == 1, na.rm = TRUE) * (1-prop.elig.kc))))
-  } else {
-    nStart.KC <- pmax(0, pmin(length(idsEligSt.KC), round((prep.coverage.KC - prep.cov.curr.KC) *
-                                                          sum(prepElig == 1 & region %in% c("KC"), na.rm = TRUE))))
-    nStart.oth <- pmax(0, pmin(length(idsEligSt.oth), round((prep.coverage.oth - prep.cov.curr.oth) *
-                                                            sum(prepElig == 1 & region %in% c("OW", "EW"), na.rm = TRUE))))
-  }
-  
-  idsStart.KC <- NULL
-  if (nStart.KC > 0) {
-    if (prep.init.rate >= 1) {
-      idsStart.KC <- ssample(idsEligSt.KC, nStart.KC)
-    } else {
-      idsStart.KC <- idsEligSt.KC[rbinom(nStart.KC, 1, prep.init.rate) == 1]
+    ## If at = prep.start.step, assing PrEP to eligible individuals such that coverage = prep.coverage.init.
+    ## For this step, do not require men to test in the current time step to be eligible, but only regular testers can start PrEP
+    if(at == prep.start.step){
+      idsSusc <- which(active == 1 & (diag.status == 0 | is.na(diag.status)) & prepStat == 0 & tt.traj %in% c(3,4))
+      idsElig.init <- intersect(which(prepElig == 1), idsSusc)
+      
+      nStart <- pmax(0, pmin(length(idsElig.init), round(prep.coverage * sum(prepElig == 1, na.rm = TRUE))))
+      
+      idsStart <- NULL
+      if (nStart > 0){
+        if (prep.init.rate >= 1) {
+          idsStart <- ssample(idsElig.init, nStart)
+        } else {
+          idsStart <- idsElig.init[rbinom(nStart, 1, prep.init.rate) == 1]
+        }
+      }
     }
-  }
+  
+  
+    ## If at > prep.start.step, sample ids to start PrEP if current coverage < coverage threshold
+    if (at > prep.start.step & is.finite(prep.start.step)){
+      nStart <- pmax(0, pmin(length(idsEligStart), round((prep.coverage - prep.cov.curr)*sum(prepElig == 1, na.rm = TRUE))))
+      
+      idsStart <- NULL
+      if (nStart > 0) {
+        if (prep.init.rate >= 1) {
+          idsStart <- ssample(idsEligStart, nStart)
+        } else {
+          idsStart <- idsEligStart[rbinom(nStart, 1, prep.init.rate) == 1]
+        }
+      }
+    }
+  
  
-  idsStart.oth <- NULL
-  if (nStart.oth > 0) {
-    if (prep.init.rate >= 1) {
-      idsStart.oth <- ssample(idsEligSt.oth, nStart.oth)
-    } else {
-      idsStart.oth <- idsEligSt.oth[rbinom(nStart.oth, 1, prep.init.rate) == 1]
-    }
-  }
-  
-  idsStart <- c(idsStart.KC, idsStart.oth)
-  
-  # Attributes
+  # Assign PrEP-related attributes
   if (length(idsStart) > 0) {
     prepStat[idsStart] <- 1
     prepStartTime[idsStart] <- at
@@ -246,15 +230,12 @@ prep_msm_whamp <- function(dat, at) {
   dat$attr$spontDisc <- spontDisc
 
   # Summary Statistics
-  prep.cov <- sum(prepStat == 1, na.rm = TRUE)/sum(prepElig == 1, na.rm = TRUE)
-  prep.cov.KC <- sum(prepStat == 1 & region %in% "KC", na.rm = TRUE)/
-    sum(prepElig == 1 & region %in% "KC", na.rm = TRUE)
-  prep.cov.oth <- sum(prepStat == 1 & region %in% c("OW", "EW"), na.rm = TRUE)/
-    sum(prepElig == 1 & region %in% c("OW", "EW"), na.rm = TRUE)
+  prep.cov.elig <- sum(prepStat == 1, na.rm = TRUE)/sum(prepElig == 1, na.rm = TRUE)
+  prep.cov.all <- sum(prepStat == 1, na.rm = TRUE)/sum((diag.status == 0 | is.na(diag.status)), na.rm = TRUE)
+
+  dat$epi$prep.cov.elig[at] <- prep.cov.elig
+  dat$epi$prep.cov.all[at] <- prep.cov.all
   
-  dat$epi$prep.cov[at] <- prep.cov
-  dat$epi$prep.cov.KC[at] <- prep.cov.KC
-  dat$epi$prep.cov.oth[at] <- prep.cov.oth
   dat$epi$prepStart[at] <- length(idsStart)
   # dat$epi$time.to.disc <- mean(time.to.disc)
   # dat$epi$time.since.prep.start <- mean(time.since.prep.start)
