@@ -203,19 +203,20 @@
 #' @param prep.class.hr The hazard ratio for infection per act associated with each
 #'        level of adherence.
 #' @param prep.uptake.scen PrEP uptake scenarios, with options \code{"stable"} for
-#'        stable coverage at levels defined by \code{prep.coverage.init.region}, 
-#'        \code{"tot.fifty"} for increased uptake to 50 percent overall by 2020 (from 2017), 
-#'        \code{"reg.fifty"} for increased uptake up to 50 percent in each region (KC and other) 
-#'        by 2020, and \code{"max"} for increased uptake to levels defined by 
-#'        \code{"prep.cov.max"}, after hitting 50 percent overall in 2020.
-#' @param prep.coverage.init.region Vector of length 2 for the proportion of eligible men 
-#'        (eligibility defined by CAI and discordant partnership status in line with 
-#'        WA State guidelines) in King County and other counties in WA who are allowed 
-#'        to start PrEP once they become eligible at the time step in which PrEP is initiated
+#'        stable coverage at levels defined by \code{prep.coverage.init}, 
+#'        \code{"fifty"} for increased uptake to 50 percent overall by 2020 (from 2017), 
+#'        \code{"max"} for increased uptake to levels defined by \code{"prep.cov.max"}, 
+#'        after hitting 50 percent overall in 2020, and \code{"lower"} for stable coverage
+#'        at levels defined by \code{prep.coverage.init.low}.
+#' @param prep.coverage.init The proportion of eligible men (eligibility defined by CAI and 
+#'        discordant partnership status in line with WA State guidelines) who are assigned PrEP 
+#'        in the time step in which PrEP is initiated (as specified in \code{prep.start}).
+#' @param prep.coverage.init.low Low-range estimate for the proportion of eligible men 
+#'        (eligibility defined by CAI and discordant partnership status in line with WA 
+#'        State guidelines) who are assigned PrEP in the time step in which PrEP is initiated 
 #'        (as specified in \code{prep.start}).
-#' @param prep.cov.max Vector of length 2 for the maximum attainable PrEP coverage
-#'        for each region (King County vs. other counties). Upon reaching these values, 
-#'        PrEP uptake will stabilize.
+#' @param prep.cov.max Maximum attainable PrEP coverage if \code{prep.uptake.scen} is set to "max".  
+#'        Upon reaching these values, PrEP uptake will stabilize.
 #' @param prep.cov.method The method for calculating PrEP coverage, with options
 #'        of \code{"curr"} to base the numerator on the number of people currently
 #'        on PrEP and \code{"ever"} to base it on the number of people ever on
@@ -423,8 +424,9 @@ param_msm_whamp <- function(nwstats,
                       prep.class.prob.high = c(0.03, 0.07, 0.90),
                       prep.class.hr = c(0.69, 0.19, 0.04),
                       prep.uptake.scen = "stable",
-                      prep.coverage.init.region = c(0.4392,	0.2655),
-                      prep.cov.max = c(0.7497,	0.6232),
+                      prep.coverage.init = 0.3331,
+                      prep.coverage.init.low = 0.25,
+                      prep.cov.max = 0.6618,
                       prep.cov.method = "curr",
                       prep.init.rate = 1,
                       prep.tst.int = 90,
