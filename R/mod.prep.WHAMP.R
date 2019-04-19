@@ -75,7 +75,7 @@ prep_msm_whamp <- function(dat, at) {
 
   twind <- at - dat$param$prep.risk.int
   
-  prepElig[which(ind1 == at | ind2 >= twind)] <- 1
+  prepElig[which((ind1 == at | ind2 >= twind) & (diag.status == 0 | is.na(diag.status)))] <- 1
   
   idsEligStart <- intersect(which(prepElig == 1),
                             idsEligStart)
@@ -103,7 +103,7 @@ prep_msm_whamp <- function(dat, at) {
   
   
   # Spontaneous (memoryless) discontinuation
-  discont.elig <- which(active == 1 & prepStat == 1 & prepDiscont == 1 & diag.status != 1)
+  discont.elig <- which(active == 1 & prepStat == 1 & prepDiscont == 1 & (diag.status == 0 | is.na(diag.status)))
   idsDiscont <- discont.elig[rbinom(length(discont.elig), 1,
                                     prep.discont.prob) == 1]
   
@@ -111,6 +111,7 @@ prep_msm_whamp <- function(dat, at) {
   
   # Diagnosis
   idsStpDx <- which(active == 1 & prepStat == 1 & diag.status == 1)
+  prepElig[idsStpDx] <- 0
 
   # Death
   idsStpDth <- which(active == 0 & prepStat == 1)
@@ -119,8 +120,8 @@ prep_msm_whamp <- function(dat, at) {
   idsStp <- c(idsStpDx, idsStpDth, idsEligStop, idsDiscont)
   
   # Time to discontinuation among those who stopped
-    time.to.disc <- rep(NA, length(idsStp))
-    time.to.disc <- at - prepStartTime[idsStp]
+    # time.to.disc <- rep(NA, length(idsStp))
+    # time.to.disc <- at - prepStartTime[idsStp]
  
   
   # Reset PrEP status
@@ -214,9 +215,9 @@ prep_msm_whamp <- function(dat, at) {
   }
   
   ## Calculate time on PrEP among current users -----------------------
-  time.since.prep.start <- rep(NA, sum(prepStat == 1, na.rm = TRUE))
-  time.since.prep.start <- (at - prepStartTime[prepStat == 1]) 
-  
+  # time.since.prep.start <- rep(NA, sum(prepStat == 1, na.rm = TRUE))
+  # time.since.prep.start <- (at - prepStartTime[prepStat == 1]) 
+
   
   ## Output --------------------------------------------------------------------
 
@@ -227,7 +228,7 @@ prep_msm_whamp <- function(dat, at) {
   dat$attr$prepClass <- prepClass
   dat$attr$prepLastRisk <- prepLastRisk
   # dat$attr$prepLastStiScreen <- prepLastStiScreen
-  dat$attr$prepDiscont <- prepDiscont
+  dat$attr$prepDisc <- prepDiscont
   dat$attr$spontDisc <- spontDisc
 
   # Summary Statistics
