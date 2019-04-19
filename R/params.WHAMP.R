@@ -227,6 +227,9 @@
 #'        overrides the mean testing interval parameters.
 #' @param prep.risk.int Time window for assessment of risk eligibility for PrEP
 #'        in days.
+#' @param prep.ind.plt.int Interval for defining whether a partner was recently tested
+#'        in days. If the partner has not tested negative within the specified interval, 
+#'        UAI in the partnership is an indication for PrEP use.
 #' @param prep.risk.reassess.method Method for determining risk-based discontinuation
 #'        of PrEP, with \code{"none"} for no risk-based discontinuation, \code{"inst"} 
 #'        for reassessment every time step, and \code{"year"} for reassessment at yearly
@@ -431,6 +434,7 @@ param_msm_whamp <- function(nwstats,
                       prep.init.rate = 1,
                       prep.tst.int = 90,
                       prep.risk.int = 365,
+                      prep.ind.plt.int = 365,
                       prep.risk.reassess.method = "inst", #year
                       prep.discont = 0.3,
                       prep.discont.prob = 0.017724,

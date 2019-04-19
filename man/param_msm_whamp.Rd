@@ -66,8 +66,8 @@ param_msm_whamp(nwstats, change.size = FALSE, new.size = 90000,
   prep.coverage.init = 0.3331, prep.coverage.init.low = 0.25,
   prep.cov.max = 0.6618, prep.cov.method = "curr",
   prep.init.rate = 1, prep.tst.int = 90, prep.risk.int = 365,
-  prep.risk.reassess.method = "inst", prep.discont = 0.3,
-  prep.discont.prob = 0.017724, rcomp.prob = 0,
+  prep.ind.plt.int = 365, prep.risk.reassess.method = "inst",
+  prep.discont = 0.3, prep.discont.prob = 0.017724, rcomp.prob = 0,
   rcomp.adh.groups = "all", rcomp.main.only = FALSE,
   rcomp.discl.only = FALSE, rcomp.discont = FALSE,
   rgc.tprob = 0.357698, ugc.tprob = 0.248095, rct.tprob = 0.321597,
@@ -414,6 +414,10 @@ overrides the mean testing interval parameters.}
 
 \item{prep.risk.int}{Time window for assessment of risk eligibility for PrEP
 in days.}
+
+\item{prep.ind.plt.int}{Interval for defining whether a partner was recently tested
+in days. If the partner has not tested negative within the specified interval, 
+UAI in the partnership is an indication for PrEP use.}
 
 \item{prep.risk.reassess.method}{Method for determining risk-based discontinuation
 of PrEP, with \code{"none"} for no risk-based discontinuation, \code{"inst"} 
