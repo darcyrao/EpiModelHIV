@@ -33,6 +33,7 @@ prep_msm_whamp <- function(dat, at) {
   age <- dat$attr$age
   status <- dat$attr$status
   diag.status <- dat$attr$diag.status
+  tt.traj <- dat$attr$tt.traj
   lnt <- dat$attr$last.neg.test
   prepElig <- dat$attr$prepElig
   prepStat <- dat$attr$prepStat
@@ -80,8 +81,8 @@ prep_msm_whamp <- function(dat, at) {
                             idsEligStart)
   
   # No longer indicated for PrEP
-  idsNoIndic <- which((ind1 < at | is.na(ind1)) & 
-                        (ind2 < twind | is.na(ind2)))
+  idsNoIndic <- which(((ind1 < at) | is.na(ind1)) & 
+                        ((ind2 < twind) | is.na(ind2)))
   
   prepElig[idsNoIndic] <- 0
 
@@ -148,13 +149,13 @@ prep_msm_whamp <- function(dat, at) {
     if (prep.uptake.scen == "fifty"){
       prep.cov.max <- 0.5
       prep.scaleup.rate <- (prep.cov.max - prep.coverage.init) / (3*52)
-      prep.coverage <- min((dat$epi$prep.cov[at - 1] + prep.scaleup.rate), prep.cov.max)
+      prep.coverage <- min((prep.coverage.init + prep.scaleup.rate*(at - prep.start.step)), prep.cov.max)
     }
     # Increase to maximum coverage in each region, after reaching 50% overall by 2020
     if (prep.uptake.scen == "max"){
       prep.cov.2020 <- 0.5
       prep.scaleup.rate <- (prep.cov.2020 - prep.coverage.init) / (3*52) # set scaleup rate based on rate needed to reach 50% by 2020
-      prep.coverage <- min(dat$epi$prep.cov[at-1] + prep.scaleup.rate, prep.cov.max)
+      prep.coverage <- min((prep.coverage.init + prep.scaleup.rate*(at - prep.start.step)), prep.cov.max)
     }
   }
   
