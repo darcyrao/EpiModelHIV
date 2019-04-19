@@ -275,7 +275,7 @@ riskhist_msm_whamp <- function(dat, at) {
   # uCT.tx <- dat$attr$uCT.tx
   
   ## Parameters
-  time.unit <- dat$param$time.unit
+  prep.ind.plt.int <- dat$param$prep.ind.plt.int
   
   ## Edgelist, adds uai summation per partnership from act list
   pid <- NULL # For R CMD Check
@@ -337,7 +337,7 @@ riskhist_msm_whamp <- function(dat, at) {
   uai.mono <- intersect(monog.2sided, uai.any)
   uai.mono.neg <- intersect(uai.mono, all.neg)
   part.id1 <- c(el2[el2$p1 %in% uai.mono.neg, 2], el2[el2$p2 %in% uai.mono.neg, 1])
-  part.recently.tested <- since.test[part.id1] <= (180/time.unit)
+  part.recently.tested <- since.test[part.id1] <= prep.ind.plt.int
   mono.neg.recently.tested <- uai.mono.neg[which(part.recently.tested == TRUE)]
   
   uai.risk <- setdiff(uai.any, mono.neg.recently.tested)
