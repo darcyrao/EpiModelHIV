@@ -83,6 +83,8 @@ prevalence_msm_whamp <- function(dat, at) {
     dat$epi$i.num.OW <- rNA
     dat$epi$i.num.EW <- rNA
     dat$epi$incid <- rNA
+    dat$epi$incid.prep0 <- rNA
+    dat$epi$incid.prep1 <- rNA
     dat$epi$ir100 <- rNA
     dat$epi$prev.all <- rNA
     dat$epi$prev.dx <- rNA
