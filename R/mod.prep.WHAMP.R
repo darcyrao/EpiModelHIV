@@ -59,6 +59,8 @@ prep_msm_whamp <- function(dat, at) {
   prep.discont.prob <- dat$param$prep.discont.prob
   if(dat$param$prep.adh == "high"){
     prep.class.prob <- dat$param$prep.class.prob.high
+  } else if (dat$param$prep.adh == "mid") {
+    prep.class.prob <- dat$param$prep.class.prob.mid
   } else {
     prep.class.prob <- dat$param$prep.class.prob.low
   }
@@ -268,6 +270,7 @@ riskhist_msm_whamp <- function(dat, at) {
   n <- length(dat$attr$active)
   uid <- dat$attr$uid
   dx <- dat$attr$diag.status
+  tt.traj <- dat$attr$tt.traj
   since.test <- at - dat$attr$last.neg.test
   # rGC.tx <- dat$attr$rGC.tx
   # uGC.tx <- dat$attr$uGC.tx
@@ -276,6 +279,7 @@ riskhist_msm_whamp <- function(dat, at) {
   
   ## Parameters
   prep.ind.plt.int <- dat$param$prep.ind.plt.int
+  prep.uai.ind <- dat$param$prep.uai.ind 
   
   ## Edgelist, adds uai summation per partnership from act list
   pid <- NULL # For R CMD Check
@@ -314,34 +318,119 @@ riskhist_msm_whamp <- function(dat, at) {
   
   dat$attr$prep.ind.discord.ongoing[ai.sd] <- at
   
-  ## Condition 2: UAI outside of a 2-sided "monogamous" partnership
-  ##               with a partner tested negative in past 6 months
+  ## Condition 2: Definitions "nrt", "nonmain", or "nonmain.nrt" as set by param prep.uai.ind
   
-  # Any UAI
-  uai.any <- unique(c(el2$p1[el2$uai > 0],
-                      el2$p2[el2$uai > 0]))
-  
-  # Monogamous partnerships (2-sided)
-  tot.deg <- main.deg + casl.deg + inst.deg
-  tot.deg.p1 <- tot.deg[el2$p1]
-  tot.deg.p2 <- tot.deg[el2$p2]
-  monog.2sided <- unique(c(el2$p1[tot.deg.p1 == 1 & tot.deg.p2 == 1],
-                           el2$p2[tot.deg.p1 == 1 & tot.deg.p2 == 1]))
-  
-  # "Negative" partnerships
-  tneg <- unique(c(el2$p1[el2$st1 == 0], el2$p2[el2$st1 == 0]))
-  fneg <- unique(c(el2$p1[which(dx[el2$p1] == 0)], el2$p2[which(dx[el2$p1] == 0)]))
-  all.neg <- c(tneg, fneg)
-  
+  if (prep.uai.ind == "nrt"){
+    #-- UAI outside of a 2-sided "monogamous" partnership with a partner tested negative in past n time steps (and never tested pos)
+    
+    # Any UAI
+    uai.any <- unique(c(el2$p1[el2$uai > 0],
+                        el2$p2[el2$uai > 0]))
+    
+    # Monogamous partnerships (2-sided)
+    tot.deg <- main.deg + casl.deg + inst.deg
+    tot.deg.p1 <- tot.deg[el2$p1]
+    tot.deg.p2 <- tot.deg[el2$p2]
+    monog.2sided <- unique(c(el2$p1[tot.deg.p1 == 1 & tot.deg.p2 == 1],
+                             el2$p2[tot.deg.p1 == 1 & tot.deg.p2 == 1]))
+    
+    # "Negative" partnerships
+    tneg <- unique(c(el2$p1[el2$st1 == 0], el2$p2[el2$st1 == 0]))
+    fneg <- unique(c(el2$p1[which(dx[el2$p1] == 0)], el2$p2[which(dx[el2$p1] == 0)]))
+    all.neg <- c(tneg, fneg)
+    
+    # Combine
+    uai.mono <- intersect(monog.2sided, uai.any)
+    uai.mono.neg <- intersect(uai.mono, all.neg)
+    part.id1 <- c(el2[el2$p1 %in% uai.mono.neg, 2], el2[el2$p2 %in% uai.mono.neg, 1])
+    part.recently.tested <- since.test[part.id1] <= prep.ind.plt.int
+    mono.neg.recently.tested <- uai.mono.neg[which(part.recently.tested == TRUE)]
+    
+    uai.risk <- setdiff(uai.any, mono.neg.recently.tested)
+    dat$attr$prep.ind.uai.risk[uai.risk] <- at
+    
+  }
 
-  uai.mono <- intersect(monog.2sided, uai.any)
-  uai.mono.neg <- intersect(uai.mono, all.neg)
-  part.id1 <- c(el2[el2$p1 %in% uai.mono.neg, 2], el2[el2$p2 %in% uai.mono.neg, 1])
-  part.recently.tested <- since.test[part.id1] <= prep.ind.plt.int
-  mono.neg.recently.tested <- uai.mono.neg[which(part.recently.tested == TRUE)]
+  if (prep.uai.ind == "nonmain"){
+    #-- UAI outside of a 2-sided "monogamous" partnership with a main partner who ever tested HIV-neg and never tested HIV-pos
+    
+    # Any UAI
+    uai.any <- unique(c(el2$p1[el2$uai > 0],
+                        el2$p2[el2$uai > 0]))
+    
+    # Monogamous main partnerships (2-sided)
+    tot.deg <- main.deg + casl.deg + inst.deg
+    tot.deg.p1 <- tot.deg[el2$p1]
+    tot.deg.p2 <- tot.deg[el2$p2]
+    el2m <- el2[el2[, "ptype"] == 1, ]
+
+    monog.main.2sided <- unique(c(el2m$p1[tot.deg.p1 == 1 & tot.deg.p2 == 1],
+                             el2m$p2[tot.deg.p1 == 1 & tot.deg.p2 == 1]))
+    
+    # "Negative" main partnerships
+    tnegm <- unique(c(el2m$p1[el2m$st1 == 0], el2m$p2[el2m$st1 == 0]))
+    fnegm <- unique(c(el2m$p1[which(dx[el2m$p1] == 0)], el2m$p2[which(dx[el2m$p1] == 0)]))
+    all.neg.m <- c(tnegm, fnegm)
+    
+    # Combine
+    uai.mono.main <- intersect(monog.main.2sided, uai.any)
+    uai.mono.main.neg <- intersect(uai.mono.main, all.neg.m)
+    part.id1 <- c(el2m[el2m$p1 %in% uai.mono.main.neg, 2], el2m[el2m$p2 %in% uai.mono.main.neg, 1])
+    part.ever.tested <- !is.na(since.test[part.id1])
+    mono.neg.tested.main <- uai.mono.main.neg[which(part.ever.tested == TRUE)]
+    
+    uai.risk <- setdiff(uai.any, mono.neg.tested.main)
+    dat$attr$prep.ind.uai.risk[uai.risk] <- at
+  }
   
-  uai.risk <- setdiff(uai.any, mono.neg.recently.tested)
-  dat$attr$prep.ind.uai.risk[uai.risk] <- at
+  if (prep.uai.ind == "nonmain.nrt"){
+    #-- UAI outside of a 2-sided "monogamous" partnership with a main partner who ever tested HIV-neg and never tested HIV-pos
+    #-- or a with persistent partner who tested HIV-negative in the past n time steps and never tested positive 
+    
+    # Any UAI
+    uai.any <- unique(c(el2$p1[el2$uai > 0],
+                        el2$p2[el2$uai > 0]))
+    
+    # Monogamous partnerships (2-sided)
+    tot.deg <- main.deg + casl.deg + inst.deg
+    tot.deg.p1 <- tot.deg[el2$p1]
+    tot.deg.p2 <- tot.deg[el2$p2]
+    
+    el2m <- el2[el2[, "ptype"] == 1, ]
+    monog.main.2sided <- unique(c(el2m$p1[tot.deg.p1 == 1 & tot.deg.p2 == 1],
+                                  el2m$p2[tot.deg.p1 == 1 & tot.deg.p2 == 1]))
+    
+    el2p <- el2[el2[, "ptype"] == 2, ]
+    monog.pers.2sided <- unique(c(el2p$p1[tot.deg.p1 == 1 & tot.deg.p2 == 1],
+                                  el2p$p2[tot.deg.p1 == 1 & tot.deg.p2 == 1]))
+    
+    # "Negative" partnerships
+    tneg <- unique(c(el2$p1[el2$st1 == 0], el2$p2[el2$st1 == 0]))
+    fneg <- unique(c(el2$p1[which(dx[el2$p1] == 0)], el2$p2[which(dx[el2$p1] == 0)]))
+    all.neg <- c(tneg, fneg)
+    
+    # Combine
+    uai.mono.main <- intersect(monog.main.2sided, uai.any)
+    uai.mono.main.neg <- intersect(uai.mono.main, all.neg)
+    uai.mono.pers <- intersect(monog.pers.2sided, uai.any)
+    uai.mono.pers.neg <- intersect(uai.mono.pers, all.neg)
+    
+    # Main partners ever tested or pers partners tested within prep.ind.plt.int
+    part.id.m <- c(el2m[el2m$p1 %in% uai.mono.main.neg, 2],
+                   el2m[el2m$p2 %in% uai.mono.main.neg, 1])
+    part.m.ever.tested <- !is.na(since.test[part.id.m])
+    monog.neg.tested.main <- uai.mono.main.neg[which(part.m.ever.tested == TRUE)]
+    
+    part.id.p <- c(el2p[el2p$p1 %in% uai.mono.pers.neg, 2],
+                   el2p[el2p$p2 %in% uai.mono.pers.neg, 1])
+    part.p.recently.tested <- (since.test[part.id.p] <= prep.ind.plt.int)
+    monog.neg.tested.pers <- uai.mono.pers.neg[which(part.p.recently.tested == TRUE)]
+    
+    monog.neg.tested <- union(monog.neg.tested.main, monog.neg.tested.pers)
+    
+    uai.risk <- setdiff(uai.any, monog.neg.tested)
+    dat$attr$prep.ind.uai.risk[uai.risk] <- at
+  }
   
   return(dat)
 }
