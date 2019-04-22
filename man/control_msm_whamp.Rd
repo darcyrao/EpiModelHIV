@@ -61,6 +61,8 @@ step.}
 
 \item{disclose.FUN}{Module function for HIV status disclosure.}
 
+\item{nwfeatures.FUN}{Module function to track features of the sexual netowrk.}
+
 \item{acts.FUN}{Module function to simulate the number of sexual acts within
 partnerships.}
 
