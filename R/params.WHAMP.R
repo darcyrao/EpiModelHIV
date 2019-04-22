@@ -195,9 +195,12 @@
 #'        they're having AI.
 #'
 #' @param prep.start Time step at which the PrEP intervention should start.
-#' @param prep.adh PrEP adherence scenario, with options \code{"low"} and \code{"high"}
+#' @param prep.adh PrEP adherence scenario, with options \code{"low"}, \code{"mid"},
+#'        and \code{"high"}
 #' @param prep.class.prob.low The proportion of men in low, medium, and high adherence
 #'        groups if \code{prep.adh} == "low".
+#' @param prep.class.prob.mid The proportion of men in low, medium, and high adherence
+#'        groups if \code{prep.adh} == "mid".
 #' @param prep.class.prob.high The proportion of men in low, medium, and high adherence
 #'        groups if \code{prep.adh} == "high.
 #' @param prep.class.hr The hazard ratio for infection per act associated with each
@@ -227,6 +230,21 @@
 #'        overrides the mean testing interval parameters.
 #' @param prep.risk.int Time window for assessment of risk eligibility for PrEP
 #'        in days.
+#' @param prep.uai.ind Definition of UAI-based indication for PrEP, with options 
+#'        \code{"nrt"} for UAI outside of a monogamous partnership with a partner who 
+#'        tested for HIV within the interval defined by \code{prep.ind.plt.int} (i.e.
+#'        UAI with a nonmonogamous main or persistent partner, with an inst partner,
+#'        or with any partner not tested negative within the specified interval), 
+#'        \code{"nonmain"} for UAI outside of a monogamous main partnership with a partner
+#'        who had ever tested for HIV (i.e. UAI with any pers or inst partner, with 
+#'        a nonmonogamous main partner, with a main partner ever tested negative for HIV,
+#'        or a diagnosed HIV-positive main partner), or \code{"nonmain.nrt"} for UAI 
+#'        outside of a monogamous partnership with a main partner who ever tested 
+#'        negative or a persistent partner who tested negative within the interval 
+#'        defined by \code{prep.ind.plt.int} (i.e. UAI with a non-monogamous main partner, 
+#'        a main partner never tested or who has been diagnosed HIV-positive,
+#'        UAI with a nonmonogamous persistent partner or a persistent partner not tested
+#'        negative within the speicified interval, or with an inst partner.
 #' @param prep.ind.plt.int Interval for defining whether a partner was recently tested
 #'        in days. If the partner has not tested negative within the specified interval, 
 #'        UAI in the partnership is an indication for PrEP use.
@@ -423,7 +441,8 @@ param_msm_whamp <- function(nwstats,
 
                       prep.start = Inf, # Set to Inf for no PrEP
                       prep.adh = "low",
-                      prep.class.prob.low = c(0.05, 0.30, 0.65),
+                      prep.class.prob.low = c(0.20, 0.10, 0.65),
+                      prep.class.prob.mid = c(0.05, 0.30, 0.65),
                       prep.class.prob.high = c(0.03, 0.07, 0.90),
                       prep.class.hr = c(0.69, 0.19, 0.04),
                       prep.uptake.scen = "stable",
@@ -434,6 +453,7 @@ param_msm_whamp <- function(nwstats,
                       prep.init.rate = 1,
                       prep.tst.int = 90,
                       prep.risk.int = 365,
+                      prep.uai.ind = "nonmain.nrt",
                       prep.ind.plt.int = 365,
                       prep.risk.reassess.method = "inst", #year
                       prep.discont = 0.3,
@@ -612,6 +632,7 @@ init_msm_whamp <- function(nwstats,
 #' @param resim_nets.FUN Module function for network resimulation at each time
 #'        step.
 #' @param disclose.FUN Module function for HIV status disclosure.
+#' @param nwfeatures.FUN Module function to track features of the sexual netowrk.
 #' @param acts.FUN Module function to simulate the number of sexual acts within
 #'        partnerships.
 #' @param condoms.FUN Module function to simulate condom use within acts.

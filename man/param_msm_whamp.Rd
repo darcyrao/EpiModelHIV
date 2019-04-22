@@ -60,14 +60,16 @@ param_msm_whamp(nwstats, change.size = FALSE, new.size = 90000,
   cond.discl.main.beta = -0.85, cond.diag.pers.beta = -0.67,
   cond.discl.pers.beta = -0.85, cond.diag.inst.beta = -0.67,
   cond.discl.inst.beta = -0.85, vv.iev.prob = 0.42, prep.start = Inf,
-  prep.adh = "low", prep.class.prob.low = c(0.05, 0.3, 0.65),
+  prep.adh = "low", prep.class.prob.low = c(0.2, 0.1, 0.65),
+  prep.class.prob.mid = c(0.05, 0.3, 0.65),
   prep.class.prob.high = c(0.03, 0.07, 0.9), prep.class.hr = c(0.69,
   0.19, 0.04), prep.uptake.scen = "stable",
   prep.coverage.init = 0.3331, prep.coverage.init.low = 0.25,
   prep.cov.max = 0.6618, prep.cov.method = "curr",
   prep.init.rate = 1, prep.tst.int = 90, prep.risk.int = 365,
-  prep.ind.plt.int = 365, prep.risk.reassess.method = "inst",
-  prep.discont = 0.3, prep.discont.prob = 0.017724, rcomp.prob = 0,
+  prep.uai.ind = "nonmain.nrt", prep.ind.plt.int = 365,
+  prep.risk.reassess.method = "inst", prep.discont = 0.3,
+  prep.discont.prob = 0.017724, rcomp.prob = 0,
   rcomp.adh.groups = "all", rcomp.main.only = FALSE,
   rcomp.discl.only = FALSE, rcomp.discont = FALSE,
   rgc.tprob = 0.357698, ugc.tprob = 0.248095, rct.tprob = 0.321597,
@@ -371,10 +373,14 @@ they're having AI.}
 
 \item{prep.start}{Time step at which the PrEP intervention should start.}
 
-\item{prep.adh}{PrEP adherence scenario, with options \code{"low"} and \code{"high"}}
+\item{prep.adh}{PrEP adherence scenario, with options \code{"low"}, \code{"mid"},
+and \code{"high"}}
 
 \item{prep.class.prob.low}{The proportion of men in low, medium, and high adherence
 groups if \code{prep.adh} == "low".}
+
+\item{prep.class.prob.mid}{The proportion of men in low, medium, and high adherence
+groups if \code{prep.adh} == "mid".}
 
 \item{prep.class.prob.high}{The proportion of men in low, medium, and high adherence
 groups if \code{prep.adh} == "high.}
@@ -414,6 +420,22 @@ overrides the mean testing interval parameters.}
 
 \item{prep.risk.int}{Time window for assessment of risk eligibility for PrEP
 in days.}
+
+\item{prep.uai.ind}{Definition of UAI-based indication for PrEP, with options 
+\code{"nrt"} for UAI outside of a monogamous partnership with a partner who 
+tested for HIV within the interval defined by \code{prep.ind.plt.int} (i.e.
+UAI with a nonmonogamous main or persistent partner, with an inst partner,
+or with any partner not tested negative within the specified interval), 
+\code{"nonmain"} for UAI outside of a monogamous main partnership with a partner
+who had ever tested for HIV (i.e. UAI with any pers or inst partner, with 
+a nonmonogamous main partner, with a main partner ever tested negative for HIV,
+or a diagnosed HIV-positive main partner), or \code{"nonmain.nrt"} for UAI 
+outside of a monogamous partnership with a main partner who ever tested 
+negative or a persistent partner who tested negative within the interval 
+defined by \code{prep.ind.plt.int} (i.e. UAI with a non-monogamous main partner, 
+a main partner never tested or who has been diagnosed HIV-positive,
+UAI with a nonmonogamous persistent partner or a persistent partner not tested
+negative within the speicified interval, or with an inst partner.}
 
 \item{prep.ind.plt.int}{Interval for defining whether a partner was recently tested
 in days. If the partner has not tested negative within the specified interval, 
