@@ -440,7 +440,7 @@ param_msm_whamp <- function(nwstats,
                       vv.iev.prob = 0.42,
 
                       prep.start = Inf, # Set to Inf for no PrEP
-                      prep.adh = "low",
+                      prep.adh = "mid",
                       prep.class.prob.low = c(0.20, 0.10, 0.65),
                       prep.class.prob.mid = c(0.05, 0.30, 0.65),
                       prep.class.prob.high = c(0.03, 0.07, 0.90),
@@ -453,7 +453,7 @@ param_msm_whamp <- function(nwstats,
                       prep.init.rate = 1,
                       prep.tst.int = 90,
                       prep.risk.int = 365,
-                      prep.uai.ind = "nonmain.nrt",
+                      prep.uai.ind = "nonmain",
                       prep.ind.plt.int = 365,
                       prep.risk.reassess.method = "inst", #year
                       prep.discont = 0.3,
