@@ -166,21 +166,24 @@ condoms_msm_whamp <- function(dat, at) {
       uai.prob[idsRC.disc] <- 1 - (1 - uai.prob[idsRC.disc]) * (1 - rcomp.prob)
       
     }
-
+  
+    anyprep <- (prepStat[elt[,1]] == 1 | prepStat[elt[,2]] == 1)
+    
     ai.vec <- elt[, "ai"]
     p1 <- rep(elt[, "p1"], ai.vec)
     p2 <- rep(elt[, "p2"], ai.vec)
     ptype <- rep(elt[, "ptype"], ai.vec)
+    prep <- rep(anyprep, ai.vec)
 
     uai.prob.peract <- rep(uai.prob, ai.vec)
     uai <- rbinom(length(p1), 1, uai.prob.peract)
 
     if (type == "main") {
       pid <- rep(1:length(ai.vec), ai.vec)
-      al <- cbind(p1, p2, ptype, uai, pid)
+      al <- cbind(p1, p2, ptype, uai, prep, pid)
     } else {
       pid <- rep(max(al[, "pid"]) + (1:length(ai.vec)), ai.vec)
-      tmp.al <- cbind(p1, p2, ptype, uai, pid)
+      tmp.al <- cbind(p1, p2, ptype, uai, prep, pid)
       al <- rbind(al, tmp.al)
     }
 
@@ -191,9 +194,28 @@ condoms_msm_whamp <- function(dat, at) {
   if (at == 2) {
     dat$epi$ai.events <- rep(NA, 2)
     dat$epi$uai.events <- rep(NA, 2)
+    dat$epi$ai.events.main <- rep(NA, 2)
+    dat$epi$uai.events.main <- rep(NA, 2)
+    dat$epi$ai.events.pers <- rep(NA, 2)
+    dat$epi$uai.events.pers <- rep(NA, 2)
+    dat$epi$ai.events.inst <- rep(NA, 2)
+    dat$epi$uai.events.inst <- rep(NA, 2)
+    dat$epi$uai.events.prep <- rep(NA, 2)
+    dat$epi$uai.events.noprep <- rep(NA, 2)
   }
+  
   dat$epi$ai.events[at] <- nrow(al)
   dat$epi$uai.events[at] <- sum(al[, "uai"])
-
+  dat$epi$ai.events.main[at] <- nrow(al[al[,"ptype"] == 1,])
+  dat$epi$uai.events.main[at] <- sum(al[, "uai"][al[,"ptype"] == 1])
+  dat$epi$ai.events.pers[at] <- nrow(al[al[,"ptype"] == 2,])
+  dat$epi$uai.events.pers[at] <- sum(al[, "uai"][al[,"ptype"] == 2])
+  dat$epi$ai.events.inst[at] <- nrow(al[al[,"ptype"] == 3,])
+  dat$epi$uai.events.inst[at] <- sum(al[, "uai"][al[,"ptype"] == 3])
+  dat$epi$ai.events.prep[at] <- nrow(al[al[,"prep"] == TRUE,])
+  dat$epi$uai.events.prep[at] <- sum(al[, "uai"][al[,"prep"] == TRUE])
+  dat$epi$ai.events.noprep[at] <- nrow(al[al[,"prep"] == FALSE,])
+  dat$epi$uai.events.noprep[at] <- sum(al[, "uai"][al[,"prep"] == FALSE])
+  
   return(dat)
 }
