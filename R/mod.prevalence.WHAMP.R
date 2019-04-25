@@ -33,6 +33,9 @@ prevalence_msm_whamp <- function(dat, at) {
   tt.traj <- dat$attr$tt.traj
   status <- dat$attr$status
   diag.status <- dat$attr$diag.status
+  diag.time <- dat$attr$diag.time
+  inf.time <- dat$attr$inf.time
+  ttdx <- diag.time - inf.time # time from infection to diagnosis
   tx.status <- dat$attr$tx.status
   vl <- dat$attr$vl
   prepStat <- dat$attr$prepStat
@@ -86,6 +89,8 @@ prevalence_msm_whamp <- function(dat, at) {
     dat$epi$incid.prep0 <- rNA
     dat$epi$incid.prep1 <- rNA
     dat$epi$ir100 <- rNA
+    dat$epi$newdx <- rNA
+    dat$epi$newdx.rec <- rNA
     dat$epi$prev.all <- rNA
     dat$epi$prev.dx <- rNA
     dat$epi$prev.dx.H <- rNA
@@ -100,8 +105,8 @@ prevalence_msm_whamp <- function(dat, at) {
     dat$epi$prep.cov.all <- rNA
     dat$epi$prepElig <- rNA
     dat$epi$prepStart <- rNA
-    # dat$epi$time.to.disc <- rNA
-    # dat$epi$time.since.prep.start <- rNA
+    dat$epi$time.to.disc <- rNA
+    dat$epi$time.since.prep.start <- rNA
     dat$epi$i.num.prep0 <- rNA
     dat$epi$i.num.prep1 <- rNA
     dat$epi$i.prev.prep0 <- rNA
@@ -232,6 +237,8 @@ prevalence_msm_whamp <- function(dat, at) {
   dat$epi$i.num.KC[at] <- sum(status == 1 & region == "KC", na.rm = TRUE)
   dat$epi$i.num.OW[at] <- sum(status == 1 & region == "OW", na.rm = TRUE)
   dat$epi$i.num.EW[at] <- sum(status == 1 & region == "EW", na.rm = TRUE)
+  dat$epi$newdx[at] <- sum(diag.time == at, na.rm = TRUE)
+  dat$epi$newdx.rec[at] <- sum(diag.time == at & ttdx < 52, na.rm = TRUE) # new diagnoses diagnosed within 12 months of infection
 
   dat$epi$prev.all[at] <- dat$epi$i.num[at] / dat$epi$num[at]
   dat$epi$prev.dx[at] <- sum(diag.status == 1, na.rm = TRUE) / dat$epi$num[at]
