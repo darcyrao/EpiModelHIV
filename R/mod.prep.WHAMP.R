@@ -123,7 +123,7 @@ prep_msm_whamp <- function(dat, at) {
   
   # Time to discontinuation among those who stopped
     # time.to.disc <- rep(NA, length(idsStp))
-    # time.to.disc <- at - prepStartTime[idsStp]
+    time.to.disc <- at - prepStartTime[idsStp]
  
   
   # Reset PrEP status
@@ -218,7 +218,7 @@ prep_msm_whamp <- function(dat, at) {
   
   ## Calculate time on PrEP among current users -----------------------
   # time.since.prep.start <- rep(NA, sum(prepStat == 1, na.rm = TRUE))
-  # time.since.prep.start <- (at - prepStartTime[prepStat == 1]) 
+  time.since.prep.start <- (at - prepStartTime[prepStat == 1]) 
 
   
   ## Output --------------------------------------------------------------------
@@ -241,8 +241,8 @@ prep_msm_whamp <- function(dat, at) {
   dat$epi$prep.cov.all[at] <- prep.cov.all
   
   dat$epi$prepStart[at] <- length(idsStart)
-  # dat$epi$time.to.disc <- mean(time.to.disc)
-  # dat$epi$time.since.prep.start <- mean(time.since.prep.start)
+  dat$epi$time.to.disc[at] <- mean(time.to.disc, na.rm = TRUE)
+  dat$epi$time.since.prep.start[at] <- mean(time.since.prep.start, na.rm = TRUE)
 
   return(dat)
 }
